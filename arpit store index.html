@@ -1,39 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Arpit Store',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
-      ),
-      home: const ArpitStoreScreen(),
-    );
-  }
-}
-
-class ArpitStoreScreen extends StatefulWidget {
-  const ArpitStoreScreen({super.key});
-
-  @override
-  State<ArpitStoreScreen> createState() => _ArpitStoreScreenState();
-}
-
-class _ArpitStoreScreenState extends State<ArpitStoreScreen> {
-  InAppWebViewController? webViewController;
-
-  final String htmlContent = r'''
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -682,27 +646,3 @@ class _ArpitStoreScreenState extends State<ArpitStoreScreen> {
     </script>
 </body>
 </html>
-  ''';
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: InAppWebView(
-          initialData: InAppWebViewInitialData(data: htmlContent),
-          initialSettings: InAppWebViewSettings(
-            javaScriptEnabled: true,
-            domStorageEnabled: true,
-            useWideViewPort: true,
-            databaseEnabled: true,
-            allowFileAccessFromFileURLs: true,
-            allowUniversalAccessFromFileURLs: true,
-          ),
-          onWebViewCreated: (controller) {
-            webViewController = controller;
-          },
-        ),
-      ),
-    );
-  }
-}
