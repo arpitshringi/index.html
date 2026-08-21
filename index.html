@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arpit Store - Live Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-     
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); color: #f8fafc; min-height: 100vh; padding-bottom: 60px; }
@@ -35,63 +35,12 @@
         .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; }
         
         /* Saree Special Offer Banner */
-        .saree-offer-banner {
-            display: none;
-            background: linear-gradient(135deg, #4c1d95 0%, #831843 50%, #9f1239 100%);
-            border: 2px dashed #f43f5e;
-            border-radius: 20px;
-            padding: 22px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25);
-            position: relative;
-            overflow: hidden;
-        }
-        .saree-offer-banner::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 150px;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-        }
-        .offer-badge {
-            background: #f43f5e;
-            color: white;
-            font-size: 12px;
-            font-weight: 800;
-            padding: 4px 12px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .offer-title {
-            font-size: 20px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 8px;
-            line-height: 1.3;
-        }
-        .offer-desc {
-            font-size: 14px;
-            color: #cbd5e1;
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-        .offer-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid rgba(255,255,255,0.15);
-            padding-top: 10px;
-            font-size: 13px;
-            color: #fb7185;
-            font-weight: 700;
-        }
+        .saree-offer-banner { display: none; background: linear-gradient(135deg, #4c1d95 0%, #831843 50%, #9f1239 100%); border: 2px dashed #f43f5e; border-radius: 20px; padding: 22px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25); position: relative; overflow: hidden; }
+        .saree-offer-banner::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; }
+        .offer-badge { background: #f43f5e; color: white; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
+        .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
+        .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
         .card { position: relative; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 14px; cursor: pointer; transition: transform 0.2s; }
@@ -131,8 +80,6 @@
         .remove-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;}
 
         #onlinePaymentSection { display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid #38bdf8; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
-        #onlinePaymentSection img { background: white; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
-        .upi-link-btn { display: inline-block; background: #38bdf8; color: #000; padding: 10px 20px; border-radius: 8px; font-weight: bold; text-decoration: none; margin-bottom: 15px; }
         
         .cart-item { background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         .cart-item-info h4 { font-size: 14px; color: white; margin-bottom: 5px; }
@@ -170,7 +117,6 @@
                 <button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">💄 Beauty</button>
             </div>
 
-            <!-- Saree Special Offer Thumbnail Banner -->
             <div id="sareeOfferBanner" class="saree-offer-banner">
                 <span class="offer-badge">🔥 Mega Saree Special Offer</span>
                 <div class="offer-title">🥻 5 Saree Combo Trial Offer (COD Available)</div>
@@ -214,11 +160,20 @@
                 </select>
 
                 <div id="onlinePaymentSection">
-                    <h4 style="color: white; margin-bottom: 10px;">Scan to Pay ₹<span id="qrTotal">0</span></h4>
-                    <img id="qrCodeImg" src="" alt="UPI QR Code" width="180" height="180"><br>
-                    <a id="directPayLink" href="#" class="upi-link-btn">Pay Directly via UPI App</a>
-                    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment karne ke baad apna Transaction Number niche zaroor daalein.</p>
-                    <input type="text" id="utrNumber" class="input-box" placeholder="Daalein Transaction / UTR Number *" style="border-color: #ef4444;">
+                    <h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
+                    
+                    <!-- Direct UPI Payment Button -->
+                    <a id="directPayLink" href="#" style="display: block; width: 100%; background: #22c55e; color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 14px; border-radius: 8px; margin-bottom: 15px; text-decoration: none;">
+                        📱 Pay via PhonePe / GPay / Paytm
+                    </a>
+                    
+                    <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 10px;">Ya fir niche diya QR Code scan karein:</p>
+                    
+                    <!-- QR Code -->
+                    <img id="qrCodeImg" src="" alt="UPI QR Code" width="180" height="180" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
+                    
+                    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment hone ke baad apna UTR / Transaction Number niche zaroor daalein 👇</p>
+                    <input type="text" id="utrNumber" class="input-box" placeholder="Daalein 12-Digit UTR Number *" style="border-color: #ef4444;">
                 </div>
 
                 <button class="pay-btn" id="submitBtn" onclick="window.submitOrder()">Confirm & Place Order</button>
@@ -360,7 +315,6 @@
             
             document.getElementById('pageTitle').innerText = cat === 'All' ? 'All Products' : cat + ' Collection';
             
-            // Show or Hide Saree Offer Banner based on category
             const banner = document.getElementById('sareeOfferBanner');
             if (cat === 'Saree') {
                 banner.style.display = 'block';
@@ -461,7 +415,7 @@
                     <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.addToCart('${p.id}'); window.toggleCart();">Buy Now</button>
                 </div>
                 <button class="add-btn" style="background: #25D366; color: white; border: none; font-size: 16px; padding: 12px; margin-top: 5px;" onclick="window.shareProduct('${p.id}')">
-                    📲 WhatsApp Par Share Karein
+                    📲 Share on WhatsApp
                 </button>
             `;
             window.scrollTo(0, 0);
@@ -495,8 +449,10 @@
             cartList.innerHTML = '';
             
             if(cart.length === 0) {
-                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center;">Aapka Cart khaali hai!</p>';
-                document.getElementById('totalPrice').innerText = "0";
+                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center;">Your cart is empty!</p>';
+                if (document.getElementById('totalPrice')) {
+                    document.getElementById('totalPrice').innerText = "0";
+                }
                 document.getElementById('qrTotal').innerText = "0";
                 return;
             }
@@ -513,7 +469,8 @@
                     </div>
                 `;
             });
-            document.getElementById('totalPrice').innerText = cartTotalAmount;
+            
+            if(document.getElementById('totalPrice')) document.getElementById('totalPrice').innerText = cartTotalAmount;
             document.getElementById('qrTotal').innerText = cartTotalAmount;
             
             let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
@@ -551,7 +508,7 @@
             }
 
             let submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "Order Bhej Rahe Hain...";
+            submitBtn.innerText = "Processing Order...";
             submitBtn.disabled = true;
 
             let orderText = `🛒 *🔥 NEW PREMIUM ORDER 🔥*\n\n`;
@@ -610,33 +567,32 @@
             });
         };
 
-                window.shareProduct = (id) => {
+        window.shareProduct = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) return;
 
-            let baseUrl = window.location.origin + window.location.pathname;
-            let productLink = `${baseUrl}?id=${p.id}`;
-            let shareText = `🔥 Dekho ye mast product: ${p.name}\n\n👉 Direct Khareedne Ke Liye Link Par Click Karo: ${productLink}`;
+            let baseUrl = window.location.origin + window.location.pathname.replace(/\/index\.html\/?$/, '');
+            if(baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+            let productLink = `${baseUrl}/?id=${p.id}`;
+            
+            let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
 
             let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
             window.open(whatsappUrl, '_blank');
         };
 
-        
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const paramVal = urlParams.get('id');
             
             if (paramVal && !window.linkOpened && liveProducts.length > 0) {
-                // 1. Check karo kya ye product ID hai?
                 const product = liveProducts.find(p => p.id === paramVal);
                 if (product) {
                     window.linkOpened = true;
                     window.showProductDetail(paramVal);
-                    return;
+                    return; 
                 }
                 
-                // 2. Agar ID nahi, toh check karo kya ye Category hai?
                 const matchedCategory = liveProducts.some(p => {
                     let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
                     return productCat.includes(paramVal.toLowerCase());
@@ -644,13 +600,11 @@
                 
                 if (matchedCategory) {
                     window.linkOpened = true;
-                    // Category ko capital format mein change karke filter chalao
                     let formattedCat = paramVal.charAt(0).toUpperCase() + paramVal.slice(1).toLowerCase();
                     window.filterCategory(formattedCat);
                 }
             }
         };
-
 
         window.onload = listenToProducts;
     </script>
