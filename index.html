@@ -612,24 +612,19 @@
         };
 
         window.shareProduct = (id) => {
-            const p = liveProducts.find(item => item.id === id);
-            if(!p) return;
-            
-            let baseUrl = window.location.href.split('?')[0]; 
-            let isHosted = baseUrl.includes('http');
-            let productLink = isHosted ? `${baseUrl}?id=${p.id}` : `Download Arpit Store App!`;
+    const p = liveProducts.find(item => item.id === id);
+    if(!p) return;
 
-            let shareText = `🔥 Dekho ye mast product: *${p.name}*\n💰 Sirf ₹${p.price} mein!\n\n🛍️ Check out here:\n${productLink}`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: p.name,
-                    text: shareText,
-                }).catch(console.error);
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-            }
-        };
+    let baseUrl = window.location.origin + window.location.pathname;
+    let productLink = `${baseUrl}?id=${p.id}`;
+    let shareText = `🔥 Dekho ye mast product: ${p.name}\n\n👉 Direct Khareedne Ke Liye Link Par Click Karo: ${productLink}`;
+
+    // Direct WhatsApp launcher
+    let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+    window.location.href = whatsappUrl;
+};
+
+
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
