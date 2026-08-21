@@ -622,15 +622,31 @@
             window.open(whatsappUrl, '_blank');
         };
 
+        
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
-            // Yahan se setTimeout hata diya hai, ab ye sahi se chalega
-            if (productId && !window.linkOpened && liveProducts.length > 0) {
-                const product = liveProducts.find(p => p.id === productId);
+            const paramVal = urlParams.get('id');
+            
+            if (paramVal && !window.linkOpened && liveProducts.length > 0) {
+                // 1. Check karo kya ye product ID hai?
+                const product = liveProducts.find(p => p.id === paramVal);
                 if (product) {
                     window.linkOpened = true;
-                    window.showProductDetail(productId);
+                    window.showProductDetail(paramVal);
+                    return;
+                }
+                
+                // 2. Agar ID nahi, toh check karo kya ye Category hai?
+                const matchedCategory = liveProducts.some(p => {
+                    let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
+                    return productCat.includes(paramVal.toLowerCase());
+                });
+                
+                if (matchedCategory) {
+                    window.linkOpened = true;
+                    // Category ko capital format mein change karke filter chalao
+                    let formattedCat = paramVal.charAt(0).toUpperCase() + paramVal.slice(1).toLowerCase();
+                    window.filterCategory(formattedCat);
                 }
             }
         };
