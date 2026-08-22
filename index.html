@@ -650,13 +650,16 @@
     if(!pathName.endsWith('/')) {
         pathName += '/';
     }
-    let productLink = `${cleanOrigin}${pathName}?id=${p.id}`;
+    
+    // Space waali ID ko bhi URL-safe banane ke liye encodeURIComponent lagaya hai
+    let productLink = `${cleanOrigin}${pathName}?id=${encodeURIComponent(p.id)}`;
     
     let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
 
     let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
     window.open(whatsappUrl, '_blank');
 };
+
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
