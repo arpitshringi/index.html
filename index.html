@@ -27,6 +27,18 @@
 
         .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
         
+        /* Smart Search Bar Styling */
+        .search-container { position: relative; margin-bottom: 18px; }
+        .search-input { width: 100%; padding: 12px 16px 12px 45px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; color: white; font-size: 15px; backdrop-filter: blur(8px); transition: 0.2s; }
+        .search-input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56,189,248,0.2); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
+        .clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; }
+
+        /* Active Filters Badges */
+        .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .filter-badge { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .filter-badge span { cursor: pointer; font-weight: bold; }
+
         .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;}
         .category-tabs::-webkit-scrollbar { display: none; }
         .tab-btn { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
@@ -109,6 +121,17 @@
 
     <div class="container">
         <div id="homeView">
+            
+            <!-- Smart Search Bar -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords..." oninput="window.handleSearch(this.value)">
+                <button id="clearSearchBtn" class="clear-search" onclick="window.clearSearchBox()">✕</button>
+            </div>
+
+            <!-- Active Filters Badges -->
+            <div id="activeFilters" class="active-filters"></div>
+
             <div class="category-tabs">
                 <button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">All</button>
                 <button class="tab-btn" id="tab-Watchlist" onclick="window.showWatchlist()">❤️ Watchlist</button>
@@ -211,6 +234,7 @@
         let cart = [];
         let watchlist = JSON.parse(localStorage.getItem('arpit_watchlist')) || [];
         let currentCategory = 'All';
+        let searchQuery = '';
         let cartTotalAmount = 0;
 
         function formatMediaUrl(url) {
@@ -231,16 +255,14 @@
                     liveProducts = [];
                     snapshot.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
                     document.getElementById('loadingText').style.display = 'none';
-                    if(currentCategory === 'Watchlist') window.showWatchlist();
-                    else window.filterCategory(currentCategory);
+                    applyFiltersAndRender();
                     window.checkSharedLink(); 
                 } else {
                     onSnapshot(collection(db, "product"), (snap2) => {
                         liveProducts = [];
                         snap2.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
                         document.getElementById('loadingText').style.display = 'none';
-                        if(currentCategory === 'Watchlist') window.showWatchlist();
-                        else window.filterCategory(currentCategory);
+                        applyFiltersAndRender();
                         window.checkSharedLink();
                     });
                 }
@@ -257,6 +279,7 @@
         window.goHome = () => {
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
+            window.clearSearchBox();
             window.filterCategory('All');
         };
 
@@ -270,12 +293,7 @@
             }
             
             localStorage.setItem('arpit_watchlist', JSON.stringify(watchlist));
-            
-            if (currentCategory === 'Watchlist') {
-                window.showWatchlist();
-            } else {
-                window.filterCategory(currentCategory);
-            }
+            applyFiltersAndRender();
 
             const detailLikeBtn = document.getElementById('detailLikeBtn');
             if (detailLikeBtn) {
@@ -294,8 +312,7 @@
             document.getElementById('pageTitle').innerText = '❤️ My Watchlist';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             
-            let filtered = liveProducts.filter(p => watchlist.includes(p.id));
-            renderProductsUI(filtered);
+            applyFiltersAndRender();
         };
 
         window.filterCategory = (cat) => {
@@ -319,14 +336,69 @@
                 banner.style.display = 'none';
             }
             
-            let filtered = (cat === 'All') ? liveProducts : liveProducts.filter(p => {
-                let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-                let target = cat.toLowerCase();
-                return productCat.includes(target) || target.includes(productCat);
-            });
-            
-            renderProductsUI(filtered);
+            applyFiltersAndRender();
         };
+
+        window.handleSearch = (val) => {
+            searchQuery = val.trim().toLowerCase();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            clearBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
+            applyFiltersAndRender();
+        };
+
+        window.clearSearchBox = () => {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+            applyFiltersAndRender();
+        };
+
+        function applyFiltersAndRender() {
+            let filtered = [];
+
+            // 1. Category Filter
+            if (currentCategory === 'Watchlist') {
+                filtered = liveProducts.filter(p => watchlist.includes(p.id));
+            } else if (currentCategory === 'All') {
+                filtered = liveProducts;
+            } else {
+                filtered = liveProducts.filter(p => {
+                    let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
+                    let target = currentCategory.toLowerCase();
+                    return productCat.includes(target) || target.includes(productCat);
+                });
+            }
+
+            // 2. Search Keyword Filter
+            if (searchQuery !== '') {
+                filtered = filtered.filter(p => {
+                    let name = (p.name || '').toLowerCase();
+                    let desc = (p.description || '').toLowerCase();
+                    let cat = (p.category || p.type || p.cat || '').toLowerCase();
+                    return name.includes(searchQuery) || desc.includes(searchQuery) || cat.includes(searchQuery);
+                });
+            }
+
+            // Render Active Filter Badges
+            updateActiveFiltersUI();
+
+            // Render Products
+            renderProductsUI(filtered);
+        }
+
+        function updateActiveFiltersUI() {
+            const badgeContainer = document.getElementById('activeFilters');
+            badgeContainer.innerHTML = '';
+
+            let badgesHtml = '';
+            if (currentCategory !== 'All') {
+                badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
+            }
+            if (searchQuery !== '') {
+                badgesHtml += `<div class="filter-badge">Keyword: "${searchQuery}" <span onclick="window.clearSearchBox()">×</span></div>`;
+            }
+            badgeContainer.innerHTML = badgesHtml;
+        }
 
         function renderProductsUI(items) {
             const grid = document.getElementById('productGrid');
@@ -335,6 +407,8 @@
             if(items.length === 0) {
                 if(currentCategory === 'Watchlist') {
                     grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">💔</div><p style="color: #94a3b8; font-size:16px;">Aapki Watchlist khaali hai.<br>Products par ❤️ dabayein!</p></div>';
+                } else if(searchQuery !== '') {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for "<b>${searchQuery}</b>"</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding:8px 16px; background:#38bdf8; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
                 } else {
                     grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me koi product nahi hai!</p>';
                 }
@@ -568,7 +642,6 @@
             const p = liveProducts.find(item => item.id === id);
             if(!p) return;
 
-            // Clean base URL creation without index.html suffix
             let cleanOrigin = window.location.origin;
             let pathName = window.location.pathname;
             if(pathName.endsWith('index.html')) {
