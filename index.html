@@ -639,24 +639,24 @@
         };
 
         window.shareProduct = (id) => {
-            const p = liveProducts.find(item => item.id === id);
-            if(!p) return;
+    const p = liveProducts.find(item => item.id === id);
+    if(!p) return;
 
-            let cleanOrigin = window.location.origin;
-            let pathName = window.location.pathname;
-            if(pathName.endsWith('index.html')) {
-                pathName = pathName.substring(0, pathName.lastIndexOf('index.html'));
-            }
-            if(!pathName.endsWith('/')) {
-                pathName += '/';
-            }
-            let productLink = `${cleanOrigin}${pathName}?id=${p.id}`;
-            
-            let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
+    let cleanOrigin = window.location.origin;
+    let pathName = window.location.pathname;
+    if(pathName.endsWith('index.html')) {
+        pathName = pathName.substring(0, pathName.lastIndexOf('index.html'));
+    }
+    if(!pathName.endsWith('/')) {
+        pathName += '/';
+    }
+    let productLink = `${cleanOrigin}${pathName}?id=${p.id}`;
+    
+    let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
 
-            let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-            window.open(whatsappUrl, '_blank');
-        };
+    let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, '_blank');
+};
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
