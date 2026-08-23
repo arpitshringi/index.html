@@ -233,16 +233,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Updated Google Script Backend Webhook URL - YAHAN CHANGE KIYA HAI
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywlz4cQxfkL4daFizRf877fFkcwrDnsrHWW86ohZBR3rcjoFxXOxrbFcdbGXsoinKMcg/exec";
+        // Updated Google Script Backend Webhook URL (New URL set here)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI071UZD5HhV9I-rv81oLerA7bj-qOXPVU0cS6Ypt2c41eDxxJIukMB-ImoyoABEEIkA/exec";
         const UPI_ID = "7665913393@ptsbi";
 
         let liveProducts = [];
-        let cart = [];
+        
+        // Cart data loaded from localStorage so it persists across page reloads/app closes
+        let cart = JSON.parse(localStorage.getItem('arpit_cart')) || [];
+        
         let watchlist = JSON.parse(localStorage.getItem('arpit_watchlist')) || [];
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
+
+        // Set initial cart count badge on load
+        document.getElementById('cartCount').innerText = cart.length;
 
         // --- PULL TO REFRESH FEATURE ---
         let touchStart = 0;
@@ -598,12 +604,16 @@
         window.addToCart = (id) => {
             const item = liveProducts.find(p => p.id === id);
             cart.push(item);
+            // Save updated cart to localStorage
+            localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
         };
 
         window.removeFromCart = (index) => {
             cart.splice(index, 1);
+            // Save updated cart to localStorage
+            localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
         };
@@ -719,7 +729,9 @@
                 const successModal = document.getElementById('successModal');
                 successModal.style.display = 'flex';
 
+                // Clear cart and remove from localStorage after successful order
                 cart = [];
+                localStorage.removeItem('arpit_cart');
                 document.getElementById('cartCount').innerText = '0';
                 document.getElementById('custName').value = '';
                 document.getElementById('custPhone').value = '';
