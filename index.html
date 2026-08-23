@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v1.1</title>
+    <title>Arpit Store - Live Premium v1.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -233,8 +233,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        const TELEGRAM_BOT_TOKEN = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
-        const TELEGRAM_CHAT_ID = "7900935815";
+        // Google Script Backend URL
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXNTaIxEtsCVOu35CbZSCP78yqrXYjt3K3RdHE1hp0tE2EjfJCeBC0KKDo1xne0qTs3w/exec";
         const UPI_ID = "7665913393@ptsbi";
 
         let liveProducts = [];
@@ -504,7 +504,7 @@
 
                 grid.innerHTML += `
                     <div class="order-card" style="grid-column: 1/-1;">
-                        <span class="order-status-badge">${ord.status}</span>
+                        <span class="order-status-badge" id="status-badge-${ord.orderId}">${ord.status}</span>
                         <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
                         <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date: ${ord.date}</p>
                         <ul style="margin-left: 20px; margin-bottom: 10px;">${itemsListHtml}</ul>
@@ -513,6 +513,35 @@
                 `;
             });
         }
+
+        // STEP 2: ग्राहक की ऐप में हर 5 सेकंड पर लाइव स्टेटस चेक करने का कोड
+        function fetchLiveStatusForAllOrders() {
+            let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+            if (savedOrders.length === 0) return;
+
+            savedOrders.forEach((ord, index) => {
+                let rawId = ord.orderId.toString().replace('#', '');
+                fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(rawId)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.status) {
+                            // LocalStorage में अपडेट करो
+                            savedOrders[index].status = data.status;
+                            localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+
+                            // Screen पर दिख रहे Badge को तुरंत बदलो
+                            let badge = document.getElementById(`status-badge-${ord.orderId}`);
+                            if (badge) {
+                                badge.innerText = data.status;
+                            }
+                        }
+                    })
+                    .catch(err => console.log("Status check error:", err));
+            });
+        }
+
+        // हर 5 सेकंड में Google Sheet से नया स्टेटस फेच करेगा
+        setInterval(fetchLiveStatusForAllOrders, 5000);
 
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
@@ -621,6 +650,7 @@
             onlineSection.style.display = (mode === 'Online') ? 'block' : 'none';
         };
 
+        // STEP 1: नया ऑर्डर Google Sheet + Telegram पर भेजने का फंक्शन
         window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
@@ -648,65 +678,51 @@
             submitBtn.innerText = "Processing Order...";
             submitBtn.disabled = true;
 
-            let orderId = Math.floor(100000 + Math.random() * 900000);
+            let rawOrderId = Math.floor(100000 + Math.random() * 900000);
+            let orderId = rawOrderId.toString();
 
-            let orderText = `🛒 *🔥 NEW PREMIUM ORDER 🔥*\n\n`;
-            orderText += `🆔 *Order ID:* #${orderId}\n`;
-            orderText += `👤 *Name:* ${name}\n`;
-            orderText += `📱 *Phone:* ${phone}\n`;
-            orderText += `📍 *Address:* ${address}\n`;
-            orderText += `💳 *Payment Mode:* ${paymentMode}\n`;
-            if(paymentMode === 'Online') {
-                orderText += `✅ *Transaction/UTR ID:* \`${utrNumber}\`\n`;
-            }
-            
-            orderText += `\n📦 *Order Items:*\n`;
-            cart.forEach((item, index) => {
-                orderText += `${index+1}. ${item.name} - (₹${item.price})\n`;
-            });
-            orderText += `\n💰 *Total Amount:* ₹${cartTotalAmount}\n`;
+            let payload = {
+                action: "new_order",
+                orderId: orderId,
+                name: name,
+                phone: phone,
+                address: address + (paymentMode === 'Online' ? ` (UTR: ${utrNumber})` : ''),
+                total: cartTotalAmount
+            };
 
-            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: orderText,
-                    parse_mode: "Markdown"
-                })
+                body: JSON.stringify(payload)
             })
-            .then(response => response.json())
-            .then(data => {
-                if(data.ok) {
-                    // Save Order locally for tracking
-                    let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
-                    savedOrders.unshift({
-                        orderId: orderId,
-                        items: [...cart],
-                        total: cartTotalAmount,
-                        date: new Date().toLocaleDateString('hi-IN'),
-                        status: "Your order on the way 🚚"
-                    });
-                    localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+            .then(() => {
+                // Save Order locally for tracking
+                let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+                savedOrders.unshift({
+                    orderId: orderId,
+                    items: [...cart],
+                    total: cartTotalAmount,
+                    date: new Date().toLocaleDateString('hi-IN'),
+                    status: "Order Confirmed"
+                });
+                localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
 
-                    document.getElementById('cartModal').style.display = 'none';
-                    const successModal = document.getElementById('successModal');
-                    successModal.style.display = 'flex';
+                document.getElementById('cartModal').style.display = 'none';
+                const successModal = document.getElementById('successModal');
+                successModal.style.display = 'flex';
 
-                    cart = [];
-                    document.getElementById('cartCount').innerText = '0';
-                    document.getElementById('custName').value = '';
-                    document.getElementById('custPhone').value = '';
-                    document.getElementById('custAddress').value = '';
-                    document.getElementById('utrNumber').value = '';
+                cart = [];
+                document.getElementById('cartCount').innerText = '0';
+                document.getElementById('custName').value = '';
+                document.getElementById('custPhone').value = '';
+                document.getElementById('custAddress').value = '';
+                document.getElementById('utrNumber').value = '';
 
-                    setTimeout(() => {
-                        successModal.style.display = 'none';
-                        window.showMyOrders();
-                    }, 2500);
-                } else {
-                    alert("Error: Telegram par message nahi gaya.");
-                }
+                setTimeout(() => {
+                    successModal.style.display = 'none';
+                    window.showMyOrders();
+                }, 2500);
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -763,23 +779,19 @@
                 }
             }
         };
-    // --- AUTO UPDATE FOR INSTALLED APP ---
-    const APP_VERSION = "1.2";
 
-    if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
-        localStorage.setItem('installed_app_version', APP_VERSION);
-        if ('caches' in window) {
-            caches.keys().then(names => {
-                for (let name of names) caches.delete(name);
-            });
+        // --- AUTO UPDATE FOR INSTALLED APP ---
+        const APP_VERSION = "1.3";
+
+        if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
+            localStorage.setItem('installed_app_version', APP_VERSION);
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+            window.location.reload(true);
         }
-        window.location.reload(true);
-    }
-
-    window.onload = listenToProducts;
-</script>
-</body>
-</html>
 
         window.onload = listenToProducts;
     </script>
