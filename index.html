@@ -3,7 +3,10 @@
 <head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arpit Store - Live Premium</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Arpit Store - Live Premium v1.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -21,27 +24,25 @@
         .drawer.open { left: 0; }
         .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         .close-drawer { background: none; border: none; color: #94a3b8; font-size: 22px; cursor: pointer; }
-        .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; }
+        .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .drawer-item:hover { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 250; }
 
         .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
         
-        /* Smart Search Bar Styling */
         .search-container { position: relative; margin-bottom: 18px; }
         .search-input { width: 100%; padding: 12px 16px 12px 45px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; color: white; font-size: 15px; backdrop-filter: blur(8px); transition: 0.2s; }
         .search-input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 10px rgba(56,189,248,0.2); }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
         .clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; }
 
-        /* Active Filters Badges */
         .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
         .filter-badge { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
         .filter-badge span { cursor: pointer; font-weight: bold; }
 
         .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;}
         .category-tabs::-webkit-scrollbar { display: none; }
-        .tab-btn { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .tab-btn { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; border-color: transparent; }
 
         .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; }
@@ -95,6 +96,10 @@
         .cart-item { background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         .cart-item-info h4 { font-size: 14px; color: white; margin-bottom: 5px; }
         .cart-item-info p { font-size: 14px; color: #38bdf8; font-weight: bold; }
+
+        /* Order Tracking Card Styling */
+        .order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; margin-bottom: 15px; }
+        .order-status-badge { background: #0284c7; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -106,6 +111,7 @@
             <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
         </div>
         <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
+        <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
         <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
         <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
         <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
@@ -133,7 +139,8 @@
             <div id="activeFilters" class="active-filters"></div>
 
             <div class="category-tabs">
-                <button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">All</button>
+                <button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">🏠 All</button>
+                <button class="tab-btn" id="tab-Orders" onclick="window.showMyOrders()">📦 My Orders</button>
                 <button class="tab-btn" id="tab-Watchlist" onclick="window.showWatchlist()">❤️ Watchlist</button>
                 <button class="tab-btn" id="tab-Saree" onclick="window.filterCategory('Saree')">🥻 Sarees</button>
                 <button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">💄 Beauty</button>
@@ -233,9 +240,21 @@
         let liveProducts = [];
         let cart = [];
         let watchlist = JSON.parse(localStorage.getItem('arpit_watchlist')) || [];
+        let myOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
+
+        // --- PULL TO REFRESH FEATURE ---
+        let touchStart = 0;
+        let touchEnd = 0;
+        window.addEventListener('touchstart', e => { touchStart = e.touches[0].clientY; }, {passive: true});
+        window.addEventListener('touchend', e => {
+            touchEnd = e.changedTouches[0].clientY;
+            if (window.scrollY === 0 && touchEnd - touchStart > 130) {
+                location.reload();
+            }
+        }, {passive: true});
 
         function formatMediaUrl(url) {
             if(!url) return '';
@@ -315,9 +334,27 @@
             applyFiltersAndRender();
         };
 
+        window.showMyOrders = () => {
+            currentCategory = 'MyOrders';
+            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const orderTab = document.getElementById('tab-Orders');
+            if(orderTab) orderTab.classList.add('active');
+            
+            document.getElementById('pageTitle').innerText = '📦 My Orders';
+            document.getElementById('sareeOfferBanner').style.display = 'none';
+            
+            renderOrdersUI();
+        };
+
         window.filterCategory = (cat) => {
             if(cat === 'Watchlist') {
                 window.showWatchlist();
+                return;
+            }
+            if(cat === 'MyOrders') {
+                window.showMyOrders();
                 return;
             }
             currentCategory = cat;
@@ -354,9 +391,13 @@
         };
 
         function applyFiltersAndRender() {
+            if (currentCategory === 'MyOrders') {
+                renderOrdersUI();
+                return;
+            }
+
             let filtered = [];
 
-            // 1. Category Filter
             if (currentCategory === 'Watchlist') {
                 filtered = liveProducts.filter(p => watchlist.includes(p.id));
             } else if (currentCategory === 'All') {
@@ -369,7 +410,6 @@
                 });
             }
 
-            // 2. Search Keyword Filter
             if (searchQuery !== '') {
                 filtered = filtered.filter(p => {
                     let name = (p.name || '').toLowerCase();
@@ -379,10 +419,7 @@
                 });
             }
 
-            // Render Active Filter Badges
             updateActiveFiltersUI();
-
-            // Render Products
             renderProductsUI(filtered);
         }
 
@@ -391,7 +428,7 @@
             badgeContainer.innerHTML = '';
 
             let badgesHtml = '';
-            if (currentCategory !== 'All') {
+            if (currentCategory !== 'All' && currentCategory !== 'MyOrders') {
                 badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
             }
             if (searchQuery !== '') {
@@ -443,6 +480,35 @@
                             <p>₹${p.price}</p>
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); window.addToCart('${p.id}')">Add to Cart</button>
+                    </div>
+                `;
+            });
+        }
+
+        function renderOrdersUI() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+
+            if(savedOrders.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
+                return;
+            }
+
+            savedOrders.forEach(ord => {
+                let itemsListHtml = '';
+                ord.items.forEach(it => {
+                    itemsListHtml += `<li style="color:#cbd5e1; font-size:14px;">${it.name} - ₹${it.price}</li>`;
+                });
+
+                grid.innerHTML += `
+                    <div class="order-card" style="grid-column: 1/-1;">
+                        <span class="order-status-badge">${ord.status}</span>
+                        <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
+                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date: ${ord.date}</p>
+                        <ul style="margin-left: 20px; margin-bottom: 10px;">${itemsListHtml}</ul>
+                        <p style="color:#38bdf8; font-weight:bold; font-size:16px;">Total Paid: ₹${ord.total}</p>
                     </div>
                 `;
             });
@@ -582,7 +648,10 @@
             submitBtn.innerText = "Processing Order...";
             submitBtn.disabled = true;
 
+            let orderId = Math.floor(100000 + Math.random() * 900000);
+
             let orderText = `🛒 *🔥 NEW PREMIUM ORDER 🔥*\n\n`;
+            orderText += `🆔 *Order ID:* #${orderId}\n`;
             orderText += `👤 *Name:* ${name}\n`;
             orderText += `📱 *Phone:* ${phone}\n`;
             orderText += `📍 *Address:* ${address}\n`;
@@ -609,6 +678,17 @@
             .then(response => response.json())
             .then(data => {
                 if(data.ok) {
+                    // Save Order locally for tracking
+                    let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+                    savedOrders.unshift({
+                        orderId: orderId,
+                        items: [...cart],
+                        total: cartTotalAmount,
+                        date: new Date().toLocaleDateString('hi-IN'),
+                        status: "Your order on the way 🚚"
+                    });
+                    localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+
                     document.getElementById('cartModal').style.display = 'none';
                     const successModal = document.getElementById('successModal');
                     successModal.style.display = 'flex';
@@ -622,8 +702,8 @@
 
                     setTimeout(() => {
                         successModal.style.display = 'none';
-                        window.goHome();
-                    }, 3000);
+                        window.showMyOrders();
+                    }, 2500);
                 } else {
                     alert("Error: Telegram par message nahi gaya.");
                 }
@@ -639,27 +719,25 @@
         };
 
         window.shareProduct = (id) => {
-    const p = liveProducts.find(item => item.id === id);
-    if(!p) return;
+            const p = liveProducts.find(item => item.id === id);
+            if(!p) return;
 
-    let cleanOrigin = window.location.origin;
-    let pathName = window.location.pathname;
-    if(pathName.endsWith('index.html')) {
-        pathName = pathName.substring(0, pathName.lastIndexOf('index.html'));
-    }
-    if(!pathName.endsWith('/')) {
-        pathName += '/';
-    }
-    
-    // Space waali ID ko bhi URL-safe banane ke liye encodeURIComponent lagaya hai
-    let productLink = `${cleanOrigin}${pathName}?id=${encodeURIComponent(p.id)}`;
-    
-    let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
+            let cleanOrigin = window.location.origin;
+            let pathName = window.location.pathname;
+            if(pathName.endsWith('index.html')) {
+                pathName = pathName.substring(0, pathName.lastIndexOf('index.html'));
+            }
+            if(!pathName.endsWith('/')) {
+                pathName += '/';
+            }
+            
+            let productLink = `${cleanOrigin}${pathName}?id=${encodeURIComponent(p.id)}`;
+            
+            let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
 
-    let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-    window.open(whatsappUrl, '_blank');
-};
-
+            let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+            window.open(whatsappUrl, '_blank');
+        };
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -685,6 +763,23 @@
                 }
             }
         };
+    // --- AUTO UPDATE FOR INSTALLED APP ---
+    const APP_VERSION = "1.2";
+
+    if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
+        localStorage.setItem('installed_app_version', APP_VERSION);
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                for (let name of names) caches.delete(name);
+            });
+        }
+        window.location.reload(true);
+    }
+
+    window.onload = listenToProducts;
+</script>
+</body>
+</html>
 
         window.onload = listenToProducts;
     </script>
