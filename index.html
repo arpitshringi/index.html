@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v1.3</title>
+    <title>Arpit Store - Live Premium v1.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -98,8 +98,8 @@
         .cart-item-info p { font-size: 14px; color: #38bdf8; font-weight: bold; }
 
         /* Order Tracking Card Styling */
-        .order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 16px; margin-bottom: 15px; }
-        .order-status-badge { background: #0284c7; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 10px; transition: 0.3s; }
+        .order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; }
+        .order-status-badge { background: #0284c7; color: white; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; transition: 0.3s; }
     </style>
 </head>
 <body>
@@ -233,24 +233,21 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Updated Google Script Backend Webhook URL (New URL set here)
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwI071UZD5HhV9I-rv81oLerA7bj-qOXPVU0cS6Ypt2c41eDxxJIukMB-ImoyoABEEIkA/exec";
+        // ✅ UPDATED GOOGLE SCRIPT URL HERE (Naya URL)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
 
         let liveProducts = [];
         
-        // Cart data loaded from localStorage so it persists across page reloads/app closes
         let cart = JSON.parse(localStorage.getItem('arpit_cart')) || [];
-        
         let watchlist = JSON.parse(localStorage.getItem('arpit_watchlist')) || [];
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
 
-        // Set initial cart count badge on load
         document.getElementById('cartCount').innerText = cart.length;
 
-        // --- PULL TO REFRESH FEATURE ---
+        // Pull to refresh feature
         let touchStart = 0;
         let touchEnd = 0;
         window.addEventListener('touchstart', e => { touchStart = e.touches[0].clientY; }, {passive: true});
@@ -354,14 +351,9 @@
         };
 
         window.filterCategory = (cat) => {
-            if(cat === 'Watchlist') {
-                window.showWatchlist();
-                return;
-            }
-            if(cat === 'MyOrders') {
-                window.showMyOrders();
-                return;
-            }
+            if(cat === 'Watchlist') { window.showWatchlist(); return; }
+            if(cat === 'MyOrders') { window.showMyOrders(); return; }
+            
             currentCategory = cat;
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
             
@@ -372,11 +364,7 @@
             document.getElementById('pageTitle').innerText = cat === 'All' ? 'All Products' : cat + ' Collection';
             
             const banner = document.getElementById('sareeOfferBanner');
-            if (cat === 'Saree') {
-                banner.style.display = 'block';
-            } else {
-                banner.style.display = 'none';
-            }
+            if (cat === 'Saree') { banner.style.display = 'block'; } else { banner.style.display = 'none'; }
             
             applyFiltersAndRender();
         };
@@ -396,13 +384,9 @@
         };
 
         function applyFiltersAndRender() {
-            if (currentCategory === 'MyOrders') {
-                renderOrdersUI();
-                return;
-            }
+            if (currentCategory === 'MyOrders') { renderOrdersUI(); return; }
 
             let filtered = [];
-
             if (currentCategory === 'Watchlist') {
                 filtered = liveProducts.filter(p => watchlist.includes(p.id));
             } else if (currentCategory === 'All') {
@@ -431,7 +415,6 @@
         function updateActiveFiltersUI() {
             const badgeContainer = document.getElementById('activeFilters');
             badgeContainer.innerHTML = '';
-
             let badgesHtml = '';
             if (currentCategory !== 'All' && currentCategory !== 'MyOrders') {
                 badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
@@ -490,6 +473,7 @@
             });
         }
 
+        // ✅ UPDATE B: Order UI mein Dynamic Text aur Chhoti Photo!
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -502,56 +486,85 @@
             }
 
             savedOrders.forEach(ord => {
-                let itemsListHtml = '';
+                let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
                 ord.items.forEach(it => {
-                    itemsListHtml += `<li style="color:#cbd5e1; font-size:14px;">${it.name} - ₹${it.price}</li>`;
+                    // Photo logic
+                    let imgUrl = (it.media && it.media.length > 0) ? formatMediaUrl(it.media[0]) : 'https://via.placeholder.com/50?text=No+Img';
+                    
+                    itemsListHtml += `
+                        <li style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <img src="${imgUrl}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;">
+                            <div style="flex: 1;">
+                                <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
+                                <div style="color: #38bdf8; font-size: 13px; font-weight: bold;">₹${it.price}</div>
+                            </div>
+                        </li>
+                    `;
                 });
+                itemsListHtml += '</ul>';
 
-                let badgeBg = '#0284c7';
-                if (ord.status === 'Out for Delivery') badgeBg = '#eab308';
-                else if (ord.status === 'Delivered') badgeBg = '#22c55e';
+                // Status & Dynamic text logic
+                let subText = "";
+                let badgeBg = '#0284c7'; // Blue for Confirmed
+
+                if (ord.status === "Order Confirmed") {
+                    subText = "Hi, your order is ready";
+                } else if (ord.status === "Your order on the way") {
+                    badgeBg = '#eab308'; // Yellow
+                    subText = "Order on the way! 🚚";
+                } else if (ord.status === "Your order is delivered") {
+                    badgeBg = '#22c55e'; // Green
+                    subText = "Delivered Successfully ✅";
+                } else if (ord.status === "Cancel your order") {
+                    badgeBg = '#ef4444'; // Red
+                    subText = "Order Cancelled ❌";
+                }
 
                 grid.innerHTML += `
                     <div class="order-card" style="grid-column: 1/-1;">
-                        <span class="order-status-badge" id="status-badge-${ord.orderId}" style="background: ${badgeBg};">${ord.status}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span class="order-status-badge" style="background: ${badgeBg}; margin: 0;">${ord.status}</span>
+                            <span style="color:#38bdf8; font-size:13px; font-weight:bold;">${subText}</span>
+                        </div>
                         <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
-                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date: ${ord.date}</p>
-                        <ul style="margin-left: 20px; margin-bottom: 10px;">${itemsListHtml}</ul>
-                        <p style="color:#38bdf8; font-weight:bold; font-size:16px;">Total Paid: ₹${ord.total}</p>
+                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date & Time: ${ord.date}</p>
+                        ${itemsListHtml}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
+                            <span style="color:#94a3b8; font-size:14px;">Total Paid:</span>
+                            <span style="color:#38bdf8; font-weight:bold; font-size:18px;">₹${ord.total}</span>
+                        </div>
                     </div>
                 `;
             });
         }
 
-        // Live Order Status Check Logic (Every 5 Sec)
+        // ✅ Live Update Fix - Background status change par photo/text refresh hone ke liye
         function fetchLiveStatusForAllOrders() {
             let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
             if (savedOrders.length === 0) return;
+            let statusChanged = false;
 
-            savedOrders.forEach((ord, index) => {
+            let fetchPromises = savedOrders.map((ord, index) => {
                 let cleanId = ord.orderId.toString().replace('#', '').trim();
                 
-                fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
+                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
                     .then(res => res.json())
                     .then(data => {
-                        if (data && data.status) {
+                        if (data && data.status && data.status !== ord.status) {
                             savedOrders[index].status = data.status;
-                            localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
-
-                            let badge = document.getElementById(`status-badge-${ord.orderId}`);
-                            if (badge) {
-                                badge.innerText = data.status;
-                                if(data.status === 'Out for Delivery') {
-                                    badge.style.background = '#eab308';
-                                } else if(data.status === 'Delivered') {
-                                    badge.style.background = '#22c55e';
-                                } else {
-                                    badge.style.background = '#0284c7';
-                                }
-                            }
+                            statusChanged = true;
                         }
                     })
                     .catch(err => console.log("Status check error:", err));
+            });
+
+            Promise.all(fetchPromises).then(() => {
+                if(statusChanged) {
+                    localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+                    if(currentCategory === 'MyOrders') {
+                        renderOrdersUI(); // UI Refresh ho jayega dynamically
+                    }
+                }
             });
         }
 
@@ -604,7 +617,6 @@
         window.addToCart = (id) => {
             const item = liveProducts.find(p => p.id === id);
             cart.push(item);
-            // Save updated cart to localStorage
             localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
@@ -612,7 +624,6 @@
 
         window.removeFromCart = (index) => {
             cart.splice(index, 1);
-            // Save updated cart to localStorage
             localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
@@ -634,9 +645,7 @@
             
             if(cart.length === 0) {
                 cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center;">Your cart is empty!</p>';
-                if (document.getElementById('totalPrice')) {
-                    document.getElementById('totalPrice').innerText = "0";
-                }
+                if (document.getElementById('totalPrice')) { document.getElementById('totalPrice').innerText = "0"; }
                 document.getElementById('qrTotal').innerText = "0";
                 return;
             }
@@ -668,7 +677,7 @@
             onlineSection.style.display = (mode === 'Online') ? 'block' : 'none';
         };
 
-        // Submit Order Function
+        // ✅ UPDATE A: Submit order function jismein Time include kar diya
         window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
@@ -676,16 +685,8 @@
             const paymentMode = document.getElementById('paymentMode').value;
             const utrNumber = document.getElementById('utrNumber').value.trim();
 
-            if(!name || !phone || !address) {
-                alert("Bhai, kripya Naam, Mobile Number aur Address poora bharein!");
-                return;
-            }
-
-            if(cart.length === 0) {
-                alert("Cart me koi product hi nahi hai!");
-                return;
-            }
-
+            if(!name || !phone || !address) { alert("Bhai, kripya Naam, Mobile Number aur Address poora bharein!"); return; }
+            if(cart.length === 0) { alert("Cart me koi product hi nahi hai!"); return; }
             if(paymentMode === 'Online' && utrNumber === "") {
                 alert("⚠️ WARNING: Online Payment select kiya hai! Transaction/UTR ID daalna zaroori hai.");
                 document.getElementById('utrNumber').focus();
@@ -699,29 +700,28 @@
             let rawOrderId = Math.floor(100000 + Math.random() * 900000);
             let orderId = rawOrderId.toString();
 
+            // Date ke saath exact Time save karne ke liye
+            let now = new Date();
+            let timeStr = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true});
+            let dateStr = now.toLocaleDateString('en-IN');
+            let fullDateTime = `${dateStr}, ${timeStr}`;
+
             let payload = {
-                action: "new_order",
-                orderId: orderId,
-                name: name,
-                phone: phone,
+                action: "new_order", orderId: orderId, name: name, phone: phone,
                 address: address + (paymentMode === 'Online' ? ` (UTR: ${utrNumber})` : ''),
-                total: cartTotalAmount
+                total: cartTotalAmount, date: fullDateTime
             };
 
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
             .then(() => {
                 let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
                 savedOrders.unshift({
-                    orderId: orderId,
-                    items: [...cart],
-                    total: cartTotalAmount,
-                    date: new Date().toLocaleDateString('hi-IN'),
-                    status: "Order Confirmed"
+                    orderId: orderId, items: [...cart], total: cartTotalAmount,
+                    date: fullDateTime, status: "Order Confirmed"
                 });
                 localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
 
@@ -729,7 +729,6 @@
                 const successModal = document.getElementById('successModal');
                 successModal.style.display = 'flex';
 
-                // Clear cart and remove from localStorage after successful order
                 cart = [];
                 localStorage.removeItem('arpit_cart');
                 document.getElementById('cartCount').innerText = '0';
@@ -738,19 +737,10 @@
                 document.getElementById('custAddress').value = '';
                 document.getElementById('utrNumber').value = '';
 
-                setTimeout(() => {
-                    successModal.style.display = 'none';
-                    window.showMyOrders();
-                }, 2500);
+                setTimeout(() => { successModal.style.display = 'none'; window.showMyOrders(); }, 2500);
             })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Internet Error: Order fail ho gaya.");
-            })
-            .finally(() => {
-                submitBtn.innerText = "Confirm & Place Order";
-                submitBtn.disabled = false;
-            });
+            .catch(error => { console.error("Error:", error); alert("Internet Error: Order fail ho gaya."); })
+            .finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
         };
 
         window.shareProduct = (id) => {
@@ -759,17 +749,11 @@
 
             let cleanOrigin = window.location.origin;
             let pathName = window.location.pathname;
-            if(pathName.endsWith('index.html')) {
-                pathName = pathName.substring(0, pathName.lastIndexOf('index.html'));
-            }
-            if(!pathName.endsWith('/')) {
-                pathName += '/';
-            }
+            if(pathName.endsWith('index.html')) { pathName = pathName.substring(0, pathName.lastIndexOf('index.html')); }
+            if(!pathName.endsWith('/')) { pathName += '/'; }
             
             let productLink = `${cleanOrigin}${pathName}?id=${encodeURIComponent(p.id)}`;
-            
             let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
-
             let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
             window.open(whatsappUrl, '_blank');
         };
@@ -799,15 +783,11 @@
             }
         };
 
-        // Auto Update Version
-        const APP_VERSION = "1.4";
-
+        const APP_VERSION = "1.5";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) {
-                caches.keys().then(names => {
-                    for (let name of names) caches.delete(name);
-                });
+                caches.keys().then(names => { for (let name of names) caches.delete(name); });
             }
             window.location.reload(true);
         }
