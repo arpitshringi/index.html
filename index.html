@@ -641,7 +641,16 @@
             savedOrders.forEach(ord => {
                 let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
                 ord.items.forEach(it => {
-                    let imgUrl = (it.media && it.media.length > 0) ? formatMediaUrl(it.media[0]) : ((it.colors && it.colors.length > 0) ? formatMediaUrl(it.colors[0].image) : 'https://via.placeholder.com/50?text=No+Img');
+                    
+                    // Smart image fetching for Orders list (Old or New Array formats)
+                    let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
+                    if (it.media && it.media.length > 0) {
+                        imgUrl = formatMediaUrl(it.media[0]);
+                    } else if (it.colors && it.colors.length > 0) {
+                        let c = it.colors[0];
+                        let cImg = Array.isArray(c.images) ? c.images[0] : (Array.isArray(c.image) ? c.image[0] : (c.image || c.img));
+                        if (cImg) imgUrl = formatMediaUrl(cImg);
+                    }
                     
                     itemsListHtml += `
                         <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" title="Click to view & buy again" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
@@ -723,15 +732,33 @@
 
         setInterval(fetchLiveStatusForAllOrders, 5000);
 
-        window.selectColor = (colorName, imgUrl, el) => {
+        // Advanced Multi-Image Color Selection
+        window.selectColor = (colorName, colorImagesJson, el) => {
             selectedColor = colorName;
-            document.getElementById('colorLabel').innerText = colorName;
+            const label = document.getElementById('colorLabel');
+            if (label) label.innerText = colorName;
             
-            const mainImg = document.getElementById('mainDetailImg');
-            if (mainImg) mainImg.src = imgUrl;
-
             document.querySelectorAll('.color-thumb').forEach(thumb => thumb.classList.remove('active'));
-            if(el) el.classList.add('active');
+            if (el) el.classList.add('active');
+
+            let images = [];
+            try {
+                images = JSON.parse(decodeURIComponent(colorImagesJson));
+            } catch(e) {
+                images = [colorImagesJson];
+            }
+
+            if (!Array.isArray(images)) images = [images];
+
+            const slider = document.querySelector('.detail-slider');
+            if (slider && images.length > 0) {
+                let newSliderHtml = "";
+                images.forEach(imgUrl => {
+                    let link = formatMediaUrl(imgUrl);
+                    newSliderHtml += `<img src="${link}" class="detail-slide-item" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
+                });
+                slider.innerHTML = newSliderHtml;
+            }
         };
 
         window.selectSize = (size, el) => {
@@ -740,7 +767,7 @@
             if(el) el.classList.add('active');
         };
 
-        // Product Detail View (Updated Smart & Safe Logic)
+        // Firebase Array Auto Handling - Detail View
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) {
@@ -755,26 +782,34 @@
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
 
-            // Smart Colors parsing
             let parsedColors = [];
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
                 parsedColors = p.colors.map(c => {
                     if (typeof c === 'object' && c !== null) {
+                        let imgList = [];
+                        if (Array.isArray(c.images)) {
+                            imgList = c.images;
+                        } else if (Array.isArray(c.image)) { 
+                            imgList = c.image;
+                        } else if (c.image) {
+                            imgList = [c.image];
+                        } else if (c.img) {
+                            imgList = [c.img];
+                        }
                         return {
                             name: c.name || c.color || c.title || 'Variant',
-                            image: c.image || c.img || c.url || ''
+                            images: imgList
                         };
                     } else if (typeof c === 'string') {
-                        return { name: c, image: '' };
+                        return { name: c, images: [] };
                     }
-                    return { name: '', image: '' };
+                    return { name: '', images: [] };
                 });
             }
 
             selectedColor = parsedColors.length > 0 ? parsedColors[0].name : "";
             selectedSize = (p.sizes && p.sizes.length > 0) ? p.sizes[0] : "";
 
-            // Build Color Thumbnails UI
             let colorsHtml = "";
             if (parsedColors.length > 0) {
                 colorsHtml = `
@@ -783,16 +818,17 @@
                         <div class="color-options">
                 `;
                 parsedColors.forEach((c, index) => {
-                    let imgUrl = formatMediaUrl(c.image) || (p.media && p.media.length > 0 ? formatMediaUrl(p.media[0]) : 'https://via.placeholder.com/60x75?text=No+Img');
+                    let thumbImg = (c.images.length > 0) ? formatMediaUrl(c.images[0]) : (p.media && p.media.length > 0 ? formatMediaUrl(p.media[0]) : 'https://via.placeholder.com/60x75?text=No+Img');
+                    let jsonImages = encodeURIComponent(JSON.stringify(c.images));
+                    
                     colorsHtml += `
-                        <img src="${imgUrl}" class="color-thumb ${index === 0 ? 'active' : ''}" 
-                             onclick="window.selectColor('${c.name}', '${imgUrl}', this)" loading="lazy">
+                        <img src="${thumbImg}" class="color-thumb ${index === 0 ? 'active' : ''}" 
+                             onclick="window.selectColor('${c.name}', '${jsonImages}', this)" loading="lazy">
                     `;
                 });
                 colorsHtml += `</div></div>`;
             }
 
-            // Build Sizes UI
             let sizesHtml = "";
             if (p.sizes && p.sizes.length > 0) {
                 sizesHtml = `
@@ -809,13 +845,11 @@
                 sizesHtml += `</div></div>`;
             }
 
-            // Main Display Image Logic
-            let firstColorImg = (parsedColors.length > 0 && parsedColors[0].image) ? formatMediaUrl(parsedColors[0].image) : '';
-            let mainDisplayImg = firstColorImg || ((p.media && p.media.length > 0) ? formatMediaUrl(p.media[0]) : 'https://via.placeholder.com/400x300?text=No+Image');
+            let initialImages = (parsedColors.length > 0 && parsedColors[0].images.length > 0) ? parsedColors[0].images : (p.media || []);
 
             let mediaHtml = '<div class="detail-slider">';
-            if (p.media && p.media.length > 1 && !firstColorImg) {
-                p.media.forEach(rawLink => {
+            if (initialImages.length > 0) {
+                initialImages.forEach(rawLink => {
                     let link = formatMediaUrl(rawLink);
                     if (link.includes('.mp4') || link.includes('video')) {
                         mediaHtml += `<video src="${link}" class="detail-slide-item" controls autoplay muted loop></video>`;
@@ -824,7 +858,7 @@
                     }
                 });
             } else {
-                mediaHtml += `<img id="mainDetailImg" src="${mainDisplayImg}" class="detail-slide-item" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
+                mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" class="detail-slide-item">`;
             }
             mediaHtml += '</div>';
 
