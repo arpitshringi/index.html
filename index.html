@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v1.6</title>
+    <title>Arpit Store - Live Premium v1.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -69,6 +69,22 @@
         .offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
         .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
+
+        /* Color & Size Variant Styling */
+        .variant-section { margin: 15px 0; }
+        .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
+        .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .color-options::-webkit-scrollbar { display: none; }
+        .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
+        .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
+
+        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .size-btn { padding: 6px 14px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
+
+        /* Order Re-buy Items */
+        .order-item-clickable { cursor: pointer; transition: 0.2s; }
+        .order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
 
         /* Loader */
         .loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
@@ -197,7 +213,7 @@
                     <button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">🎛️ Filter</button>
                 </div>
 
-                <!-- Hidden Sort Menu (Filter click karne par toggle hoga) -->
+                <!-- Hidden Sort Menu -->
                 <div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
                     <select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
                         <option value="featured">✨ Featured</option>
@@ -314,14 +330,16 @@
         let searchQuery = '';
         let cartTotalAmount = 0;
 
+        // Variant Variables
+        let selectedColor = "";
+        let selectedSize = "";
+
         document.getElementById('cartCount').innerText = cart.length;
 
-        // Active Tab Save Karne Ke Liye Memory Helper
         function saveActiveTab(tabName) {
             sessionStorage.setItem('active_store_tab', tabName);
         }
 
-        // Custom Toast Notification System
         window.showToast = (message, type = "success") => {
             const container = document.getElementById("toastContainer");
             const toast = document.createElement("div");
@@ -611,6 +629,7 @@
             });
         }
 
+        // Render My Orders with Re-Buy (Buy Again) Click Feature
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -625,15 +644,18 @@
             savedOrders.forEach(ord => {
                 let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
                 ord.items.forEach(it => {
-                    let imgUrl = (it.media && it.media.length > 0) ? formatMediaUrl(it.media[0]) : 'https://via.placeholder.com/50?text=No+Img';
+                    let imgUrl = (it.media && it.media.length > 0) ? formatMediaUrl(it.media[0]) : ((it.colors && it.colors.length > 0) ? formatMediaUrl(it.colors[0].image) : 'https://via.placeholder.com/50?text=No+Img');
                     
                     itemsListHtml += `
-                        <li style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                            <img src="${imgUrl}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;" loading="lazy">
-                            <div style="flex: 1;">
-                                <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
-                                <div style="color: #38bdf8; font-size: 13px; font-weight: bold;">₹${it.price}</div>
+                        <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" title="Click to view & buy again" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
+                                <div>
+                                    <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
+                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold;">₹${it.price}</div>
+                                </div>
                             </div>
+                            <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap;">Buy Again 🔄</button>
                         </li>
                     `;
                 });
@@ -704,9 +726,31 @@
 
         setInterval(fetchLiveStatusForAllOrders, 5000);
 
+        // Variant Color & Size Selector Handlers
+        window.selectColor = (colorName, imgUrl, el) => {
+            selectedColor = colorName;
+            document.getElementById('colorLabel').innerText = colorName;
+            
+            const mainImg = document.getElementById('mainDetailImg');
+            if (mainImg) mainImg.src = imgUrl;
+
+            document.querySelectorAll('.color-thumb').forEach(thumb => thumb.classList.remove('active'));
+            if(el) el.classList.add('active');
+        };
+
+        window.selectSize = (size, el) => {
+            selectedSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            if(el) el.classList.add('active');
+        };
+
+        // Product Detail View with Variant Support
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
-            if(!p) return;
+            if(!p) {
+                window.showToast("Product details unavailable!", "error");
+                return;
+            }
 
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
@@ -715,8 +759,52 @@
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
 
+            // Set Default Variants
+            selectedColor = (p.colors && p.colors.length > 0) ? p.colors[0].name : "";
+            selectedSize = (p.sizes && p.sizes.length > 0) ? p.sizes[0] : "";
+
+            // Build Color Thumbnails UI
+            let colorsHtml = "";
+            if (p.colors && p.colors.length > 0) {
+                colorsHtml = `
+                    <div class="variant-section">
+                        <div class="variant-title">Selected Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
+                        <div class="color-options">
+                `;
+                p.colors.forEach((c, index) => {
+                    let imgUrl = formatMediaUrl(c.image);
+                    colorsHtml += `
+                        <img src="${imgUrl}" class="color-thumb ${index === 0 ? 'active' : ''}" 
+                             onclick="window.selectColor('${c.name}', '${imgUrl}', this)" loading="lazy">
+                    `;
+                });
+                colorsHtml += `</div></div>`;
+            }
+
+            // Build Size Selection Buttons UI
+            let sizesHtml = "";
+            if (p.sizes && p.sizes.length > 0) {
+                sizesHtml = `
+                    <div class="variant-section">
+                        <div class="variant-title">Select Size:</div>
+                        <div class="size-options">
+                `;
+                p.sizes.forEach((s, index) => {
+                    sizesHtml += `
+                        <button class="size-btn ${index === 0 ? 'active' : ''}" 
+                                onclick="window.selectSize('${s}', this)">${s}</button>
+                    `;
+                });
+                sizesHtml += `</div></div>`;
+            }
+
+            // Initial Main Display Image
+            let initialImg = (p.colors && p.colors.length > 0) ? formatMediaUrl(p.colors[0].image) : ((p.media && p.media.length > 0) ? formatMediaUrl(p.media[0]) : '');
+
             let mediaHtml = '<div class="detail-slider">';
-            if (p.media && p.media.length > 0) {
+            if (p.colors && p.colors.length > 0) {
+                mediaHtml += `<img id="mainDetailImg" src="${initialImg}" class="detail-slide-item">`;
+            } else if (p.media && p.media.length > 0) {
                 p.media.forEach(rawLink => {
                     let link = formatMediaUrl(rawLink);
                     if (link.includes('.mp4') || link.includes('video')) {
@@ -740,10 +828,14 @@
                     <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
                 </div>
                 <h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${p.price}</h3>
-                <p style="color: #94a3b8; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">${p.description || 'Shandaar quality ka product, Arpit Store par available hai.'}</p>
+                
+                ${colorsHtml}
+                ${sizesHtml}
+
+                <p style="color: #94a3b8; font-size: 15px; margin: 15px 0; line-height: 1.6;">${p.description || 'Shandaar quality ka product, Arpit Store par available hai.'}</p>
                 <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <button class="add-btn" style="flex:1;" onclick="window.addToCart('${p.id}')">Add to Cart</button>
-                    <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.addToCart('${p.id}'); window.toggleCart();">Buy Now</button>
+                    <button class="add-btn" style="flex:1;" onclick="window.addToCartWithVariants('${p.id}')">Add to Cart</button>
+                    <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.addToCartWithVariants('${p.id}'); window.toggleCart();">Buy Now</button>
                 </div>
                 <button class="add-btn" style="background: #25D366; color: white; border: none; font-size: 16px; padding: 12px; margin-top: 5px;" onclick="window.shareProduct('${p.id}')">
                     📲 Share on WhatsApp
@@ -754,11 +846,32 @@
 
         window.addToCart = (id) => {
             const item = liveProducts.find(p => p.id === id);
-            cart.push(item);
+            cart.push({ ...item });
             localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
             window.showToast(`${item.name} added to cart!`);
+        };
+
+        window.addToCartWithVariants = (id) => {
+            const item = liveProducts.find(p => p.id === id);
+            if(!item) return;
+
+            let itemToAdd = { ...item };
+            let variantDetails = [];
+            
+            if (selectedColor) variantDetails.push(selectedColor);
+            if (selectedSize) variantDetails.push(selectedSize);
+
+            if (variantDetails.length > 0) {
+                itemToAdd.name += ` (${variantDetails.join(' / ')})`;
+            }
+
+            cart.push(itemToAdd);
+            localStorage.setItem('arpit_cart', JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            window.updateCartUI();
+            window.showToast(`${itemToAdd.name} added to cart!`);
         };
 
         window.removeFromCart = (index) => {
@@ -936,7 +1049,7 @@
             }
         };
 
-        const APP_VERSION = "1.6";
+        const APP_VERSION = "1.7";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) {
