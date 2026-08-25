@@ -209,11 +209,9 @@
                     <button class="tab-btn" id="tab-Saree" onclick="window.filterCategory('Saree')">🥻 Sarees</button>
                     <button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">💄 Beauty</button>
                     
-                    <!-- Chota Filter Icon Button -->
                     <button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">🎛️ Filter</button>
                 </div>
 
-                <!-- Hidden Sort Menu -->
                 <div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
                     <select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
                         <option value="featured">✨ Featured</option>
@@ -629,7 +627,6 @@
             });
         }
 
-        // Render My Orders with Re-Buy (Buy Again) Click Feature
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -726,7 +723,6 @@
 
         setInterval(fetchLiveStatusForAllOrders, 5000);
 
-        // Variant Color & Size Selector Handlers
         window.selectColor = (colorName, imgUrl, el) => {
             selectedColor = colorName;
             document.getElementById('colorLabel').innerText = colorName;
@@ -744,7 +740,7 @@
             if(el) el.classList.add('active');
         };
 
-        // Product Detail View with Variant Support
+        // Product Detail View (Updated Smart & Safe Logic)
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) {
@@ -759,20 +755,35 @@
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
 
-            // Set Default Variants
-            selectedColor = (p.colors && p.colors.length > 0) ? p.colors[0].name : "";
+            // Smart Colors parsing
+            let parsedColors = [];
+            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
+                parsedColors = p.colors.map(c => {
+                    if (typeof c === 'object' && c !== null) {
+                        return {
+                            name: c.name || c.color || c.title || 'Variant',
+                            image: c.image || c.img || c.url || ''
+                        };
+                    } else if (typeof c === 'string') {
+                        return { name: c, image: '' };
+                    }
+                    return { name: '', image: '' };
+                });
+            }
+
+            selectedColor = parsedColors.length > 0 ? parsedColors[0].name : "";
             selectedSize = (p.sizes && p.sizes.length > 0) ? p.sizes[0] : "";
 
             // Build Color Thumbnails UI
             let colorsHtml = "";
-            if (p.colors && p.colors.length > 0) {
+            if (parsedColors.length > 0) {
                 colorsHtml = `
                     <div class="variant-section">
                         <div class="variant-title">Selected Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
                         <div class="color-options">
                 `;
-                p.colors.forEach((c, index) => {
-                    let imgUrl = formatMediaUrl(c.image);
+                parsedColors.forEach((c, index) => {
+                    let imgUrl = formatMediaUrl(c.image) || (p.media && p.media.length > 0 ? formatMediaUrl(p.media[0]) : 'https://via.placeholder.com/60x75?text=No+Img');
                     colorsHtml += `
                         <img src="${imgUrl}" class="color-thumb ${index === 0 ? 'active' : ''}" 
                              onclick="window.selectColor('${c.name}', '${imgUrl}', this)" loading="lazy">
@@ -781,7 +792,7 @@
                 colorsHtml += `</div></div>`;
             }
 
-            // Build Size Selection Buttons UI
+            // Build Sizes UI
             let sizesHtml = "";
             if (p.sizes && p.sizes.length > 0) {
                 sizesHtml = `
@@ -798,13 +809,12 @@
                 sizesHtml += `</div></div>`;
             }
 
-            // Initial Main Display Image
-            let initialImg = (p.colors && p.colors.length > 0) ? formatMediaUrl(p.colors[0].image) : ((p.media && p.media.length > 0) ? formatMediaUrl(p.media[0]) : '');
+            // Main Display Image Logic
+            let firstColorImg = (parsedColors.length > 0 && parsedColors[0].image) ? formatMediaUrl(parsedColors[0].image) : '';
+            let mainDisplayImg = firstColorImg || ((p.media && p.media.length > 0) ? formatMediaUrl(p.media[0]) : 'https://via.placeholder.com/400x300?text=No+Image');
 
             let mediaHtml = '<div class="detail-slider">';
-            if (p.colors && p.colors.length > 0) {
-                mediaHtml += `<img id="mainDetailImg" src="${initialImg}" class="detail-slide-item">`;
-            } else if (p.media && p.media.length > 0) {
+            if (p.media && p.media.length > 1 && !firstColorImg) {
                 p.media.forEach(rawLink => {
                     let link = formatMediaUrl(rawLink);
                     if (link.includes('.mp4') || link.includes('video')) {
@@ -814,7 +824,7 @@
                     }
                 });
             } else {
-                mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" class="detail-slide-item">`;
+                mediaHtml += `<img id="mainDetailImg" src="${mainDisplayImg}" class="detail-slide-item" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
             }
             mediaHtml += '</div>';
 
