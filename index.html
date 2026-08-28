@@ -2,16 +2,16 @@
 <html lang="hi">
 <head> 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v1.7</title>
+    <title>Arpit Store - Live Premium v1.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); color: #f8fafc; min-height: 100vh; padding-bottom: 60px; }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); color: #f8fafc; min-height: 100vh; padding-bottom: 60px; touch-action: manipulation; }
         
         /* Top Announcement Bar */
         .announcement-bar { background: linear-gradient(135deg, #0284c7, #6366f1); color: white; text-align: center; padding: 8px 15px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
@@ -117,7 +117,7 @@
         
         .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; }
         .detail-slider::-webkit-scrollbar { display: none; }
-        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; }
+        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
         
         .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
         .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
@@ -153,12 +153,33 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
+        /* Image Lightbox Modal Zoom Fix */
+        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; }
+        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transition: transform 0.2s ease; }
+        .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
+
     </style>
 </head>
 <body>
 
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Offline Connection Warning Modal -->
+    <div class="modal" id="offlineModal" style="display: none; z-index: 10000;">
+        <div class="modal-content" style="text-align: center; border: 2px solid #ef4444; background: #1e293b;">
+            <div style="font-size: 50px; margin-bottom: 10px;">📡</div>
+            <h2 style="color: #ef4444; margin-bottom: 10px; font-size: 22px;">Network Issue!</h2>
+            <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Aapka Internet connection chalu nahi hai. Kripya apna Net connect karein!</p>
+            <button onclick="window.checkNetworkStatus()" style="background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px;">Retry Connection 🔄</button>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Zoom Modal -->
+    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal()">
+        <span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
+        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
+    </div>
 
     <!-- Top Announcement Bar -->
     <div class="announcement-bar">
@@ -334,6 +355,70 @@
 
         document.getElementById('cartCount').innerText = cart.length;
 
+        // --- Point 3: Offline Handling ---
+        window.checkNetworkStatus = () => {
+            const offlineModal = document.getElementById('offlineModal');
+            if (!navigator.onLine) {
+                if (offlineModal) offlineModal.style.display = 'flex';
+            } else {
+                if (offlineModal) offlineModal.style.display = 'none';
+            }
+        };
+        window.addEventListener('online', window.checkNetworkStatus);
+        window.addEventListener('offline', window.checkNetworkStatus);
+
+        // --- Point 2: Mobile Back Button Navigation ---
+        function pushNavState(type) {
+            history.pushState({ appNav: type }, '');
+        }
+
+        window.addEventListener('popstate', (e) => {
+            const zoomModal = document.getElementById('imageZoomModal');
+            if (zoomModal && zoomModal.style.display === 'flex') {
+                zoomModal.style.display = 'none';
+                return;
+            }
+
+            const cartModal = document.getElementById('cartModal');
+            if (cartModal && cartModal.style.display === 'flex') {
+                cartModal.style.display = 'none';
+                return;
+            }
+
+            const drawer = document.getElementById('drawer');
+            if (drawer && drawer.classList.contains('open')) {
+                window.toggleDrawer();
+                return;
+            }
+
+            const detailView = document.getElementById('detailView');
+            if (detailView && detailView.style.display === 'block') {
+                window.goHome();
+                return;
+            }
+
+            if (currentCategory !== 'All') {
+                window.goHome();
+                return;
+            }
+        });
+
+        // --- Point 1: Image Zoom Lightbox ---
+        window.openZoomModal = (imgUrl) => {
+            const modal = document.getElementById('imageZoomModal');
+            const zoomedImg = document.getElementById('zoomedImg');
+            if(modal && zoomedImg) {
+                zoomedImg.src = imgUrl;
+                modal.style.display = 'flex';
+                pushNavState('zoom');
+            }
+        };
+
+        window.closeZoomModal = () => {
+            const modal = document.getElementById('imageZoomModal');
+            if(modal) modal.style.display = 'none';
+        };
+
         function saveActiveTab(tabName) {
             sessionStorage.setItem('active_store_tab', tabName);
         }
@@ -372,6 +457,9 @@
         }
 
         function listenToProducts() {
+            window.checkNetworkStatus();
+            fetchLiveStatusForAllOrders(); // --- Point 4: Instant Status Fetch on App Launch ---
+
             const productsRef = collection(db, "products");
             onSnapshot(productsRef, (snapshot) => {
                 if(!snapshot.empty) {
@@ -387,6 +475,8 @@
                         restoreSavedTab();
                     });
                 }
+            }, (error) => {
+                window.checkNetworkStatus();
             });
         }
 
@@ -426,7 +516,9 @@
             const drawer = document.getElementById('drawer');
             const overlay = document.getElementById('overlay');
             drawer.classList.toggle('open');
-            overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
+            const isOpen = drawer.classList.contains('open');
+            overlay.style.display = isOpen ? 'block' : 'none';
+            if(isOpen) pushNavState('drawer');
         };
 
         window.goHome = () => {
@@ -474,6 +566,7 @@
             document.getElementById('pageTitle').innerText = '❤️ My Watchlist';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             
+            pushNavState('watchlist');
             window.applyFiltersAndRender();
         };
 
@@ -489,6 +582,8 @@
             document.getElementById('pageTitle').innerText = '📦 My Orders';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             
+            pushNavState('orders');
+            fetchLiveStatusForAllOrders(); // --- Point 4: Instant Status Refresh ---
             renderOrdersUI();
         };
 
@@ -509,6 +604,7 @@
             const banner = document.getElementById('sareeOfferBanner');
             if (cat === 'Saree') { banner.style.display = 'block'; } else { banner.style.display = 'none'; }
             
+            if(cat !== 'All') pushNavState('category');
             window.applyFiltersAndRender();
         };
 
@@ -642,7 +738,6 @@
                 let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
                 ord.items.forEach(it => {
                     
-                    // Smart image fetching for Orders list (Old or New Array formats)
                     let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
                     if (it.media && it.media.length > 0) {
                         imgUrl = formatMediaUrl(it.media[0]);
@@ -701,7 +796,9 @@
             });
         }
 
+        // --- Point 4: Live Order Status Fetch Logic ---
         function fetchLiveStatusForAllOrders() {
+            if (!navigator.onLine) return;
             let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
             if (savedOrders.length === 0) return;
             let statusChanged = false;
@@ -730,6 +827,13 @@
             });
         }
 
+        // Instant Status updates when app opens or comes back to focus
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                fetchLiveStatusForAllOrders();
+            }
+        });
+        window.addEventListener('focus', fetchLiveStatusForAllOrders);
         setInterval(fetchLiveStatusForAllOrders, 5000);
 
         // Advanced Multi-Image Color Selection
@@ -755,7 +859,7 @@
                 let newSliderHtml = "";
                 images.forEach(imgUrl => {
                     let link = formatMediaUrl(imgUrl);
-                    newSliderHtml += `<img src="${link}" class="detail-slide-item" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
+                    newSliderHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
                 });
                 slider.innerHTML = newSliderHtml;
             }
@@ -775,6 +879,7 @@
                 return;
             }
 
+            pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
 
@@ -854,7 +959,8 @@
                     if (link.includes('.mp4') || link.includes('video')) {
                         mediaHtml += `<video src="${link}" class="detail-slide-item" controls autoplay muted loop></video>`;
                     } else {
-                        mediaHtml += `<img src="${link}" class="detail-slide-item" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
+                        // Point 1: Image Click Zoom
+                        mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" title="Click to Zoom Image" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
                     }
                 });
             } else {
@@ -927,8 +1033,10 @@
 
         window.toggleCart = () => {
             const modal = document.getElementById('cartModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-            if (modal.style.display === 'flex') {
+            const isOpening = modal.style.display !== 'flex';
+            modal.style.display = isOpening ? 'flex' : 'none';
+            if (isOpening) {
+                pushNavState('cart');
                 window.updateCartUI();
                 window.handlePaymentMode();
             }
@@ -1093,7 +1201,7 @@
             }
         };
 
-        const APP_VERSION = "1.7";
+        const APP_VERSION = "1.8";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) {
