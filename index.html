@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v1.8</title>
+    <title>Arpit Store - Live Premium v1.9</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -104,8 +104,7 @@
         .slide-item { flex: 0 0 100%; width: 100%; height: 200px; object-fit: cover; border-radius: 12px; scroll-snap-align: start; }
         
         .card small { color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; font-weight: 600; }
-        .card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 4px; }
-        .card p { font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px; }
+        .card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 6px; }
         .add-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 9px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
         .add-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
 
@@ -355,7 +354,7 @@
 
         document.getElementById('cartCount').innerText = cart.length;
 
-        // --- Point 3: Offline Handling ---
+        // Offline Handling
         window.checkNetworkStatus = () => {
             const offlineModal = document.getElementById('offlineModal');
             if (!navigator.onLine) {
@@ -367,7 +366,7 @@
         window.addEventListener('online', window.checkNetworkStatus);
         window.addEventListener('offline', window.checkNetworkStatus);
 
-        // --- Point 2: Mobile Back Button Navigation ---
+        // Mobile Back Button Navigation
         function pushNavState(type) {
             history.pushState({ appNav: type }, '');
         }
@@ -403,7 +402,7 @@
             }
         });
 
-        // --- Point 1: Image Zoom Lightbox ---
+        // Image Lightbox Zoom
         window.openZoomModal = (imgUrl) => {
             const modal = document.getElementById('imageZoomModal');
             const zoomedImg = document.getElementById('zoomedImg');
@@ -458,7 +457,7 @@
 
         function listenToProducts() {
             window.checkNetworkStatus();
-            fetchLiveStatusForAllOrders(); // --- Point 4: Instant Status Fetch on App Launch ---
+            fetchLiveStatusForAllOrders();
 
             const productsRef = collection(db, "products");
             onSnapshot(productsRef, (snapshot) => {
@@ -583,7 +582,7 @@
             document.getElementById('sareeOfferBanner').style.display = 'none';
             
             pushNavState('orders');
-            fetchLiveStatusForAllOrders(); // --- Point 4: Instant Status Refresh ---
+            fetchLiveStatusForAllOrders();
             renderOrdersUI();
         };
 
@@ -693,6 +692,25 @@
                 let heartIcon = isLiked ? '❤️' : '🤍';
                 let categoryTag = p.category || p.type || p.cat || 'General';
 
+                // Discount Logic
+                let sellingPrice = Number(p.price) || 0;
+                let mrpPrice = Number(p.mrp) || 0;
+                let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
+
+                if (mrpPrice > sellingPrice) {
+                    let offAmount = mrpPrice - sellingPrice;
+                    let offPercent = Math.round((offAmount / mrpPrice) * 100);
+                    priceHtml = `
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
+                            <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
+                            <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">
+                                ${offPercent}% OFF (₹${offAmount} OFF)
+                            </span>
+                        </div>
+                    `;
+                }
+
                 let mediaHtml = '<div class="media-slider">';
                 if (p.media && p.media.length > 0) {
                     p.media.forEach(rawLink => {
@@ -715,7 +733,7 @@
                         <div>
                             <small>${categoryTag}</small>
                             <h3>${p.name}</h3>
-                            <p>₹${p.price}</p>
+                            ${priceHtml}
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); window.addToCart('${p.id}')">Add to Cart</button>
                     </div>
@@ -796,7 +814,7 @@
             });
         }
 
-        // --- Point 4: Live Order Status Fetch Logic ---
+        // Live Order Status Fetch Logic
         function fetchLiveStatusForAllOrders() {
             if (!navigator.onLine) return;
             let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
@@ -836,7 +854,7 @@
         window.addEventListener('focus', fetchLiveStatusForAllOrders);
         setInterval(fetchLiveStatusForAllOrders, 5000);
 
-        // Advanced Multi-Image Color Selection
+        // Multi-Image Color Selection
         window.selectColor = (colorName, colorImagesJson, el) => {
             selectedColor = colorName;
             const label = document.getElementById('colorLabel');
@@ -871,7 +889,7 @@
             if(el) el.classList.add('active');
         };
 
-        // Firebase Array Auto Handling - Detail View
+        // Product Detail View
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) {
@@ -886,6 +904,25 @@
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
+
+            // Discount Logic for Detail View
+            let detailSellingPrice = Number(p.price) || 0;
+            let detailMrpPrice = Number(p.mrp) || 0;
+            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
+
+            if (detailMrpPrice > detailSellingPrice) {
+                let offAmount = detailMrpPrice - detailSellingPrice;
+                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
+                detailPriceHtml = `
+                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
+                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
+                        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">
+                            SAVE ₹${offAmount} (${offPercent}% OFF)
+                        </span>
+                    </div>
+                `;
+            }
 
             let parsedColors = [];
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
@@ -959,7 +996,6 @@
                     if (link.includes('.mp4') || link.includes('video')) {
                         mediaHtml += `<video src="${link}" class="detail-slide-item" controls autoplay muted loop></video>`;
                     } else {
-                        // Point 1: Image Click Zoom
                         mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" title="Click to Zoom Image" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
                     }
                 });
@@ -977,7 +1013,7 @@
                     </div>
                     <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
                 </div>
-                <h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${p.price}</h3>
+                ${detailPriceHtml}
                 
                 ${colorsHtml}
                 ${sizesHtml}
@@ -1201,7 +1237,7 @@
             }
         };
 
-        const APP_VERSION = "1.8";
+        const APP_VERSION = "1.9";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) {
