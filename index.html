@@ -387,7 +387,8 @@
                     pushNavState('zoom');
                     return;
                 }
-                window.closeZoomModal();
+                zoomModal.style.display = 'none';
+                resetZoom();
                 return;
             }
 
@@ -405,6 +406,9 @@
 
             const detailView = document.getElementById('detailView');
             if (detailView && detailView.style.display === 'block') {
+                if (e.state && e.state.appNav === 'detail') {
+                    return;
+                }
                 window.goHome();
                 return;
             }
@@ -450,9 +454,12 @@
 
         window.closeZoomModal = () => {
             const modal = document.getElementById('imageZoomModal');
-            if(modal) {
+            if(modal && modal.style.display === 'flex') {
                 modal.style.display = 'none';
                 resetZoom();
+                if (history.state && history.state.appNav === 'zoom') {
+                    history.back();
+                }
             }
         };
 
