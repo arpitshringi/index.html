@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v1.9</title>
+    <title>Arpit Store - Live Premium v2.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -152,10 +152,12 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
-        /* Image Lightbox Modal Zoom Fix */
-        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; }
-        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transition: transform 0.2s ease; }
-        .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
+        /* Image Lightbox Modal Zoom Fix (Isolated Image Touch-Zoom) */
+        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
+        .zoom-img-wrapper { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
+        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transition: transform 0.1s linear; transform-origin: center center; cursor: grab; }
+        .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; background: rgba(0,0,0,0.5); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .zoom-hint { position: absolute; bottom: 25px; color: #94a3b8; font-size: 12px; background: rgba(0,0,0,0.6); padding: 6px 14px; border-radius: 20px; pointer-events: none; }
 
     </style>
 </head>
@@ -174,10 +176,13 @@
         </div>
     </div>
 
-    <!-- Image Lightbox Zoom Modal -->
-    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal()">
+    <!-- Image Lightbox Zoom Modal (With Touch Pinch & Double Tap Zoom) -->
+    <div class="zoom-modal" id="imageZoomModal">
         <span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
-        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
+        <div class="zoom-img-wrapper" id="zoomWrapper">
+            <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View">
+        </div>
+        <div class="zoom-hint">💡 Double tap ya 2 fingers se pinch karke zoom karein</div>
     </div>
 
     <!-- Top Announcement Bar -->
@@ -366,7 +371,7 @@
         window.addEventListener('online', window.checkNetworkStatus);
         window.addEventListener('offline', window.checkNetworkStatus);
 
-        // Mobile Back Button Navigation
+        // Mobile Hardware Back Button History Navigation
         function pushNavState(type) {
             history.pushState({ appNav: type }, '');
         }
@@ -374,7 +379,7 @@
         window.addEventListener('popstate', (e) => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
-                zoomModal.style.display = 'none';
+                window.closeZoomModal();
                 return;
             }
 
@@ -386,7 +391,8 @@
 
             const drawer = document.getElementById('drawer');
             if (drawer && drawer.classList.contains('open')) {
-                window.toggleDrawer();
+                drawer.classList.remove('open');
+                document.getElementById('overlay').style.display = 'none';
                 return;
             }
 
@@ -402,12 +408,30 @@
             }
         });
 
-        // Image Lightbox Zoom
+        // Touch Pinch & Double Tap Photo Zoom Logic
+        let imgScale = 1;
+        let startDist = 0;
+        let lastTapTime = 0;
+        let isDragging = false;
+        let startX = 0, startY = 0, translateX = 0, translateY = 0;
+
+        const zoomedImg = document.getElementById('zoomedImg');
+        const zoomWrapper = document.getElementById('zoomWrapper');
+
+        function updateImgTransform() {
+            if (zoomedImg) {
+                zoomedImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${imgScale})`;
+            }
+        }
+
         window.openZoomModal = (imgUrl) => {
             const modal = document.getElementById('imageZoomModal');
-            const zoomedImg = document.getElementById('zoomedImg');
             if(modal && zoomedImg) {
                 zoomedImg.src = imgUrl;
+                imgScale = 1;
+                translateX = 0;
+                translateY = 0;
+                updateImgTransform();
                 modal.style.display = 'flex';
                 pushNavState('zoom');
             }
@@ -416,7 +440,68 @@
         window.closeZoomModal = () => {
             const modal = document.getElementById('imageZoomModal');
             if(modal) modal.style.display = 'none';
+            imgScale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateImgTransform();
         };
+
+        if (zoomWrapper && zoomedImg) {
+            zoomWrapper.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    startDist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                } else if (e.touches.length === 1) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
+                    if (tapLength < 300 && tapLength > 0) {
+                        // Double Tap Zoom Toggle
+                        if (imgScale > 1) {
+                            imgScale = 1;
+                            translateX = 0;
+                            translateY = 0;
+                        } else {
+                            imgScale = 2.5;
+                        }
+                        updateImgTransform();
+                    } else {
+                        isDragging = true;
+                        startX = e.touches[0].clientX - translateX;
+                        startY = e.touches[0].clientY - translateY;
+                    }
+                    lastTapTime = currentTime;
+                }
+            }, { passive: true });
+
+            zoomWrapper.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && startDist > 0) {
+                    const currentDist = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    const zoomFactor = currentDist / startDist;
+                    imgScale = Math.min(Math.max(1, imgScale * zoomFactor), 4);
+                    startDist = currentDist;
+                    updateImgTransform();
+                } else if (e.touches.length === 1 && isDragging && imgScale > 1) {
+                    translateX = e.touches[0].clientX - startX;
+                    translateY = e.touches[0].clientY - startY;
+                    updateImgTransform();
+                }
+            }, { passive: true });
+
+            zoomWrapper.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) startDist = 0;
+                if (e.touches.length === 0) isDragging = false;
+                if (imgScale <= 1) {
+                    translateX = 0;
+                    translateY = 0;
+                    updateImgTransform();
+                }
+            });
+        }
 
         function saveActiveTab(tabName) {
             sessionStorage.setItem('active_store_tab', tabName);
@@ -522,10 +607,19 @@
 
         window.goHome = () => {
             saveActiveTab('All');
+            currentCategory = 'All';
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             window.clearSearchBox();
-            window.filterCategory('All');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const homeTab = document.getElementById('tab-All');
+            if(homeTab) homeTab.classList.add('active');
+
+            document.getElementById('pageTitle').innerText = 'All Products';
+            document.getElementById('sareeOfferBanner').style.display = 'none';
+
+            window.applyFiltersAndRender();
             window.scrollTo(0, 0);
         };
 
@@ -672,6 +766,7 @@
             badgeContainer.innerHTML = badgesHtml;
         }
 
+        // MRP Concept Preserved
         function renderProductsUI(items) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -692,7 +787,7 @@
                 let heartIcon = isLiked ? '❤️' : '🤍';
                 let categoryTag = p.category || p.type || p.cat || 'General';
 
-                // Discount Logic
+                // MRP Discount Logic
                 let sellingPrice = Number(p.price) || 0;
                 let mrpPrice = Number(p.mrp) || 0;
                 let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
@@ -845,7 +940,6 @@
             });
         }
 
-        // Instant Status updates when app opens or comes back to focus
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') {
                 fetchLiveStatusForAllOrders();
@@ -889,7 +983,7 @@
             if(el) el.classList.add('active');
         };
 
-        // Product Detail View
+        // Product Detail View (MRP Discount Included)
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) {
@@ -905,7 +999,7 @@
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
 
-            // Discount Logic for Detail View
+            // Discount MRP Logic for Detail View
             let detailSellingPrice = Number(p.price) || 0;
             let detailMrpPrice = Number(p.mrp) || 0;
             let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
@@ -1237,7 +1331,7 @@
             }
         };
 
-        const APP_VERSION = "1.9";
+        const APP_VERSION = "2.0";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) {
