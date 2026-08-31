@@ -158,7 +158,7 @@
 
         /* Image Lightbox Modal Zoom & Drag Fix */
         .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
-        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; }
+        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
         .zoom-img:active { cursor: grabbing; }
         .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
 
@@ -180,8 +180,8 @@
     </div>
 
     <!-- Image Lightbox Zoom Modal -->
-    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal()">
-        <span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
+    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal(false)">
+        <span class="zoom-close" onclick="window.closeZoomModal(true)">&times;</span>
         <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
     </div>
 
@@ -365,6 +365,8 @@
         let zoomPosX = 0, zoomPosY = 0;
         let startPosX = 0, startPosY = 0;
         let isDragging = false;
+        let isPinching = false;
+        let preventClick = false;
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
@@ -449,6 +451,7 @@
             zoomPosX = 0;
             zoomPosY = 0;
             isDragging = false;
+            isPinching = false;
             applyZoomTransform();
         }
 
@@ -464,7 +467,8 @@
             }
         };
 
-        window.closeZoomModal = () => {
+        window.closeZoomModal = (force = false) => {
+            if (preventClick && !force) return;
             const modal = document.getElementById('imageZoomModal');
             if(modal && modal.style.display === 'flex') {
                 modal.style.display = 'none';
@@ -489,6 +493,8 @@
                         } else {
                             zoomScale = 2.5;
                             zoomLastScale = 2.5;
+                            zoomPosX = 0;
+                            zoomPosY = 0;
                             applyZoomTransform();
                         }
                     } else if (zoomScale > 1) {
@@ -499,8 +505,10 @@
                     zoomLastTap = currentTime;
                 } else if (e.touches.length === 2) {
                     isDragging = false;
+                    isPinching = true;
                     e.preventDefault();
                     zoomStartDistance = getDistance(e.touches);
+                    zoomLastScale = zoomScale;
                 }
             }, { passive: false });
 
@@ -510,7 +518,7 @@
                     zoomPosX = e.touches[0].clientX - startPosX;
                     zoomPosY = e.touches[0].clientY - startPosY;
                     applyZoomTransform();
-                } else if (e.touches.length === 2) {
+                } else if (e.touches.length === 2 && isPinching) {
                     e.preventDefault();
                     const currentDistance = getDistance(e.touches);
                     if (zoomStartDistance > 0) {
@@ -523,11 +531,33 @@
             }, { passive: false });
 
             zoomContainer.addEventListener('touchend', (e) => {
-                if (e.touches.length < 2) {
-                    zoomLastScale = zoomScale;
-                    zoomStartDistance = 0;
-                    isDragging = false;
+                if (isPinching) {
+                    if (e.touches.length < 2) {
+                        isPinching = false;
+                        zoomLastScale = zoomScale;
+                        zoomStartDistance = 0;
+                        if (zoomScale <= 1) {
+                            resetZoom();
+                        }
+                    }
                 }
+                
+                if (e.touches.length === 0) {
+                    isDragging = false;
+                } else if (e.touches.length === 1 && zoomScale > 1) {
+                    isDragging = true;
+                    startPosX = e.touches[0].clientX - zoomPosX;
+                    startPosY = e.touches[0].clientY - zoomPosY;
+                }
+
+                preventClick = true;
+                setTimeout(() => { preventClick = false; }, 300);
+            });
+
+            zoomContainer.addEventListener('touchcancel', () => {
+                isPinching = false;
+                isDragging = false;
+                zoomLastScale = zoomScale;
             });
         }
 
