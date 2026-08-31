@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v2.0</title>
+    <title>Arpit Store - Live Premium v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -42,16 +42,25 @@
         .header-left { display: flex; align-items: center; gap: 15px; }
         .menu-icon { font-size: 24px; cursor: pointer; color: #38bdf8; background: none; border: none; }
         .logo { font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+        
         .header-right { display: flex; align-items: center; gap: 10px; }
-        .cart-btn, .profile-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); font-size: 14px; }
-        .cart-btn:hover, .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
+        .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
+        .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
+
+        /* Highlighted Guest Sign-Up Button */
+        .auth-highlight-btn { background: linear-gradient(135deg, #f43f5e, #fb7185); color: white; padding: 8px 14px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
 
         /* Drawer & Overlay */
         .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; overflow-y: auto; }
         .drawer.open { left: 0; }
-        .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .close-drawer { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-drawer:hover { color: #f8fafc; }
+        
+        .user-profile-brief { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .user-avatar-small { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; background: #38bdf8; color: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+
         .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .drawer-item:hover { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding-left: 20px; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 250; }
@@ -79,7 +88,6 @@
         .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; border-color: transparent; }
 
         .sort-select { padding: 10px 14px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; color: #f8fafc; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(8px); transition: 0.2s; }
-        .sort-select:hover, .sort-select:focus { border-color: #38bdf8; }
         .sort-select option { background: #1e293b; color: white; }
 
         .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; }
@@ -91,6 +99,22 @@
         .offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
         .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
+
+        /* Color & Size Variant Styling */
+        .variant-section { margin: 15px 0; }
+        .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
+        .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .color-options::-webkit-scrollbar { display: none; }
+        .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
+        .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
+
+        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .size-btn { padding: 6px 14px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
+
+        /* Order Re-buy Items */
+        .order-item-clickable { cursor: pointer; transition: 0.2s; }
+        .order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
 
         /* Loader */
         .loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
@@ -120,9 +144,13 @@
         .back-link { color: #38bdf8; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; padding: 8px 16px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; transition: 0.3s; }
         .back-link:hover { background: rgba(56, 189, 248, 0.2); }
         
-        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; }
+        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; }
         .detail-slider::-webkit-scrollbar { display: none; }
-        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: pointer; }
+        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
+        .detail-slider.zoomed { transform: scale(1.4); z-index: 10; }
+        
+        .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
+        .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
 
         /* Modal & Cart */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 350; }
@@ -155,16 +183,19 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
-        /* Double-Click Zoom Lightbox */
-        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; }
-        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transition: transform 0.3s ease; cursor: zoom-in; }
-        .zoom-img.zoomed { transform: scale(2.2); cursor: zoom-out; }
+        /* Image Lightbox Modal Zoom & Drag Fix */
+        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
+        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
+        .zoom-img:active { cursor: grabbing; }
         .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
 
-        /* Profile & Auth Modals */
-        .auth-tab-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: none; color: #94a3b8; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.2s; }
-        .auth-tab-btn.active { background: #38bdf8; color: #0f172a; }
-        .address-item { background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        /* Auth & Profile Modal Specifics */
+        .auth-tab-header { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .auth-tab { background: none; border: none; color: #94a3b8; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 5px; }
+        .auth-tab.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+        .google-auth-btn { width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
+        .google-auth-btn:hover { background: #f1f5f9; }
+        .address-chip { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -182,66 +213,61 @@
         </div>
     </div>
 
-    <!-- Double-Click Zoom Modal -->
-    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal()">
-        <span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
-        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" ondblclick="window.toggleZoom(this)" onclick="event.stopPropagation()">
+    <!-- Image Lightbox Zoom Modal -->
+    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal(false)">
+        <span class="zoom-close" onclick="window.closeZoomModal(true)">&times;</span>
+        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
     </div>
 
-    <!-- Login / Signup Modal -->
+    <!-- Auth / Login / Signup Modal -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
-            <h2 style="color: #38bdf8; margin-bottom: 15px; text-align: center;">Welcome to Arpit Store</h2>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <button class="auth-tab-btn active" id="loginTabBtn" onclick="window.switchAuthTab('login')">Login</button>
-                <button class="auth-tab-btn" id="signupTabBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
+            <div class="auth-tab-header">
+                <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
+                <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
             </div>
 
-            <button onclick="window.loginWithGoogle()" style="width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px;">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"> Continue with Google
+            <!-- Google Sign In Option -->
+            <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
+                Continue with Google
             </button>
+            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR with Mobile Number</div>
 
-            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR with Mobile & Password</div>
-
-            <div id="signupFields" style="display: none;">
-                <input type="text" id="authName" class="input-box" placeholder="Pura Naam (Full Name)">
+            <div id="authFormContainer">
+                <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
+                <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
+                <input type="password" id="authPassword" class="input-box" placeholder="Password">
+                <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
             </div>
-            <input type="tel" id="authPhone" class="input-box" placeholder="Mobile Number (10 Digits)">
-            <input type="password" id="authPassword" class="input-box" placeholder="Password">
-
-            <button class="pay-btn" id="authSubmitBtn" onclick="window.handleAuthSubmit()">Login</button>
         </div>
     </div>
 
-    <!-- Profile Modal -->
+    <!-- Customer Profile Modal -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <button class="close-btn" onclick="window.toggleProfileModal()">&times;</button>
             <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">My Profile</h2>
             
             <div style="text-align: center; margin-bottom: 15px;">
-                <img id="profilePhoto" src="https://via.placeholder.com/80?text=User" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; margin-bottom: 8px;">
-                <h3 id="profileNameDisplay" style="color: white; font-size: 18px;"></h3>
-                <p id="profilePhoneDisplay" style="color: #94a3b8; font-size: 14px;"></p>
+                <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
+                <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">Arpit</h3>
+                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">9876543210</p>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="font-size: 13px; color: #cbd5e1; font-weight: bold;">Update Photo URL:</label>
-                <input type="text" id="profilePhotoInput" class="input-box" placeholder="Image URL paste karein">
-            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses:</h4>
+                <div id="savedAddressesList"></div>
 
-            <div style="margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label style="font-size: 13px; color: #cbd5e1; font-weight: bold;">Saved Addresses:</label>
-                    <button onclick="window.addNewAddressPrompt()" style="background: #38bdf8; border: none; color: #0f172a; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;">+ Add Address</button>
+                <div style="margin-top: 15px; background: rgba(15,23,42,0.5); padding: 12px; border-radius: 10px;">
+                    <h5 style="color: #38bdf8; margin-bottom: 8px;">Add New Address</h5>
+                    <textarea id="newAddressInput" class="input-box" placeholder="Enter full address here..." rows="2" style="margin-bottom: 10px;"></textarea>
+                    <button class="add-btn" onclick="window.saveNewAddress()">Save Address</button>
                 </div>
-                <div id="savedAddressesList" style="max-height: 120px; overflow-y: auto;"></div>
             </div>
 
-            <button onclick="window.saveProfileChanges()" class="pay-btn" style="margin-bottom: 10px;">Save Profile</button>
-            <button onclick="window.logoutUser()" style="width: 100%; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Logout 🚪</button>
+            <button onclick="window.logoutUser()" class="remove-btn" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 14px;">Logout 🚪</button>
         </div>
     </div>
 
@@ -254,15 +280,17 @@
     <div class="overlay" id="overlay" onclick="window.toggleDrawer()"></div>
     <div class="drawer" id="drawer">
         <div class="drawer-header">
-            <span>Arpit Store Menu</span>
+            <span>Menu</span>
             <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
         </div>
+
+        <div id="drawerUserSection"></div>
+
         <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
         <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
         <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
         <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
         <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
-        <div class="drawer-item" id="drawerAuthItem" onclick="window.toggleAuthModal()">🔑 Login / Sign Up</div>
     </div>
 
     <!-- Header -->
@@ -272,7 +300,7 @@
             <div class="logo" onclick="window.goHome()">Arpit Store</div>
         </div>
         <div class="header-right">
-            <button class="profile-btn" id="headerProfileBtn" onclick="window.checkProfileOrLogin()" style="display:none;">👤 Profile</button>
+            <div id="headerAuthArea"></div>
             <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
         </div>
     </header>
@@ -350,17 +378,15 @@
             <div id="cartList" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Customer Details:</label>
-                <input type="text" id="custName" class="input-box" placeholder="Apna Pura Naam Likhien" readonly>
-                <input type="tel" id="custPhone" class="input-box" placeholder="10 Digit Mobile Number" readonly>
+                <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
+                <input type="text" id="custName" class="input-box" placeholder="Full Name" readonly>
+                <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number" readonly>
                 
-                <div style="margin-bottom: 5px;">
-                    <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Select Delivery Address:</label>
-                    <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressChange()">
-                        <option value="">-- Address Select Karein --</option>
-                    </select>
+                <div id="checkoutAddressSection">
+                    <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
+                    <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
                 </div>
-                <textarea id="custAddress" class="input-box" placeholder="Pura Pata (Address) Likhien..." rows="2"></textarea>
+                <textarea id="custAddress" class="input-box" placeholder="Delivery Address..." rows="2"></textarea>
 
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
                 <select id="paymentMode" class="input-box" onchange="window.handlePaymentMode()">
@@ -399,8 +425,28 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // PREVENT PAGE ZOOM GLOBALLY
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1 && !e.target.closest('#imageZoomModal')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastPageTap = 0;
+        document.addEventListener('touchend', (e) => {
+            if (e.target.closest('#imageZoomModal')) return;
+            const now = new Date().getTime();
+            if (now - lastPageTap <= 300) {
+                e.preventDefault();
+            }
+            lastPageTap = now;
+        }, false);
+
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('gesturechange', (e) => e.preventDefault());
+        document.addEventListener('gestureend', (e) => e.preventDefault());
 
         const firebaseConfig = {
             apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
@@ -414,8 +460,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider();
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
@@ -423,16 +467,260 @@
         let liveProducts = [];
         let cart = JSON.parse(localStorage.getItem('arpit_cart')) || [];
         let watchlist = JSON.parse(localStorage.getItem('arpit_watchlist')) || [];
+        
+        // AUTHENTICATION & USER PROFILE STATE
+        let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
+        let authMode = 'login'; // 'login' or 'signup'
+
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
 
-        let currentUser = null;
-        let userProfileData = { name: "", phone: "", photo: "", addresses: [] };
-        let authMode = 'login';
+        let selectedColor = "";
+        let selectedSize = "";
+
+        // PINCH ZOOM, DRAG & LIGHTBOX VARIABLES
+        let zoomScale = 1;
+        let zoomLastScale = 1;
+        let zoomStartDistance = 0;
+        let zoomLastTap = 0;
+        let zoomPosX = 0, zoomPosY = 0;
+        let startPosX = 0, startPosY = 0;
+        let isDragging = false;
+        let isPinching = false;
+        let preventClick = false;
+        let justPinched = false;
+        const MIN_ZOOM = 1;
+        const MAX_ZOOM = 4;
 
         document.getElementById('cartCount').innerText = cart.length;
+        updateAuthUI();
 
+        // AUTHENTICATION & PROFILE FUNCTIONS
+        window.toggleAuthModal = () => {
+            const modal = document.getElementById('authModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                pushNavState('auth');
+            } else if (history.state && history.state.appNav === 'auth') {
+                history.back();
+            }
+        };
+
+        window.switchAuthTab = (mode) => {
+            authMode = mode;
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const signupBtn = document.getElementById('tabSignupBtn');
+            const nameInput = document.getElementById('authName');
+            const submitBtn = document.getElementById('authSubmitBtn');
+
+            if (mode === 'login') {
+                loginBtn.classList.add('active');
+                signupBtn.classList.remove('active');
+                nameInput.style.display = 'none';
+                submitBtn.innerText = 'Login';
+            } else {
+                signupBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+                nameInput.style.display = 'block';
+                submitBtn.innerText = 'Sign Up';
+            }
+        };
+
+        window.submitAuth = () => {
+            const phone = document.getElementById('authPhone').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const name = document.getElementById('authName').value.trim();
+
+            if (!phone || phone.length !== 10 || !password) {
+                window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
+                return;
+            }
+
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+
+            if (authMode === 'signup') {
+                if (!name) {
+                    window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
+                    return;
+                }
+                let existing = registeredUsers.find(u => u.phone === phone);
+                if (existing) {
+                    window.showToast("Yeh mobile number pehle se registered hai! Login karein.", "error");
+                    window.switchAuthTab('login');
+                    return;
+                }
+
+                let newUser = { name, phone, password, addresses: [] };
+                registeredUsers.push(newUser);
+                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+
+                // Sync with Google Sheet "User" page
+                syncUserToExcel({ action: 'signup', name, phone, password });
+
+                currentUser = newUser;
+                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+                window.toggleAuthModal();
+                updateAuthUI();
+                window.showToast("Sign up successful! Welcome.");
+
+            } else {
+                // Login validation
+                let user = registeredUsers.find(u => u.phone === phone && u.password === password);
+                if (!user) {
+                    window.showToast("Galat mobile number ya password! Pehle Sign Up karein.", "error");
+                    return;
+                }
+                currentUser = user;
+                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+                window.toggleAuthModal();
+                updateAuthUI();
+                window.showToast("Login successful!");
+            }
+        };
+
+        window.handleGoogleLogin = () => {
+            // Simulated Google Sign-In with popup/prompt fallback
+            let googleName = prompt("Enter your Google Account Name:", "Arpit Shringi");
+            let googlePhone = prompt("Enter your 10-digit Mobile Number for verification:", "9876543210");
+            
+            if (!googleName || !googlePhone || googlePhone.length !== 10) {
+                window.showToast("Google login cancelled or invalid details.", "error");
+                return;
+            }
+
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            let user = registeredUsers.find(u => u.phone === googlePhone);
+
+            if (!user) {
+                user = { name: googleName, phone: googlePhone, password: 'google_auth_user', addresses: [] };
+                registeredUsers.push(user);
+                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+                syncUserToExcel({ action: 'signup', name: googleName, phone: googlePhone, password: 'google_auth_user' });
+            }
+
+            currentUser = user;
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+            window.toggleAuthModal();
+            updateAuthUI();
+            window.showToast("Google Login Successful!");
+        };
+
+        function syncUserToExcel(payloadData) {
+            if (!navigator.onLine) return;
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadData)
+            }).catch(err => console.log("Excel user sync error:", err));
+        }
+
+        function updateAuthUI() {
+            const headerAuthArea = document.getElementById('headerAuthArea');
+            const drawerUserSection = document.getElementById('drawerUserSection');
+
+            if (currentUser) {
+                headerAuthArea.innerHTML = `
+                    <button onclick="window.toggleProfileModal()" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;">
+                        <div class="user-avatar-small" style="width:34px; height:34px; font-size:14px;">${currentUser.name.charAt(0).toUpperCase()}</div>
+                    </button>
+                `;
+                drawerUserSection.innerHTML = `
+                    <div class="user-profile-brief" onclick="window.toggleProfileModal()">
+                        <div class="user-avatar-small">${currentUser.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div style="font-weight: 700; color: white; font-size: 14px;">${currentUser.name}</div>
+                            <div style="font-size: 12px; color: #38bdf8;">${currentUser.phone} (View Profile)</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                headerAuthArea.innerHTML = `
+                    <button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Sign Up</button>
+                `;
+                drawerUserSection.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login / Sign Up 🚀</button>
+                    </div>
+                `;
+            }
+        }
+
+        window.toggleProfileModal = () => {
+            if (!currentUser) {
+                window.toggleAuthModal();
+                return;
+            }
+            const modal = document.getElementById('profileModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                document.getElementById('profileAvatarDisplay').innerText = currentUser.name.charAt(0).toUpperCase();
+                document.getElementById('profileNameDisplay').innerText = currentUser.name;
+                document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
+                renderSavedAddresses();
+                pushNavState('profile');
+            } else if (history.state && history.state.appNav === 'profile') {
+                history.back();
+            }
+        };
+
+        function renderSavedAddresses() {
+            const listDiv = document.getElementById('savedAddressesList');
+            if (!currentUser.addresses || currentUser.addresses.length === 0) {
+                listDiv.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No saved addresses yet.</p>';
+                return;
+            }
+            listDiv.innerHTML = '';
+            currentUser.addresses.forEach((addr, idx) => {
+                listDiv.innerHTML += `
+                    <div class="address-chip">
+                        <span>📍 ${addr}</span>
+                        <button onclick="window.deleteAddress(${idx})" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer;">✕</button>
+                    </div>
+                `;
+            });
+        }
+
+        window.saveNewAddress = () => {
+            const newAddr = document.getElementById('newAddressInput').value.trim();
+            if (!newAddr) {
+                window.showToast("Address daalna zaroori hai!", "error");
+                return;
+            }
+            if (!currentUser.addresses) currentUser.addresses = [];
+            currentUser.addresses.push(newAddr);
+            
+            updateUserDataInStorage();
+            document.getElementById('newAddressInput').value = '';
+            renderSavedAddresses();
+            window.showToast("Address saved successfully!");
+        };
+
+        window.deleteAddress = (idx) => {
+            currentUser.addresses.splice(idx, 1);
+            updateUserDataInStorage();
+            renderSavedAddresses();
+            window.showToast("Address removed.");
+        };
+
+        function updateUserDataInStorage() {
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            registeredUsers = registeredUsers.map(u => u.phone === currentUser.phone ? currentUser : u);
+            localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+        }
+
+        window.logoutUser = () => {
+            currentUser = null;
+            localStorage.removeItem('arpit_current_user');
+            document.getElementById('profileModal').style.display = 'none';
+            updateAuthUI();
+            window.showToast("Logged out successfully.");
+        };
+
+        // Offline Handling
         window.checkNetworkStatus = () => {
             const offlineModal = document.getElementById('offlineModal');
             if (!navigator.onLine) {
@@ -444,230 +732,39 @@
         window.addEventListener('online', window.checkNetworkStatus);
         window.addEventListener('offline', window.checkNetworkStatus);
 
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            const profileBtn = document.getElementById('headerProfileBtn');
-            const drawerAuthItem = document.getElementById('drawerAuthItem');
-
-            if (user) {
-                profileBtn.style.display = 'block';
-                drawerAuthItem.innerText = '👤 My Profile';
-                drawerAuthItem.onclick = () => { window.toggleDrawer(); window.toggleProfileModal(); };
-                await fetchUserData(user.uid);
-            } else {
-                profileBtn.style.display = 'none';
-                drawerAuthItem.innerText = '🔑 Login / Sign Up';
-                drawerAuthItem.onclick = () => { window.toggleDrawer(); window.toggleAuthModal(); };
-                userProfileData = { name: "", phone: "", photo: "", addresses: [] };
-            }
-        });
-
-        async function fetchUserData(uid) {
-            try {
-                const docRef = doc(db, "users", uid);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    userProfileData = docSnap.data();
-                } else {
-                    userProfileData = {
-                        name: currentUser.displayName || "Arpit Customer",
-                        phone: currentUser.phoneNumber || "",
-                        photo: currentUser.photoURL || "",
-                        addresses: []
-                    };
-                }
-                updateProfileUI();
-            } catch (e) {
-                console.error("Error fetching user data:", e);
-            }
-        }
-
-        function updateProfileUI() {
-            document.getElementById('profilePhoto').src = userProfileData.photo || 'https://via.placeholder.com/80?text=User';
-            document.getElementById('profileNameDisplay').innerText = userProfileData.name || 'User';
-            document.getElementById('profilePhoneDisplay').innerText = userProfileData.phone || currentUser.email || '';
-            document.getElementById('profilePhotoInput').value = userProfileData.photo || '';
-
-            renderAddressesList();
-        }
-
-        function renderAddressesList() {
-            const listContainer = document.getElementById('savedAddressesList');
-            listContainer.innerHTML = '';
-
-            if (!userProfileData.addresses || userProfileData.addresses.length === 0) {
-                listContainer.innerHTML = '<p style="color:#94a3b8; font-size:12px; text-align:center;">Koi address save nahi hai.</p>';
-                return;
-            }
-
-            userProfileData.addresses.forEach((addr, idx) => {
-                listContainer.innerHTML += `
-                    <div class="address-item">
-                        <div style="font-size:12px; color:#cbd5e1; word-break: break-all; max-width: 80%;"><b>#${idx+1}:</b> ${addr}</div>
-                        <button onclick="window.removeAddress(${idx})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px;">🗑</button>
-                    </div>
-                `;
-            });
-        }
-
-        window.addNewAddressPrompt = () => {
-            const newAddr = prompt("Apna naya address (Pura Pata) enter karein:");
-            if (newAddr && newAddr.trim() !== "") {
-                if (!userProfileData.addresses) userProfileData.addresses = [];
-                userProfileData.addresses.push(newAddr.trim());
-                saveUserDataToCloud();
-            }
-        };
-
-        window.removeAddress = (index) => {
-            userProfileData.addresses.splice(index, 1);
-            saveUserDataToCloud();
-        };
-
-        window.saveProfileChanges = async () => {
-            const newPhoto = document.getElementById('profilePhotoInput').value.trim();
-            userProfileData.photo = newPhoto;
-            await saveUserDataToCloud();
-            window.showToast("Profile updated successfully!");
-            window.toggleProfileModal();
-        };
-
-        async function saveUserDataToCloud() {
-            if (!currentUser) return;
-            try {
-                await setDoc(doc(db, "users", currentUser.uid), userProfileData, { merge: true });
-                updateProfileUI();
-                
-                syncUserToGoogleSheet({
-                    name: userProfileData.name,
-                    phone: userProfileData.phone || currentUser.email,
-                    address: userProfileData.addresses.join(" | "),
-                    action: "register_user"
-                });
-            } catch (e) {
-                console.error("Cloud save error:", e);
-            }
-        }
-
-        function syncUserToGoogleSheet(payload) {
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(err => console.log("Sheet sync error:", err));
-        }
-
-        window.toggleAuthModal = () => {
-            const modal = document.getElementById('authModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        };
-
-        window.toggleProfileModal = () => {
-            const modal = document.getElementById('profileModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-        };
-
-        window.checkProfileOrLogin = () => {
-            if (currentUser) {
-                window.toggleProfileModal();
-            } else {
-                window.toggleAuthModal();
-            }
-        };
-
-        window.switchAuthTab = (mode) => {
-            authMode = mode;
-            const loginBtn = document.getElementById('loginTabBtn');
-            const signupBtn = document.getElementById('signupTabBtn');
-            const signupFields = document.getElementById('signupFields');
-            const submitBtn = document.getElementById('authSubmitBtn');
-
-            if (mode === 'login') {
-                loginBtn.classList.add('active');
-                signupBtn.classList.remove('active');
-                signupFields.style.display = 'none';
-                submitBtn.innerText = 'Login';
-            } else {
-                signupBtn.classList.add('active');
-                loginBtn.classList.remove('active');
-                signupFields.style.display = 'block';
-                submitBtn.innerText = 'Sign Up';
-            }
-        };
-
-        window.loginWithGoogle = async () => {
-            try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                
-                userProfileData = {
-                    name: user.displayName || "Google User",
-                    phone: user.phoneNumber || user.email,
-                    photo: user.photoURL || "",
-                    addresses: userProfileData.addresses || []
-                };
-                
-                await saveUserDataToCloud();
-                window.toggleAuthModal();
-                window.showToast("Login successful via Google!");
-            } catch (error) {
-                window.showToast("Google Login failed: " + error.message, "error");
-            }
-        };
-
-        window.handleAuthSubmit = async () => {
-            const phone = document.getElementById('authPhone').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            const name = document.getElementById('authName').value.trim();
-
-            if (!phone || !password) {
-                window.showToast("Mobile number aur password bharna zaroori hai!", "error");
-                return;
-            }
-
-            const pseudoEmail = `${phone}@arpitstore.com`;
-
-            try {
-                if (authMode === 'signup') {
-                    if (!name) {
-                        window.showToast("Apna naam bhi likhein!", "error");
-                        return;
-                    }
-                    await createUserWithEmailAndPassword(auth, pseudoEmail, password);
-                    userProfileData = { name: name, phone: phone, photo: "", addresses: [] };
-                    await saveUserDataToCloud();
-                    window.toggleAuthModal();
-                    window.showToast("Account created successfully!");
-                } else {
-                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
-                    window.toggleAuthModal();
-                    window.showToast("Logged in successfully!");
-                }
-            } catch (error) {
-                window.showToast("Authentication Error: " + error.message, "error");
-            }
-        };
-
-        window.logoutUser = async () => {
-            await signOut(auth);
-            window.toggleProfileModal();
-            window.showToast("Logged out successfully!");
-        };
-
         function pushNavState(type) {
             history.pushState({ appNav: type }, '');
         }
 
+        // PERFECT MOBILE BACK BUTTON LISTENER
         window.addEventListener('popstate', (e) => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
+                if (zoomScale > 1) {
+                    resetZoom();
+                    pushNavState('zoom');
+                    return;
+                }
                 zoomModal.style.display = 'none';
+                resetZoom();
                 return;
             }
 
             const cartModal = document.getElementById('cartModal');
             if (cartModal && cartModal.style.display === 'flex') {
                 cartModal.style.display = 'none';
+                return;
+            }
+
+            const authModal = document.getElementById('authModal');
+            if (authModal && authModal.style.display === 'flex') {
+                authModal.style.display = 'none';
+                return;
+            }
+
+            const profileModal = document.getElementById('profileModal');
+            if (profileModal && profileModal.style.display === 'flex') {
+                profileModal.style.display = 'none';
                 return;
             }
 
@@ -692,30 +789,130 @@
             }
         });
 
+        function getDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.hypot(dx, dy);
+        }
+
+        function applyZoomTransform() {
+            const zoomedImg = document.getElementById('zoomedImg');
+            if (zoomedImg) {
+                zoomedImg.style.transform = `translate(${zoomPosX}px, ${zoomPosY}px) scale(${zoomScale})`;
+            }
+        }
+
+        function resetZoom() {
+            zoomScale = 1;
+            zoomLastScale = 1;
+            zoomStartDistance = 0;
+            zoomPosX = 0;
+            zoomPosY = 0;
+            isDragging = false;
+            isPinching = false;
+            applyZoomTransform();
+        }
+
         window.openZoomModal = (imgUrl) => {
             const modal = document.getElementById('imageZoomModal');
             const zoomedImg = document.getElementById('zoomedImg');
             if(modal && zoomedImg) {
                 zoomedImg.src = imgUrl;
-                zoomedImg.classList.remove('zoomed');
+                resetZoom();
                 modal.style.display = 'flex';
                 pushNavState('zoom');
             }
         };
 
-        window.closeZoomModal = () => {
+        window.closeZoomModal = (force = false) => {
+            if (!force && (preventClick || justPinched || zoomScale > 1)) return;
             const modal = document.getElementById('imageZoomModal');
             if(modal && modal.style.display === 'flex') {
                 modal.style.display = 'none';
+                resetZoom();
                 if (history.state && history.state.appNav === 'zoom') {
                     history.back();
                 }
             }
         };
 
-        window.toggleZoom = (imgElement) => {
-            imgElement.classList.toggle('zoomed');
-        };
+        const zoomContainer = document.getElementById('imageZoomModal');
+        if (zoomContainer) {
+            zoomContainer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    isPinching = true;
+                    isDragging = false;
+                    e.preventDefault();
+                    zoomStartDistance = getDistance(e.touches);
+                    zoomLastScale = zoomScale;
+                } else if (e.touches.length === 1) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - zoomLastTap;
+                    
+                    if (tapLength < 300 && tapLength > 0) {
+                        e.preventDefault();
+                        if (zoomScale > 1) {
+                            resetZoom();
+                        } else {
+                            zoomScale = 2.5;
+                            zoomLastScale = 2.5;
+                            zoomPosX = 0;
+                            zoomPosY = 0;
+                            applyZoomTransform();
+                        }
+                    } else if (zoomScale > 1 && !isPinching) {
+                        isDragging = true;
+                        startPosX = e.touches[0].clientX - zoomPosX;
+                        startPosY = e.touches[0].clientY - zoomPosY;
+                    }
+                    zoomLastTap = currentTime;
+                }
+            }, { passive: false });
+
+            zoomContainer.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && isPinching) {
+                    e.preventDefault();
+                    const currentDistance = getDistance(e.touches);
+                    if (zoomStartDistance > 0) {
+                        const factor = currentDistance / zoomStartDistance;
+                        zoomScale = Math.min(Math.max(zoomLastScale * factor, MIN_ZOOM), MAX_ZOOM);
+                        if (zoomScale === 1) { zoomPosX = 0; zoomPosY = 0; }
+                        applyZoomTransform();
+                    }
+                } else if (e.touches.length === 1 && isDragging && zoomScale > 1) {
+                    e.preventDefault();
+                    zoomPosX = e.touches[0].clientX - startPosX;
+                    zoomPosY = e.touches[0].clientY - startPosY;
+                    applyZoomTransform();
+                }
+            }, { passive: false });
+
+            zoomContainer.addEventListener('touchend', (e) => {
+                if (isPinching) {
+                    justPinched = true;
+                    setTimeout(() => { justPinched = false; }, 400);
+                    if (e.touches.length === 1) {
+                        isPinching = false;
+                        zoomLastScale = zoomScale;
+                        isDragging = true;
+                        startPosX = e.touches[0].clientX - zoomPosX;
+                        startPosY = e.touches[0].clientY - zoomPosY;
+                    } else if (e.touches.length === 0) {
+                        isPinching = false;
+                        isDragging = false;
+                        zoomLastScale = zoomScale;
+                    }
+                } else if (e.touches.length === 0) {
+                    isDragging = false;
+                }
+                preventClick = true;
+                setTimeout(() => { preventClick = false; }, 300);
+            });
+        }
+
+        function saveActiveTab(tabName) {
+            sessionStorage.setItem('active_store_tab', tabName);
+        }
 
         window.showToast = (message, type = "success") => {
             const container = document.getElementById("toastContainer");
@@ -723,10 +920,7 @@
             toast.className = `toast ${type}`;
             toast.innerHTML = type === "error" ? `⚠️ ${message}` : `✅ ${message}`;
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                if(container.contains(toast)) container.removeChild(toast);
-            }, 3000);
+            setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, 3000);
         };
 
         function formatMediaUrl(url) {
@@ -742,6 +936,8 @@
 
         function listenToProducts() {
             window.checkNetworkStatus();
+            fetchLiveStatusForAllOrders();
+
             const productsRef = collection(db, "products");
             onSnapshot(productsRef, (snapshot) => {
                 if(!snapshot.empty) {
@@ -757,36 +953,26 @@
                         restoreSavedTab();
                     });
                 }
-            }, (error) => {
-                window.checkNetworkStatus();
-            });
+            }, (error) => { window.checkNetworkStatus(); });
         }
 
         function restoreSavedTab() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('id')) {
-                window.checkSharedLink();
-                return;
-            }
-
+            if (urlParams.get('id')) { window.checkSharedLink(); return; }
             const savedTab = sessionStorage.getItem('active_store_tab');
             if (savedTab) {
-                if (savedTab === 'MyOrders') {
-                    window.showMyOrders();
-                } else if (savedTab === 'Watchlist') {
-                    window.showWatchlist();
-                } else {
-                    window.filterCategory(savedTab);
-                }
-            } else {
-                window.applyFiltersAndRender();
-            }
+                if (savedTab === 'MyOrders') window.showMyOrders();
+                else if (savedTab === 'Watchlist') window.showWatchlist();
+                else window.filterCategory(savedTab);
+            } else { window.applyFiltersAndRender(); }
         }
 
         window.toggleFilterSortMenu = () => {
             const menu = document.getElementById('filterSortDropdown');
             const isHidden = menu.style.display === 'none';
             menu.style.display = isHidden ? 'block' : 'none';
+            const btn = document.getElementById('filterToggleBtn');
+            if (btn) btn.style.background = isHidden ? 'rgba(56, 189, 248, 0.25)' : 'rgba(30, 41, 59, 0.8)';
         };
 
         window.toggleDrawer = () => {
@@ -796,10 +982,11 @@
             const isOpen = drawer.classList.contains('open');
             overlay.style.display = isOpen ? 'block' : 'none';
             if(isOpen) pushNavState('drawer');
+            else if (history.state && history.state.appNav === 'drawer') history.back();
         };
 
         window.goHome = () => {
-            sessionStorage.setItem('active_store_tab', 'All');
+            saveActiveTab('All');
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             window.clearSearchBox();
@@ -808,11 +995,13 @@
         };
 
         window.goHomeSilently = () => {
+            saveActiveTab('All');
             currentCategory = 'All';
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-All').classList.add('active');
+            const homeTab = document.getElementById('tab-All');
+            if(homeTab) homeTab.classList.add('active');
             document.getElementById('pageTitle').innerText = 'All Products';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             window.applyFiltersAndRender();
@@ -829,15 +1018,18 @@
             }
             localStorage.setItem('arpit_watchlist', JSON.stringify(watchlist));
             window.applyFiltersAndRender();
+            const detailLikeBtn = document.getElementById('detailLikeBtn');
+            if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
             if(isAdding) window.showToast("Saved to Watchlist!");
         };
 
         window.showWatchlist = () => {
-            sessionStorage.setItem('active_store_tab', 'Watchlist');
+            saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-Watchlist').classList.add('active');
+            const watchTab = document.getElementById('tab-Watchlist');
+            if(watchTab) watchTab.classList.add('active');
             document.getElementById('pageTitle').innerText = '❤️ My Watchlist';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             pushNavState('watchlist');
@@ -845,35 +1037,39 @@
         };
 
         window.showMyOrders = () => {
-            sessionStorage.setItem('active_store_tab', 'MyOrders');
+            saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-Orders').classList.add('active');
+            const orderTab = document.getElementById('tab-Orders');
+            if(orderTab) orderTab.classList.add('active');
             document.getElementById('pageTitle').innerText = '📦 My Orders';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             pushNavState('orders');
+            fetchLiveStatusForAllOrders();
             renderOrdersUI();
         };
 
         window.filterCategory = (cat) => {
-            sessionStorage.setItem('active_store_tab', cat);
+            saveActiveTab(cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
             if(cat === 'MyOrders') { window.showMyOrders(); return; }
-            
             currentCategory = cat;
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-' + cat).classList.add('active');
+            const activeTab = document.getElementById('tab-' + cat);
+            if(activeTab) activeTab.classList.add('active');
             document.getElementById('pageTitle').innerText = cat === 'All' ? 'All Products' : cat + ' Collection';
-            document.getElementById('sareeOfferBanner').style.display = (cat === 'Saree') ? 'block' : 'none';
+            const banner = document.getElementById('sareeOfferBanner');
+            if (cat === 'Saree') banner.style.display = 'block'; else banner.style.display = 'none';
             if(cat !== 'All') pushNavState('category');
             window.applyFiltersAndRender();
         };
 
         window.handleSearch = (val) => {
             searchQuery = val.trim().toLowerCase();
-            document.getElementById('clearSearchBtn').style.display = searchQuery.length > 0 ? 'block' : 'none';
+            const clearBtn = document.getElementById('clearSearchBtn');
+            clearBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
             window.applyFiltersAndRender();
         };
 
@@ -886,45 +1082,83 @@
 
         window.applyFiltersAndRender = () => {
             if (currentCategory === 'MyOrders') { renderOrdersUI(); return; }
-
             let filtered = [];
-            if (currentCategory === 'Watchlist') {
-                filtered = liveProducts.filter(p => watchlist.includes(p.id));
-            } else if (currentCategory === 'All') {
-                filtered = [...liveProducts];
-            } else {
+            if (currentCategory === 'Watchlist') filtered = liveProducts.filter(p => watchlist.includes(p.id));
+            else if (currentCategory === 'All') filtered = [...liveProducts];
+            else {
                 filtered = liveProducts.filter(p => {
                     let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-                    return productCat.includes(currentCategory.toLowerCase());
+                    let target = currentCategory.toLowerCase();
+                    return productCat.includes(target) || target.includes(productCat);
                 });
             }
-
             if (searchQuery !== '') {
-                filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchQuery));
+                filtered = filtered.filter(p => {
+                    let name = (p.name || '').toLowerCase();
+                    let desc = (p.description || '').toLowerCase();
+                    let cat = (p.category || p.type || p.cat || '').toLowerCase();
+                    return name.includes(searchQuery) || desc.includes(searchQuery) || cat.includes(searchQuery);
+                });
             }
-
             const sortVal = document.getElementById('sortSelect').value;
             if (sortVal === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
-            if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
+            else if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
+            else if (sortVal === 'name') filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
+            updateActiveFiltersUI();
             renderProductsUI(filtered);
         };
+
+        function updateActiveFiltersUI() {
+            const badgeContainer = document.getElementById('activeFilters');
+            badgeContainer.innerHTML = '';
+            let badgesHtml = '';
+            if (currentCategory !== 'All' && currentCategory !== 'MyOrders') {
+                badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
+            }
+            if (searchQuery !== '') {
+                badgesHtml += `<div class="filter-badge">Keyword: "${searchQuery}" <span onclick="window.clearSearchBox()">×</span></div>`;
+            }
+            badgeContainer.innerHTML = badgesHtml;
+        }
 
         function renderProductsUI(items) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            
             if(items.length === 0) {
-                grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 40px;">Koi product nahi mila!</p>';
+                if(currentCategory === 'Watchlist') grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">💔</div><p style="color: #94a3b8; font-size:16px;">Aapki Watchlist khaali hai.<br>Products par ❤️ dabayein!</p></div>';
+                else if(searchQuery !== '') grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for "<b>${searchQuery}</b>"</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding:10px 20px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
+                else grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me abhi koi product nahi hai!</p>';
                 return;
             }
 
             items.forEach(p => {
                 let isLiked = watchlist.includes(p.id);
+                let heartIcon = isLiked ? '❤️' : '🤍';
+                let categoryTag = p.category || p.type || p.cat || 'General';
+                let sellingPrice = Number(p.price) || 0;
+                let mrpPrice = Number(p.mrp) || 0;
+                let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
+
+                if (mrpPrice > sellingPrice) {
+                    let offAmount = mrpPrice - sellingPrice;
+                    let offPercent = Math.round((offAmount / mrpPrice) * 100);
+                    priceHtml = `
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
+                            <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
+                            <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">
+                                ${offPercent}% OFF (₹${offAmount} OFF)
+                            </span>
+                        </div>
+                    `;
+                }
+
                 let mediaHtml = '<div class="media-slider">';
                 if (p.media && p.media.length > 0) {
                     p.media.forEach(rawLink => {
-                        mediaHtml += `<img src="${formatMediaUrl(rawLink)}" class="slide-item" loading="lazy">`;
+                        let link = formatMediaUrl(rawLink);
+                        mediaHtml += `<img src="${link}" class="slide-item" loading="lazy" onerror="this.src='https://via.placeholder.com/300x180?text=Image+Error'">`;
                     });
                 } else {
                     mediaHtml += `<img src="https://via.placeholder.com/300x180?text=No+Image" class="slide-item">`;
@@ -933,12 +1167,12 @@
 
                 grid.innerHTML += `
                     <div class="card" onclick="window.showProductDetail('${p.id}')">
-                        <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${isLiked ? '❤️' : '🤍'}</div>
+                        <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</div>
                         ${mediaHtml}
                         <div>
-                            <small>${p.category || 'General'}</small>
+                            <small>${categoryTag}</small>
                             <h3>${p.name}</h3>
-                            <p style="font-weight: 700; color: #38bdf8; font-size: 18px;">₹${p.price}</p>
+                            ${priceHtml}
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); window.addToCart('${p.id}')">Add to Cart</button>
                     </div>
@@ -950,37 +1184,139 @@
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
-
             if(savedOrders.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><p style="color: #94a3b8;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
                 return;
             }
 
             savedOrders.forEach(ord => {
+                let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
+                ord.items.forEach(it => {
+                    let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
+                    if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
+                    itemsListHtml += `
+                        <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
+                                <div>
+                                    <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
+                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold;">₹${it.price}</div>
+                                </div>
+                            </div>
+                            <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Buy Again 🔄</button>
+                        </li>
+                    `;
+                });
+                itemsListHtml += '</ul>';
+
+                let subText = "Hi, your order is ready";
+                let badgeBg = '#0284c7';
+                if (ord.status === "Your order on the way") { badgeBg = '#eab308'; subText = "Order on the way! 🚚"; }
+                else if (ord.status === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
+                else if (ord.status === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
+
                 grid.innerHTML += `
                     <div class="order-card" style="grid-column: 1/-1;">
-                        <span class="order-status-badge">${ord.status}</span>
-                        <h4 style="color:white; margin: 10px 0 5px 0;">Order ID: #${ord.orderId}</h4>
-                        <p style="color:#94a3b8; font-size:12px;">Date: ${ord.date}</p>
-                        <p style="color:#38bdf8; font-weight:bold; margin-top:10px;">Total Paid: ₹${ord.total}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span class="order-status-badge" style="background: ${badgeBg}; margin: 0;">${ord.status}</span>
+                            <span style="color:#38bdf8; font-size:13px; font-weight:bold;">${subText}</span>
+                        </div>
+                        <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
+                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date & Time: ${ord.date}</p>
+                        ${itemsListHtml}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
+                            <span style="color:#94a3b8; font-size:14px;">Total Paid:</span>
+                            <span style="color:#38bdf8; font-weight:bold; font-size:18px;">₹${ord.total}</span>
+                        </div>
                     </div>
                 `;
             });
         }
 
+        function fetchLiveStatusForAllOrders() {
+            if (!navigator.onLine) return;
+            let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+            if (savedOrders.length === 0) return;
+            let statusChanged = false;
+            let fetchPromises = savedOrders.map((ord, index) => {
+                let cleanId = ord.orderId.toString().replace('#', '').trim();
+                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.status && data.status !== ord.status) {
+                            savedOrders[index].status = data.status;
+                            statusChanged = true;
+                        }
+                    }).catch(err => console.log("Status error:", err));
+            });
+            Promise.all(fetchPromises).then(() => {
+                if(statusChanged) {
+                    localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+                    if(currentCategory === 'MyOrders') renderOrdersUI();
+                }
+            });
+        }
+
+        window.selectColor = (colorName, colorImagesJson, el) => {
+            selectedColor = colorName;
+            const label = document.getElementById('colorLabel');
+            if (label) label.innerText = colorName;
+            document.querySelectorAll('.color-thumb').forEach(thumb => thumb.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            let images = [];
+            try { images = JSON.parse(decodeURIComponent(colorImagesJson)); } catch(e) { images = [colorImagesJson]; }
+            if (!Array.isArray(images)) images = [images];
+
+            const slider = document.querySelector('.detail-slider');
+            if (slider && images.length > 0) {
+                let newSliderHtml = "";
+                images.forEach(imgUrl => {
+                    let link = formatMediaUrl(imgUrl);
+                    newSliderHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')">`;
+                });
+                slider.innerHTML = newSliderHtml;
+            }
+        };
+
+        window.selectSize = (size, el) => {
+            selectedSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            if(el) el.classList.add('active');
+        };
+
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
-            if(!p) return;
-
+            if(!p) { window.showToast("Product unavailable!", "error"); return; }
             pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
 
+            let isLiked = watchlist.includes(p.id);
+            let heartIcon = isLiked ? '❤️' : '🤍';
+            let categoryTag = p.category || p.type || p.cat || 'General';
+            let detailSellingPrice = Number(p.price) || 0;
+            let detailMrpPrice = Number(p.mrp) || 0;
+            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
+
+            if (detailMrpPrice > detailSellingPrice) {
+                let offAmount = detailMrpPrice - detailSellingPrice;
+                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
+                detailPriceHtml = `
+                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
+                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
+                        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAVE ₹${offAmount} (${offPercent}% OFF)</span>
+                    </div>
+                `;
+            }
+
+            let initialImages = p.media || [];
             let mediaHtml = '<div class="detail-slider">';
-            if (p.media && p.media.length > 0) {
-                p.media.forEach(rawLink => {
+            if (initialImages.length > 0) {
+                initialImages.forEach(rawLink => {
                     let link = formatMediaUrl(rawLink);
-                    mediaHtml += `<img src="${link}" class="detail-slide-item" ondblclick="window.openZoomModal('${link}')" title="Double click to zoom">`;
+                    mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')">`;
                 });
             } else {
                 mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" class="detail-slide-item">`;
@@ -989,20 +1325,58 @@
 
             document.getElementById('detailContent').innerHTML = `
                 ${mediaHtml}
-                <h2 style="color: white; margin-bottom: 10px;">${p.name}</h2>
-                <h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${p.price}</h3>
-                <p style="color: #94a3b8; font-size: 15px; margin-bottom: 20px;">${p.description || ''}</p>
-                <button class="add-btn" onclick="window.addToCart('${p.id}')">Add to Cart</button>
+                <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <div>
+                        <small style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">${categoryTag}</small>
+                        <h2 style="color: white; margin: 0;">${p.name}</h2>
+                    </div>
+                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
+                </div>
+                ${detailPriceHtml}
+                <p style="color: #94a3b8; font-size: 15px; margin: 15px 0; line-height: 1.6;">${p.description || 'Premium quality product.'}</p>
+                <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                    <button class="add-btn" style="flex:1;" onclick="window.addToCartWithVariants('${p.id}')">Add to Cart</button>
+                    <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.buyNowProduct('${p.id}')">Buy Now</button>
+                </div>
             `;
             window.scrollTo(0, 0);
         };
 
         window.addToCart = (id) => {
+            if (!currentUser) {
+                window.showToast("Pehle Sign Up / Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
             const item = liveProducts.find(p => p.id === id);
             cart.push({ ...item });
             localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast(`${item.name} added to cart!`);
+        };
+
+        window.addToCartWithVariants = (id) => {
+            if (!currentUser) {
+                window.showToast("Pehle Sign Up / Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
+            const item = liveProducts.find(p => p.id === id);
+            if(!item) return;
+            cart.push({ ...item });
+            localStorage.setItem('arpit_cart', JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            window.showToast(`${item.name} added to cart!`);
+        };
+
+        window.buyNowProduct = (id) => {
+            if (!currentUser) {
+                window.showToast("Kripya pehle Sign Up karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
+            window.addToCartWithVariants(id);
+            window.toggleCart();
         };
 
         window.removeFromCart = (index) => {
@@ -1013,40 +1387,20 @@
         };
 
         window.toggleCart = () => {
+            if (!currentUser) {
+                window.showToast("Cart dekhne ya order karne ke liye Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
             const modal = document.getElementById('cartModal');
             const isOpening = modal.style.display !== 'flex';
             modal.style.display = isOpening ? 'flex' : 'none';
             if (isOpening) {
                 pushNavState('cart');
                 window.updateCartUI();
-                window.autoFillCheckoutDetails();
-            }
-        };
-
-        window.autoFillCheckoutDetails = () => {
-            if (currentUser && userProfileData) {
-                document.getElementById('custName').value = userProfileData.name || '';
-                document.getElementById('custPhone').value = userProfileData.phone || '';
-                
-                const addressSelect = document.getElementById('checkoutAddressSelect');
-                addressSelect.innerHTML = '<option value="">-- Address Select Karein --</option>';
-                
-                if (userProfileData.addresses && userProfileData.addresses.length > 0) {
-                    userProfileData.addresses.forEach((addr, idx) => {
-                        addressSelect.innerHTML += `<option value="${addr}">Address #${idx+1}: ${addr}</option>`;
-                    });
-                }
-            } else {
-                document.getElementById('custName').value = '';
-                document.getElementById('custPhone').value = '';
-                document.getElementById('custAddress').value = '';
-            }
-        };
-
-        window.handleCheckoutAddressChange = () => {
-            const selectedAddr = document.getElementById('checkoutAddressSelect').value;
-            if (selectedAddr) {
-                document.getElementById('custAddress').value = selectedAddr;
+                window.handlePaymentMode();
+            } else if (history.state && history.state.appNav === 'cart') {
+                history.back();
             }
         };
 
@@ -1056,7 +1410,7 @@
             cartList.innerHTML = '';
             
             if(cart.length === 0) {
-                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center;">Your cart is empty!</p>';
+                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center; padding: 20px 0;">Your cart is empty!</p>';
                 document.getElementById('qrTotal').innerText = "0";
                 return;
             }
@@ -1073,42 +1427,78 @@
                     </div>
                 `;
             });
+            
             document.getElementById('qrTotal').innerText = cartTotalAmount;
+
+            // Auto-fill customer info
+            if (currentUser) {
+                document.getElementById('custName').value = currentUser.name;
+                document.getElementById('custPhone').value = currentUser.phone;
+                
+                let addrSelect = document.getElementById('checkoutAddressSelect');
+                addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                if (currentUser.addresses && currentUser.addresses.length > 0) {
+                    currentUser.addresses.forEach(addr => {
+                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
+                    });
+                    document.getElementById('custAddress').value = currentUser.addresses[0]; // Default auto-fill
+                } else {
+                    document.getElementById('custAddress').value = '';
+                }
+            }
+
+            let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
+            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+            document.getElementById('directPayLink').href = upiLink;
+        };
+
+        window.handleCheckoutAddressSelect = () => {
+            let selectedAddr = document.getElementById('checkoutAddressSelect').value;
+            if (selectedAddr) {
+                document.getElementById('custAddress').value = selectedAddr;
+            }
         };
 
         window.handlePaymentMode = () => {
             let mode = document.getElementById('paymentMode').value;
-            document.getElementById('onlinePaymentSection').style.display = (mode === 'Online') ? 'block' : 'none';
+            let onlineSection = document.getElementById('onlinePaymentSection');
+            onlineSection.style.display = (mode === 'Online') ? 'block' : 'none';
         };
 
         window.submitOrder = () => {
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const paymentMode = document.getElementById('paymentMode').value;
             const utrNumber = document.getElementById('utrNumber').value.trim();
 
-            if(!name || !phone || !address) { 
-                window.showToast("Kripya Naam, Mobile Number aur Address poora bharein!", "error"); 
-                return; 
-            }
-            if(cart.length === 0) { 
-                window.showToast("Cart me koi product nahi hai!", "error"); 
-                return; 
+            if(!address) { window.showToast("Kripya delivery address select ya enter karein!", "error"); return; }
+            if(cart.length === 0) { window.showToast("Cart khaali hai!", "error"); return; }
+            if(paymentMode === 'Online' && utrNumber === "") {
+                window.showToast("Online payment ke liye UTR number daalna zaroori hai.", "error");
+                return;
             }
 
-            let rawOrderId = Math.floor(100000 + Math.random() * 900000);
-            let orderId = rawOrderId.toString();
+            // Save address automatically to profile if new
+            if (currentUser && !currentUser.addresses.includes(address)) {
+                currentUser.addresses.push(address);
+                updateUserDataInStorage();
+            }
+
+            let submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "Processing Order...";
+            submitBtn.disabled = true;
+
+            let orderId = Math.floor(100000 + Math.random() * 900000).toString();
             let now = new Date();
-            let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN')}`;
+            let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true})}`;
+            let productNames = cart.map(item => item.name).join(", ");
 
             let payload = {
                 action: "new_order", 
                 orderId: orderId, 
-                name: name, 
-                phone: phone,
+                name: currentUser.name, 
+                phone: currentUser.phone,
                 address: address + (paymentMode === 'Online' ? ` (UTR: ${utrNumber})` : ''),
-                productName: cart.map(i => i.name).join(", "), 
+                productName: productNames, 
                 total: cartTotalAmount, 
                 date: fullDateTime
             };
@@ -1119,26 +1509,31 @@
                 body: JSON.stringify(payload)
             }).then(() => {
                 let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
-                savedOrders.unshift({ orderId, items: [...cart], total: cartTotalAmount, date: fullDateTime, status: "Order Confirmed" });
+                savedOrders.unshift({
+                    orderId: orderId, items: [...cart], total: cartTotalAmount,
+                    date: fullDateTime, status: "Order Confirmed"
+                });
                 localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
 
                 document.getElementById('cartModal').style.display = 'none';
-                document.getElementById('successModal').style.display = 'flex';
+                const successModal = document.getElementById('successModal');
+                successModal.style.display = 'flex';
+
                 cart = [];
                 localStorage.removeItem('arpit_cart');
                 document.getElementById('cartCount').innerText = '0';
-                setTimeout(() => { document.getElementById('successModal').style.display = 'none'; window.showMyOrders(); }, 2500);
-            });
+
+                setTimeout(() => { successModal.style.display = 'none'; window.showMyOrders(); }, 2500);
+            }).catch(error => { 
+                window.showToast("Order failed due to network error.", "error"); 
+            }).finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
         };
 
-        window.checkSharedLink = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const paramVal = urlParams.get('id');
-            if (paramVal && liveProducts.length > 0) {
-                const product = liveProducts.find(p => p.id === paramVal);
-                if (product) window.showProductDetail(paramVal);
-            }
-        };
+        const APP_VERSION = "3.0";
+        if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
+            localStorage.setItem('installed_app_version', APP_VERSION);
+            if ('caches' in window) caches.keys().then(names => { for (let name of names) caches.delete(name); });
+        }
 
         window.onload = listenToProducts;
     </script>
