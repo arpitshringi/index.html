@@ -42,13 +42,14 @@
         .header-left { display: flex; align-items: center; gap: 15px; }
         .menu-icon { font-size: 24px; cursor: pointer; color: #38bdf8; background: none; border: none; }
         .logo { font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
-        .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
-        .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .cart-btn, .profile-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); font-size: 14px; }
+        .cart-btn:hover, .profile-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
 
         /* Drawer & Overlay */
-        .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; }
+        .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; overflow-y: auto; }
         .drawer.open { left: 0; }
-        .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .close-drawer { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-drawer:hover { color: #f8fafc; }
         .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
@@ -91,22 +92,6 @@
         .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
 
-        /* Color & Size Variant Styling */
-        .variant-section { margin: 15px 0; }
-        .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
-        .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .color-options::-webkit-scrollbar { display: none; }
-        .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
-        .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
-
-        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
-        .size-btn { padding: 6px 14px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
-        .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
-
-        /* Order Re-buy Items */
-        .order-item-clickable { cursor: pointer; transition: 0.2s; }
-        .order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
-
         /* Loader */
         .loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(56, 189, 248, 0.2); border-top: 4px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
@@ -135,13 +120,9 @@
         .back-link { color: #38bdf8; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; padding: 8px 16px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; transition: 0.3s; }
         .back-link:hover { background: rgba(56, 189, 248, 0.2); }
         
-        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; }
+        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; }
         .detail-slider::-webkit-scrollbar { display: none; }
-        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
-        .detail-slider.zoomed { transform: scale(1.4); z-index: 10; }
-        
-        .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
-        .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: pointer; }
 
         /* Modal & Cart */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 350; }
@@ -174,12 +155,16 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
-        /* Image Lightbox Modal Zoom & Drag Fix */
-        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
-        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
-        .zoom-img:active { cursor: grabbing; }
+        /* Double-Click Zoom Lightbox */
+        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; }
+        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transition: transform 0.3s ease; cursor: zoom-in; }
+        .zoom-img.zoomed { transform: scale(2.2); cursor: zoom-out; }
         .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
 
+        /* Profile & Auth Modals */
+        .auth-tab-btn { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: none; color: #94a3b8; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .auth-tab-btn.active { background: #38bdf8; color: #0f172a; }
+        .address-item { background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -197,10 +182,67 @@
         </div>
     </div>
 
-    <!-- Image Lightbox Zoom Modal -->
-    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal(false)">
-        <span class="zoom-close" onclick="window.closeZoomModal(true)">&times;</span>
-        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
+    <!-- Double-Click Zoom Modal -->
+    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal()">
+        <span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
+        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" ondblclick="window.toggleZoom(this)" onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Login / Signup Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
+            <h2 style="color: #38bdf8; margin-bottom: 15px; text-align: center;">Welcome to Arpit Store</h2>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="auth-tab-btn active" id="loginTabBtn" onclick="window.switchAuthTab('login')">Login</button>
+                <button class="auth-tab-btn" id="signupTabBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
+            </div>
+
+            <button onclick="window.loginWithGoogle()" style="width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px;">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20"> Continue with Google
+            </button>
+
+            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR with Mobile & Password</div>
+
+            <div id="signupFields" style="display: none;">
+                <input type="text" id="authName" class="input-box" placeholder="Pura Naam (Full Name)">
+            </div>
+            <input type="tel" id="authPhone" class="input-box" placeholder="Mobile Number (10 Digits)">
+            <input type="password" id="authPassword" class="input-box" placeholder="Password">
+
+            <button class="pay-btn" id="authSubmitBtn" onclick="window.handleAuthSubmit()">Login</button>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="window.toggleProfileModal()">&times;</button>
+            <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">My Profile</h2>
+            
+            <div style="text-align: center; margin-bottom: 15px;">
+                <img id="profilePhoto" src="https://via.placeholder.com/80?text=User" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; margin-bottom: 8px;">
+                <h3 id="profileNameDisplay" style="color: white; font-size: 18px;"></h3>
+                <p id="profilePhoneDisplay" style="color: #94a3b8; font-size: 14px;"></p>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 13px; color: #cbd5e1; font-weight: bold;">Update Photo URL:</label>
+                <input type="text" id="profilePhotoInput" class="input-box" placeholder="Image URL paste karein">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label style="font-size: 13px; color: #cbd5e1; font-weight: bold;">Saved Addresses:</label>
+                    <button onclick="window.addNewAddressPrompt()" style="background: #38bdf8; border: none; color: #0f172a; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;">+ Add Address</button>
+                </div>
+                <div id="savedAddressesList" style="max-height: 120px; overflow-y: auto;"></div>
+            </div>
+
+            <button onclick="window.saveProfileChanges()" class="pay-btn" style="margin-bottom: 10px;">Save Profile</button>
+            <button onclick="window.logoutUser()" style="width: 100%; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Logout 🚪</button>
+        </div>
     </div>
 
     <!-- Top Announcement Bar -->
@@ -212,7 +254,7 @@
     <div class="overlay" id="overlay" onclick="window.toggleDrawer()"></div>
     <div class="drawer" id="drawer">
         <div class="drawer-header">
-            <span>Categories</span>
+            <span>Arpit Store Menu</span>
             <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
         </div>
         <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
@@ -220,6 +262,7 @@
         <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
         <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
         <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
+        <div class="drawer-item" id="drawerAuthItem" onclick="window.toggleAuthModal()">🔑 Login / Sign Up</div>
     </div>
 
     <!-- Header -->
@@ -228,7 +271,10 @@
             <button class="menu-icon" onclick="window.toggleDrawer()">☰</button>
             <div class="logo" onclick="window.goHome()">Arpit Store</div>
         </div>
-        <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+        <div class="header-right">
+            <button class="profile-btn" id="headerProfileBtn" onclick="window.checkProfileOrLogin()" style="display:none;">👤 Profile</button>
+            <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+        </div>
     </header>
 
     <div class="container">
@@ -305,8 +351,15 @@
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Customer Details:</label>
-                <input type="text" id="custName" class="input-box" placeholder="Apna Pura Naam Likhien">
-                <input type="tel" id="custPhone" class="input-box" placeholder="10 Digit Mobile Number">
+                <input type="text" id="custName" class="input-box" placeholder="Apna Pura Naam Likhien" readonly>
+                <input type="tel" id="custPhone" class="input-box" placeholder="10 Digit Mobile Number" readonly>
+                
+                <div style="margin-bottom: 5px;">
+                    <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Select Delivery Address:</label>
+                    <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressChange()">
+                        <option value="">-- Address Select Karein --</option>
+                    </select>
+                </div>
                 <textarea id="custAddress" class="input-box" placeholder="Pura Pata (Address) Likhien..." rows="2"></textarea>
 
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
@@ -346,28 +399,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        // PREVENT PAGE ZOOM GLOBALLY (Pinch & Double-tap on main UI)
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1 && !e.target.closest('#imageZoomModal')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        let lastPageTap = 0;
-        document.addEventListener('touchend', (e) => {
-            if (e.target.closest('#imageZoomModal')) return;
-            const now = new Date().getTime();
-            if (now - lastPageTap <= 300) {
-                e.preventDefault();
-            }
-            lastPageTap = now;
-        }, false);
-
-        document.addEventListener('gesturestart', (e) => e.preventDefault());
-        document.addEventListener('gesturechange', (e) => e.preventDefault());
-        document.addEventListener('gestureend', (e) => e.preventDefault());
+        import { getFirestore, collection, onSnapshot, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
@@ -381,6 +414,8 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
@@ -392,27 +427,12 @@
         let searchQuery = '';
         let cartTotalAmount = 0;
 
-        // Variant Variables
-        let selectedColor = "";
-        let selectedSize = "";
-
-        // PINCH ZOOM, DRAG & LIGHTBOX VARIABLES
-        let zoomScale = 1;
-        let zoomLastScale = 1;
-        let zoomStartDistance = 0;
-        let zoomLastTap = 0;
-        let zoomPosX = 0, zoomPosY = 0;
-        let startPosX = 0, startPosY = 0;
-        let isDragging = false;
-        let isPinching = false;
-        let preventClick = false;
-        let justPinched = false;
-        const MIN_ZOOM = 1;
-        const MAX_ZOOM = 4;
+        let currentUser = null;
+        let userProfileData = { name: "", phone: "", photo: "", addresses: [] };
+        let authMode = 'login';
 
         document.getElementById('cartCount').innerText = cart.length;
 
-        // Offline Handling
         window.checkNetworkStatus = () => {
             const offlineModal = document.getElementById('offlineModal');
             if (!navigator.onLine) {
@@ -424,22 +444,224 @@
         window.addEventListener('online', window.checkNetworkStatus);
         window.addEventListener('offline', window.checkNetworkStatus);
 
-        // Mobile Back Button History Push
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            const profileBtn = document.getElementById('headerProfileBtn');
+            const drawerAuthItem = document.getElementById('drawerAuthItem');
+
+            if (user) {
+                profileBtn.style.display = 'block';
+                drawerAuthItem.innerText = '👤 My Profile';
+                drawerAuthItem.onclick = () => { window.toggleDrawer(); window.toggleProfileModal(); };
+                await fetchUserData(user.uid);
+            } else {
+                profileBtn.style.display = 'none';
+                drawerAuthItem.innerText = '🔑 Login / Sign Up';
+                drawerAuthItem.onclick = () => { window.toggleDrawer(); window.toggleAuthModal(); };
+                userProfileData = { name: "", phone: "", photo: "", addresses: [] };
+            }
+        });
+
+        async function fetchUserData(uid) {
+            try {
+                const docRef = doc(db, "users", uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    userProfileData = docSnap.data();
+                } else {
+                    userProfileData = {
+                        name: currentUser.displayName || "Arpit Customer",
+                        phone: currentUser.phoneNumber || "",
+                        photo: currentUser.photoURL || "",
+                        addresses: []
+                    };
+                }
+                updateProfileUI();
+            } catch (e) {
+                console.error("Error fetching user data:", e);
+            }
+        }
+
+        function updateProfileUI() {
+            document.getElementById('profilePhoto').src = userProfileData.photo || 'https://via.placeholder.com/80?text=User';
+            document.getElementById('profileNameDisplay').innerText = userProfileData.name || 'User';
+            document.getElementById('profilePhoneDisplay').innerText = userProfileData.phone || currentUser.email || '';
+            document.getElementById('profilePhotoInput').value = userProfileData.photo || '';
+
+            renderAddressesList();
+        }
+
+        function renderAddressesList() {
+            const listContainer = document.getElementById('savedAddressesList');
+            listContainer.innerHTML = '';
+
+            if (!userProfileData.addresses || userProfileData.addresses.length === 0) {
+                listContainer.innerHTML = '<p style="color:#94a3b8; font-size:12px; text-align:center;">Koi address save nahi hai.</p>';
+                return;
+            }
+
+            userProfileData.addresses.forEach((addr, idx) => {
+                listContainer.innerHTML += `
+                    <div class="address-item">
+                        <div style="font-size:12px; color:#cbd5e1; word-break: break-all; max-width: 80%;"><b>#${idx+1}:</b> ${addr}</div>
+                        <button onclick="window.removeAddress(${idx})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px;">🗑</button>
+                    </div>
+                `;
+            });
+        }
+
+        window.addNewAddressPrompt = () => {
+            const newAddr = prompt("Apna naya address (Pura Pata) enter karein:");
+            if (newAddr && newAddr.trim() !== "") {
+                if (!userProfileData.addresses) userProfileData.addresses = [];
+                userProfileData.addresses.push(newAddr.trim());
+                saveUserDataToCloud();
+            }
+        };
+
+        window.removeAddress = (index) => {
+            userProfileData.addresses.splice(index, 1);
+            saveUserDataToCloud();
+        };
+
+        window.saveProfileChanges = async () => {
+            const newPhoto = document.getElementById('profilePhotoInput').value.trim();
+            userProfileData.photo = newPhoto;
+            await saveUserDataToCloud();
+            window.showToast("Profile updated successfully!");
+            window.toggleProfileModal();
+        };
+
+        async function saveUserDataToCloud() {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), userProfileData, { merge: true });
+                updateProfileUI();
+                
+                syncUserToGoogleSheet({
+                    name: userProfileData.name,
+                    phone: userProfileData.phone || currentUser.email,
+                    address: userProfileData.addresses.join(" | "),
+                    action: "register_user"
+                });
+            } catch (e) {
+                console.error("Cloud save error:", e);
+            }
+        }
+
+        function syncUserToGoogleSheet(payload) {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(err => console.log("Sheet sync error:", err));
+        }
+
+        window.toggleAuthModal = () => {
+            const modal = document.getElementById('authModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        window.toggleProfileModal = () => {
+            const modal = document.getElementById('profileModal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        window.checkProfileOrLogin = () => {
+            if (currentUser) {
+                window.toggleProfileModal();
+            } else {
+                window.toggleAuthModal();
+            }
+        };
+
+        window.switchAuthTab = (mode) => {
+            authMode = mode;
+            const loginBtn = document.getElementById('loginTabBtn');
+            const signupBtn = document.getElementById('signupTabBtn');
+            const signupFields = document.getElementById('signupFields');
+            const submitBtn = document.getElementById('authSubmitBtn');
+
+            if (mode === 'login') {
+                loginBtn.classList.add('active');
+                signupBtn.classList.remove('active');
+                signupFields.style.display = 'none';
+                submitBtn.innerText = 'Login';
+            } else {
+                signupBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+                signupFields.style.display = 'block';
+                submitBtn.innerText = 'Sign Up';
+            }
+        };
+
+        window.loginWithGoogle = async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                
+                userProfileData = {
+                    name: user.displayName || "Google User",
+                    phone: user.phoneNumber || user.email,
+                    photo: user.photoURL || "",
+                    addresses: userProfileData.addresses || []
+                };
+                
+                await saveUserDataToCloud();
+                window.toggleAuthModal();
+                window.showToast("Login successful via Google!");
+            } catch (error) {
+                window.showToast("Google Login failed: " + error.message, "error");
+            }
+        };
+
+        window.handleAuthSubmit = async () => {
+            const phone = document.getElementById('authPhone').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const name = document.getElementById('authName').value.trim();
+
+            if (!phone || !password) {
+                window.showToast("Mobile number aur password bharna zaroori hai!", "error");
+                return;
+            }
+
+            const pseudoEmail = `${phone}@arpitstore.com`;
+
+            try {
+                if (authMode === 'signup') {
+                    if (!name) {
+                        window.showToast("Apna naam bhi likhein!", "error");
+                        return;
+                    }
+                    await createUserWithEmailAndPassword(auth, pseudoEmail, password);
+                    userProfileData = { name: name, phone: phone, photo: "", addresses: [] };
+                    await saveUserDataToCloud();
+                    window.toggleAuthModal();
+                    window.showToast("Account created successfully!");
+                } else {
+                    await signInWithEmailAndPassword(auth, pseudoEmail, password);
+                    window.toggleAuthModal();
+                    window.showToast("Logged in successfully!");
+                }
+            } catch (error) {
+                window.showToast("Authentication Error: " + error.message, "error");
+            }
+        };
+
+        window.logoutUser = async () => {
+            await signOut(auth);
+            window.toggleProfileModal();
+            window.showToast("Logged out successfully!");
+        };
+
         function pushNavState(type) {
             history.pushState({ appNav: type }, '');
         }
 
-        // PERFECT MOBILE BACK BUTTON LISTENER
         window.addEventListener('popstate', (e) => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
-                if (zoomScale > 1) {
-                    resetZoom();
-                    pushNavState('zoom');
-                    return;
-                }
                 zoomModal.style.display = 'none';
-                resetZoom();
                 return;
             }
 
@@ -470,144 +692,30 @@
             }
         });
 
-        // PINCH ZOOM & DRAG HELPERS
-        function getDistance(touches) {
-            const dx = touches[0].clientX - touches[1].clientX;
-            const dy = touches[0].clientY - touches[1].clientY;
-            return Math.hypot(dx, dy);
-        }
-
-        function applyZoomTransform() {
-            const zoomedImg = document.getElementById('zoomedImg');
-            if (zoomedImg) {
-                zoomedImg.style.transform = `translate(${zoomPosX}px, ${zoomPosY}px) scale(${zoomScale})`;
-            }
-        }
-
-        function resetZoom() {
-            zoomScale = 1;
-            zoomLastScale = 1;
-            zoomStartDistance = 0;
-            zoomPosX = 0;
-            zoomPosY = 0;
-            isDragging = false;
-            isPinching = false;
-            applyZoomTransform();
-        }
-
-        // Image Lightbox Zoom Controls
         window.openZoomModal = (imgUrl) => {
             const modal = document.getElementById('imageZoomModal');
             const zoomedImg = document.getElementById('zoomedImg');
             if(modal && zoomedImg) {
                 zoomedImg.src = imgUrl;
-                resetZoom();
+                zoomedImg.classList.remove('zoomed');
                 modal.style.display = 'flex';
                 pushNavState('zoom');
             }
         };
 
-        window.closeZoomModal = (force = false) => {
-            if (!force && (preventClick || justPinched || zoomScale > 1)) return;
+        window.closeZoomModal = () => {
             const modal = document.getElementById('imageZoomModal');
             if(modal && modal.style.display === 'flex') {
                 modal.style.display = 'none';
-                resetZoom();
                 if (history.state && history.state.appNav === 'zoom') {
                     history.back();
                 }
             }
         };
 
-        // IMAGE LIGHTBOX TOUCH GESTURES (Pinch Zoom Hold & Drag Fix)
-        const zoomContainer = document.getElementById('imageZoomModal');
-        if (zoomContainer) {
-            zoomContainer.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    isPinching = true;
-                    isDragging = false;
-                    e.preventDefault();
-                    zoomStartDistance = getDistance(e.touches);
-                    zoomLastScale = zoomScale;
-                } else if (e.touches.length === 1) {
-                    const currentTime = new Date().getTime();
-                    const tapLength = currentTime - zoomLastTap;
-                    
-                    if (tapLength < 300 && tapLength > 0) {
-                        e.preventDefault();
-                        if (zoomScale > 1) {
-                            resetZoom();
-                        } else {
-                            zoomScale = 2.5;
-                            zoomLastScale = 2.5;
-                            zoomPosX = 0;
-                            zoomPosY = 0;
-                            applyZoomTransform();
-                        }
-                    } else if (zoomScale > 1 && !isPinching) {
-                        isDragging = true;
-                        startPosX = e.touches[0].clientX - zoomPosX;
-                        startPosY = e.touches[0].clientY - zoomPosY;
-                    }
-                    zoomLastTap = currentTime;
-                }
-            }, { passive: false });
-
-            zoomContainer.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && isPinching) {
-                    e.preventDefault();
-                    const currentDistance = getDistance(e.touches);
-                    if (zoomStartDistance > 0) {
-                        const factor = currentDistance / zoomStartDistance;
-                        zoomScale = Math.min(Math.max(zoomLastScale * factor, MIN_ZOOM), MAX_ZOOM);
-                        if (zoomScale === 1) { 
-                            zoomPosX = 0; 
-                            zoomPosY = 0; 
-                        }
-                        applyZoomTransform();
-                    }
-                } else if (e.touches.length === 1 && isDragging && zoomScale > 1) {
-                    e.preventDefault();
-                    zoomPosX = e.touches[0].clientX - startPosX;
-                    zoomPosY = e.touches[0].clientY - startPosY;
-                    applyZoomTransform();
-                }
-            }, { passive: false });
-
-            zoomContainer.addEventListener('touchend', (e) => {
-                if (isPinching) {
-                    justPinched = true;
-                    setTimeout(() => { justPinched = false; }, 400);
-                    
-                    if (e.touches.length === 1) {
-                        isPinching = false;
-                        zoomLastScale = zoomScale;
-                        isDragging = true;
-                        startPosX = e.touches[0].clientX - zoomPosX;
-                        startPosY = e.touches[0].clientY - zoomPosY;
-                    } else if (e.touches.length === 0) {
-                        isPinching = false;
-                        isDragging = false;
-                        zoomLastScale = zoomScale;
-                    }
-                } else if (e.touches.length === 0) {
-                    isDragging = false;
-                }
-
-                preventClick = true;
-                setTimeout(() => { preventClick = false; }, 300);
-            });
-
-            zoomContainer.addEventListener('touchcancel', () => {
-                isPinching = false;
-                isDragging = false;
-                zoomLastScale = zoomScale;
-            });
-        }
-
-        function saveActiveTab(tabName) {
-            sessionStorage.setItem('active_store_tab', tabName);
-        }
+        window.toggleZoom = (imgElement) => {
+            imgElement.classList.toggle('zoomed');
+        };
 
         window.showToast = (message, type = "success") => {
             const container = document.getElementById("toastContainer");
@@ -620,16 +728,6 @@
                 if(container.contains(toast)) container.removeChild(toast);
             }, 3000);
         };
-
-        let touchStart = 0;
-        let touchEnd = 0;
-        window.addEventListener('touchstart', e => { touchStart = e.touches[0].clientY; }, {passive: true});
-        window.addEventListener('touchend', e => {
-            touchEnd = e.changedTouches[0].clientY;
-            if (window.scrollY === 0 && touchEnd - touchStart > 130) {
-                location.reload();
-            }
-        }, {passive: true});
 
         function formatMediaUrl(url) {
             if(!url) return '';
@@ -644,8 +742,6 @@
 
         function listenToProducts() {
             window.checkNetworkStatus();
-            fetchLiveStatusForAllOrders();
-
             const productsRef = collection(db, "products");
             onSnapshot(productsRef, (snapshot) => {
                 if(!snapshot.empty) {
@@ -691,11 +787,6 @@
             const menu = document.getElementById('filterSortDropdown');
             const isHidden = menu.style.display === 'none';
             menu.style.display = isHidden ? 'block' : 'none';
-            
-            const btn = document.getElementById('filterToggleBtn');
-            if (btn) {
-                btn.style.background = isHidden ? 'rgba(56, 189, 248, 0.25)' : 'rgba(30, 41, 59, 0.8)';
-            }
         };
 
         window.toggleDrawer = () => {
@@ -704,15 +795,11 @@
             drawer.classList.toggle('open');
             const isOpen = drawer.classList.contains('open');
             overlay.style.display = isOpen ? 'block' : 'none';
-            if(isOpen) {
-                pushNavState('drawer');
-            } else if (history.state && history.state.appNav === 'drawer') {
-                history.back();
-            }
+            if(isOpen) pushNavState('drawer');
         };
 
         window.goHome = () => {
-            saveActiveTab('All');
+            sessionStorage.setItem('active_store_tab', 'All');
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             window.clearSearchBox();
@@ -721,13 +808,11 @@
         };
 
         window.goHomeSilently = () => {
-            saveActiveTab('All');
             currentCategory = 'All';
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const homeTab = document.getElementById('tab-All');
-            if(homeTab) homeTab.classList.add('active');
+            document.getElementById('tab-All').classList.add('active');
             document.getElementById('pageTitle').innerText = 'All Products';
             document.getElementById('sareeOfferBanner').style.display = 'none';
             window.applyFiltersAndRender();
@@ -735,7 +820,6 @@
 
         window.toggleLike = (id, event) => {
             if(event) event.stopPropagation(); 
-            
             let isAdding = false;
             if (watchlist.includes(id)) {
                 watchlist = watchlist.filter(itemId => itemId !== id);
@@ -743,78 +827,53 @@
                 watchlist.push(id);
                 isAdding = true;
             }
-            
             localStorage.setItem('arpit_watchlist', JSON.stringify(watchlist));
             window.applyFiltersAndRender();
-
-            const detailLikeBtn = document.getElementById('detailLikeBtn');
-            if (detailLikeBtn) {
-                detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
-            }
-            
-            if(isAdding) {
-                window.showToast("Saved to Watchlist!");
-            }
+            if(isAdding) window.showToast("Saved to Watchlist!");
         };
 
         window.showWatchlist = () => {
-            saveActiveTab('Watchlist');
+            sessionStorage.setItem('active_store_tab', 'Watchlist');
             currentCategory = 'Watchlist';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
-            
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const watchTab = document.getElementById('tab-Watchlist');
-            if(watchTab) watchTab.classList.add('active');
-            
+            document.getElementById('tab-Watchlist').classList.add('active');
             document.getElementById('pageTitle').innerText = '❤️ My Watchlist';
             document.getElementById('sareeOfferBanner').style.display = 'none';
-            
             pushNavState('watchlist');
             window.applyFiltersAndRender();
         };
 
         window.showMyOrders = () => {
-            saveActiveTab('MyOrders');
+            sessionStorage.setItem('active_store_tab', 'MyOrders');
             currentCategory = 'MyOrders';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
-            
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const orderTab = document.getElementById('tab-Orders');
-            if(orderTab) orderTab.classList.add('active');
-            
+            document.getElementById('tab-Orders').classList.add('active');
             document.getElementById('pageTitle').innerText = '📦 My Orders';
             document.getElementById('sareeOfferBanner').style.display = 'none';
-            
             pushNavState('orders');
-            fetchLiveStatusForAllOrders();
             renderOrdersUI();
         };
 
         window.filterCategory = (cat) => {
-            saveActiveTab(cat);
+            sessionStorage.setItem('active_store_tab', cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
             if(cat === 'MyOrders') { window.showMyOrders(); return; }
             
             currentCategory = cat;
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
-            
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const activeTab = document.getElementById('tab-' + cat);
-            if(activeTab) activeTab.classList.add('active');
-            
+            document.getElementById('tab-' + cat).classList.add('active');
             document.getElementById('pageTitle').innerText = cat === 'All' ? 'All Products' : cat + ' Collection';
-            
-            const banner = document.getElementById('sareeOfferBanner');
-            if (cat === 'Saree') { banner.style.display = 'block'; } else { banner.style.display = 'none'; }
-            
+            document.getElementById('sareeOfferBanner').style.display = (cat === 'Saree') ? 'block' : 'none';
             if(cat !== 'All') pushNavState('category');
             window.applyFiltersAndRender();
         };
 
         window.handleSearch = (val) => {
             searchQuery = val.trim().toLowerCase();
-            const clearBtn = document.getElementById('clearSearchBtn');
-            clearBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
+            document.getElementById('clearSearchBtn').style.display = searchQuery.length > 0 ? 'block' : 'none';
             window.applyFiltersAndRender();
         };
 
@@ -836,94 +895,36 @@
             } else {
                 filtered = liveProducts.filter(p => {
                     let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-                    let target = currentCategory.toLowerCase();
-                    return productCat.includes(target) || target.includes(productCat);
+                    return productCat.includes(currentCategory.toLowerCase());
                 });
             }
 
             if (searchQuery !== '') {
-                filtered = filtered.filter(p => {
-                    let name = (p.name || '').toLowerCase();
-                    let desc = (p.description || '').toLowerCase();
-                    let cat = (p.category || p.type || p.cat || '').toLowerCase();
-                    return name.includes(searchQuery) || desc.includes(searchQuery) || cat.includes(searchQuery);
-                });
+                filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(searchQuery));
             }
 
             const sortVal = document.getElementById('sortSelect').value;
-            if (sortVal === 'low') {
-                filtered.sort((a, b) => Number(a.price) - Number(b.price));
-            } else if (sortVal === 'high') {
-                filtered.sort((a, b) => Number(b.price) - Number(a.price));
-            } else if (sortVal === 'name') {
-                filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-            }
+            if (sortVal === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
+            if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
 
-            updateActiveFiltersUI();
             renderProductsUI(filtered);
         };
-
-        function updateActiveFiltersUI() {
-            const badgeContainer = document.getElementById('activeFilters');
-            badgeContainer.innerHTML = '';
-            let badgesHtml = '';
-            if (currentCategory !== 'All' && currentCategory !== 'MyOrders') {
-                badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
-            }
-            if (searchQuery !== '') {
-                badgesHtml += `<div class="filter-badge">Keyword: "${searchQuery}" <span onclick="window.clearSearchBox()">×</span></div>`;
-            }
-            badgeContainer.innerHTML = badgesHtml;
-        }
 
         function renderProductsUI(items) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             
             if(items.length === 0) {
-                if(currentCategory === 'Watchlist') {
-                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">💔</div><p style="color: #94a3b8; font-size:16px;">Aapki Watchlist khaali hai.<br>Products par ❤️ dabayein!</p></div>';
-                } else if(searchQuery !== '') {
-                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for "<b>${searchQuery}</b>"</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding:10px 20px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
-                } else {
-                    grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me abhi koi product nahi hai!</p>';
-                }
+                grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 40px;">Koi product nahi mila!</p>';
                 return;
             }
 
             items.forEach(p => {
                 let isLiked = watchlist.includes(p.id);
-                let heartIcon = isLiked ? '❤️' : '🤍';
-                let categoryTag = p.category || p.type || p.cat || 'General';
-
-                // Discount Logic
-                let sellingPrice = Number(p.price) || 0;
-                let mrpPrice = Number(p.mrp) || 0;
-                let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
-
-                if (mrpPrice > sellingPrice) {
-                    let offAmount = mrpPrice - sellingPrice;
-                    let offPercent = Math.round((offAmount / mrpPrice) * 100);
-                    priceHtml = `
-                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
-                            <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
-                            <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">
-                                ${offPercent}% OFF (₹${offAmount} OFF)
-                            </span>
-                        </div>
-                    `;
-                }
-
                 let mediaHtml = '<div class="media-slider">';
                 if (p.media && p.media.length > 0) {
                     p.media.forEach(rawLink => {
-                        let link = formatMediaUrl(rawLink);
-                        if (link.includes('.mp4') || link.includes('video')) {
-                            mediaHtml += `<video src="${link}" class="slide-item" autoplay muted loop playsinline></video>`;
-                        } else {
-                            mediaHtml += `<img src="${link}" class="slide-item" loading="lazy" onerror="this.src='https://via.placeholder.com/300x180?text=Image+Error'">`;
-                        }
+                        mediaHtml += `<img src="${formatMediaUrl(rawLink)}" class="slide-item" loading="lazy">`;
                     });
                 } else {
                     mediaHtml += `<img src="https://via.placeholder.com/300x180?text=No+Image" class="slide-item">`;
@@ -932,12 +933,12 @@
 
                 grid.innerHTML += `
                     <div class="card" onclick="window.showProductDetail('${p.id}')">
-                        <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</div>
+                        <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${isLiked ? '❤️' : '🤍'}</div>
                         ${mediaHtml}
                         <div>
-                            <small>${categoryTag}</small>
+                            <small>${p.category || 'General'}</small>
                             <h3>${p.name}</h3>
-                            ${priceHtml}
+                            <p style="font-weight: 700; color: #38bdf8; font-size: 18px;">₹${p.price}</p>
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); window.addToCart('${p.id}')">Add to Cart</button>
                     </div>
@@ -948,300 +949,38 @@
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-
             let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
 
             if(savedOrders.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><p style="color: #94a3b8;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
                 return;
             }
 
             savedOrders.forEach(ord => {
-                let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
-                ord.items.forEach(it => {
-                    
-                    let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
-                    if (it.media && it.media.length > 0) {
-                        imgUrl = formatMediaUrl(it.media[0]);
-                    } else if (it.colors && it.colors.length > 0) {
-                        let c = it.colors[0];
-                        let cImg = Array.isArray(c.images) ? c.images[0] : (Array.isArray(c.image) ? c.image[0] : (c.image || c.img));
-                        if (cImg) imgUrl = formatMediaUrl(cImg);
-                    }
-                    
-                    itemsListHtml += `
-                        <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" title="Click to view & buy again" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
-                                <div>
-                                    <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
-                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold;">₹${it.price}</div>
-                                </div>
-                            </div>
-                            <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap;">Buy Again 🔄</button>
-                        </li>
-                    `;
-                });
-                itemsListHtml += '</ul>';
-
-                let subText = "";
-                let badgeBg = '#0284c7';
-
-                if (ord.status === "Order Confirmed") {
-                    subText = "Hi, your order is ready";
-                } else if (ord.status === "Your order on the way") {
-                    badgeBg = '#eab308';
-                    subText = "Order on the way! 🚚";
-                } else if (ord.status === "Your order is delivered") {
-                    badgeBg = '#22c55e';
-                    subText = "Delivered Successfully ✅";
-                } else if (ord.status === "Cancel your order") {
-                    badgeBg = '#ef4444';
-                    subText = "Order Cancelled ❌";
-                }
-
                 grid.innerHTML += `
                     <div class="order-card" style="grid-column: 1/-1;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <span class="order-status-badge" style="background: ${badgeBg}; margin: 0;">${ord.status}</span>
-                            <span style="color:#38bdf8; font-size:13px; font-weight:bold;">${subText}</span>
-                        </div>
-                        <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
-                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date & Time: ${ord.date}</p>
-                        ${itemsListHtml}
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
-                            <span style="color:#94a3b8; font-size:14px;">Total Paid:</span>
-                            <span style="color:#38bdf8; font-weight:bold; font-size:18px;">₹${ord.total}</span>
-                        </div>
+                        <span class="order-status-badge">${ord.status}</span>
+                        <h4 style="color:white; margin: 10px 0 5px 0;">Order ID: #${ord.orderId}</h4>
+                        <p style="color:#94a3b8; font-size:12px;">Date: ${ord.date}</p>
+                        <p style="color:#38bdf8; font-weight:bold; margin-top:10px;">Total Paid: ₹${ord.total}</p>
                     </div>
                 `;
             });
         }
 
-        // Live Order Status Fetch Logic
-        function fetchLiveStatusForAllOrders() {
-            if (!navigator.onLine) return;
-            let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
-            if (savedOrders.length === 0) return;
-            let statusChanged = false;
-
-            let fetchPromises = savedOrders.map((ord, index) => {
-                let cleanId = ord.orderId.toString().replace('#', '').trim();
-                
-                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.status && data.status !== ord.status) {
-                            savedOrders[index].status = data.status;
-                            statusChanged = true;
-                        }
-                    })
-                    .catch(err => console.log("Status check error:", err));
-            });
-
-            Promise.all(fetchPromises).then(() => {
-                if(statusChanged) {
-                    localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
-                    if(currentCategory === 'MyOrders') {
-                        renderOrdersUI();
-                    }
-                }
-            });
-        }
-
-        // Instant Status updates when app opens or comes back to focus
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                fetchLiveStatusForAllOrders();
-            }
-        });
-        window.addEventListener('focus', fetchLiveStatusForAllOrders);
-        setInterval(fetchLiveStatusForAllOrders, 5000);
-
-        // Multi-Image Color Selection
-        window.selectColor = (colorName, colorImagesJson, el) => {
-            selectedColor = colorName;
-            const label = document.getElementById('colorLabel');
-            if (label) label.innerText = colorName;
-            
-            document.querySelectorAll('.color-thumb').forEach(thumb => thumb.classList.remove('active'));
-            if (el) el.classList.add('active');
-
-            let images = [];
-            try {
-                images = JSON.parse(decodeURIComponent(colorImagesJson));
-            } catch(e) {
-                images = [colorImagesJson];
-            }
-
-            if (!Array.isArray(images)) images = [images];
-
-            const slider = document.querySelector('.detail-slider');
-            if (slider && images.length > 0) {
-                let newSliderHtml = "";
-                images.forEach(imgUrl => {
-                    let link = formatMediaUrl(imgUrl);
-                    newSliderHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
-                });
-                slider.innerHTML = newSliderHtml;
-                setupHoldZoom();
-            }
-        };
-
-        window.selectSize = (size, el) => {
-            selectedSize = size;
-            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-            if(el) el.classList.add('active');
-        };
-
-        // HOLD-TO-ZOOM LOGIC FOR MOBILE FIX
-        function setupHoldZoom() {
-            const sliders = document.querySelectorAll('.detail-slider');
-            sliders.forEach(slider => {
-                let holdTimer = null;
-                let isHolding = false;
-
-                slider.addEventListener('touchstart', (e) => {
-                    // Single finger hold logic
-                    if (e.touches.length === 1) {
-                        isHolding = false;
-                        holdTimer = setTimeout(() => {
-                            isHolding = true;
-                            slider.classList.add('zoomed');
-                        }, 400); // 400ms hold time
-                    }
-                }, { passive: true });
-
-                slider.addEventListener('touchmove', () => {
-                    clearTimeout(holdTimer);
-                }, { passive: true });
-
-                slider.addEventListener('touchend', (e) => {
-                    clearTimeout(holdTimer);
-                    if (isHolding) {
-                        e.preventDefault(); // Prevents bubbling to link/home navigation
-                        slider.classList.remove('zoomed');
-                        isHolding = false;
-                    }
-                }, { passive: false });
-
-                slider.addEventListener('touchcancel', () => {
-                    clearTimeout(holdTimer);
-                    slider.classList.remove('zoomed');
-                    isHolding = false;
-                });
-            });
-        }
-
-        // Product Detail View
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
-            if(!p) {
-                window.showToast("Product details unavailable!", "error");
-                return;
-            }
+            if(!p) return;
 
             pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
 
-            let isLiked = watchlist.includes(p.id);
-            let heartIcon = isLiked ? '❤️' : '🤍';
-            let categoryTag = p.category || p.type || p.cat || 'General';
-
-            // Discount Logic for Detail View
-            let detailSellingPrice = Number(p.price) || 0;
-            let detailMrpPrice = Number(p.mrp) || 0;
-            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
-
-            if (detailMrpPrice > detailSellingPrice) {
-                let offAmount = detailMrpPrice - detailSellingPrice;
-                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
-                detailPriceHtml = `
-                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
-                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
-                        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">
-                            SAVE ₹${offAmount} (${offPercent}% OFF)
-                        </span>
-                    </div>
-                `;
-            }
-
-            let parsedColors = [];
-            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-                parsedColors = p.colors.map(c => {
-                    if (typeof c === 'object' && c !== null) {
-                        let imgList = [];
-                        if (Array.isArray(c.images)) {
-                            imgList = c.images;
-                        } else if (Array.isArray(c.image)) { 
-                            imgList = c.image;
-                        } else if (c.image) {
-                            imgList = [c.image];
-                        } else if (c.img) {
-                            imgList = [c.img];
-                        }
-                        return {
-                            name: c.name || c.color || c.title || 'Variant',
-                            images: imgList
-                        };
-                    } else if (typeof c === 'string') {
-                        return { name: c, images: [] };
-                    }
-                    return { name: '', images: [] };
-                });
-            }
-
-            selectedColor = parsedColors.length > 0 ? parsedColors[0].name : "";
-            selectedSize = (p.sizes && p.sizes.length > 0) ? p.sizes[0] : "";
-
-            let colorsHtml = "";
-            if (parsedColors.length > 0) {
-                colorsHtml = `
-                    <div class="variant-section">
-                        <div class="variant-title">Selected Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
-                        <div class="color-options">
-                `;
-                parsedColors.forEach((c, index) => {
-                    let thumbImg = (c.images.length > 0) ? formatMediaUrl(c.images[0]) : (p.media && p.media.length > 0 ? formatMediaUrl(p.media[0]) : 'https://via.placeholder.com/60x75?text=No+Img');
-                    let jsonImages = encodeURIComponent(JSON.stringify(c.images));
-                    
-                    colorsHtml += `
-                        <img src="${thumbImg}" class="color-thumb ${index === 0 ? 'active' : ''}" 
-                             onclick="window.selectColor('${c.name}', '${jsonImages}', this)" loading="lazy">
-                    `;
-                });
-                colorsHtml += `</div></div>`;
-            }
-
-            let sizesHtml = "";
-            if (p.sizes && p.sizes.length > 0) {
-                sizesHtml = `
-                    <div class="variant-section">
-                        <div class="variant-title">Select Size:</div>
-                        <div class="size-options">
-                `;
-                p.sizes.forEach((s, index) => {
-                    sizesHtml += `
-                        <button class="size-btn ${index === 0 ? 'active' : ''}" 
-                                onclick="window.selectSize('${s}', this)">${s}</button>
-                    `;
-                });
-                sizesHtml += `</div></div>`;
-            }
-
-            let initialImages = (parsedColors.length > 0 && parsedColors[0].images.length > 0) ? parsedColors[0].images : (p.media || []);
-
             let mediaHtml = '<div class="detail-slider">';
-            if (initialImages.length > 0) {
-                initialImages.forEach(rawLink => {
+            if (p.media && p.media.length > 0) {
+                p.media.forEach(rawLink => {
                     let link = formatMediaUrl(rawLink);
-                    if (link.includes('.mp4') || link.includes('video')) {
-                        mediaHtml += `<video src="${link}" class="detail-slide-item" controls autoplay muted loop></video>`;
-                    } else {
-                        mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" title="Click to Zoom Image" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Error'">`;
-                    }
+                    mediaHtml += `<img src="${link}" class="detail-slide-item" ondblclick="window.openZoomModal('${link}')" title="Double click to zoom">`;
                 });
             } else {
                 mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" class="detail-slide-item">`;
@@ -1250,29 +989,11 @@
 
             document.getElementById('detailContent').innerHTML = `
                 ${mediaHtml}
-                <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                    <div>
-                        <small style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; font-weight: 600;">${categoryTag}</small>
-                        <h2 style="color: white; margin: 0; padding-right:10px;">${p.name}</h2>
-                    </div>
-                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
-                </div>
-                ${detailPriceHtml}
-                
-                ${colorsHtml}
-                ${sizesHtml}
-
-                <p style="color: #94a3b8; font-size: 15px; margin: 15px 0; line-height: 1.6;">${p.description || 'Shandaar quality ka product, Arpit Store par available hai.'}</p>
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <button class="add-btn" style="flex:1;" onclick="window.addToCartWithVariants('${p.id}')">Add to Cart</button>
-                    <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.addToCartWithVariants('${p.id}'); window.toggleCart();">Buy Now</button>
-                </div>
-                <button class="add-btn" style="background: #25D366; color: white; border: none; font-size: 16px; padding: 12px; margin-top: 5px;" onclick="window.shareProduct('${p.id}')">
-                    📲 Share on WhatsApp
-                </button>
+                <h2 style="color: white; margin-bottom: 10px;">${p.name}</h2>
+                <h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${p.price}</h3>
+                <p style="color: #94a3b8; font-size: 15px; margin-bottom: 20px;">${p.description || ''}</p>
+                <button class="add-btn" onclick="window.addToCart('${p.id}')">Add to Cart</button>
             `;
-            
-            setupHoldZoom();
             window.scrollTo(0, 0);
         };
 
@@ -1281,29 +1002,7 @@
             cart.push({ ...item });
             localStorage.setItem('arpit_cart', JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
-            window.updateCartUI();
             window.showToast(`${item.name} added to cart!`);
-        };
-
-        window.addToCartWithVariants = (id) => {
-            const item = liveProducts.find(p => p.id === id);
-            if(!item) return;
-
-            let itemToAdd = { ...item };
-            let variantDetails = [];
-            
-            if (selectedColor) variantDetails.push(selectedColor);
-            if (selectedSize) variantDetails.push(selectedSize);
-
-            if (variantDetails.length > 0) {
-                itemToAdd.name += ` (${variantDetails.join(' / ')})`;
-            }
-
-            cart.push(itemToAdd);
-            localStorage.setItem('arpit_cart', JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
-            window.updateCartUI();
-            window.showToast(`${itemToAdd.name} added to cart!`);
         };
 
         window.removeFromCart = (index) => {
@@ -1320,9 +1019,34 @@
             if (isOpening) {
                 pushNavState('cart');
                 window.updateCartUI();
-                window.handlePaymentMode();
-            } else if (history.state && history.state.appNav === 'cart') {
-                history.back();
+                window.autoFillCheckoutDetails();
+            }
+        };
+
+        window.autoFillCheckoutDetails = () => {
+            if (currentUser && userProfileData) {
+                document.getElementById('custName').value = userProfileData.name || '';
+                document.getElementById('custPhone').value = userProfileData.phone || '';
+                
+                const addressSelect = document.getElementById('checkoutAddressSelect');
+                addressSelect.innerHTML = '<option value="">-- Address Select Karein --</option>';
+                
+                if (userProfileData.addresses && userProfileData.addresses.length > 0) {
+                    userProfileData.addresses.forEach((addr, idx) => {
+                        addressSelect.innerHTML += `<option value="${addr}">Address #${idx+1}: ${addr}</option>`;
+                    });
+                }
+            } else {
+                document.getElementById('custName').value = '';
+                document.getElementById('custPhone').value = '';
+                document.getElementById('custAddress').value = '';
+            }
+        };
+
+        window.handleCheckoutAddressChange = () => {
+            const selectedAddr = document.getElementById('checkoutAddressSelect').value;
+            if (selectedAddr) {
+                document.getElementById('custAddress').value = selectedAddr;
             }
         };
 
@@ -1332,8 +1056,7 @@
             cartList.innerHTML = '';
             
             if(cart.length === 0) {
-                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center; padding: 20px 0;">Your cart is empty!</p>';
-                if (document.getElementById('totalPrice')) { document.getElementById('totalPrice').innerText = "0"; }
+                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center;">Your cart is empty!</p>';
                 document.getElementById('qrTotal').innerText = "0";
                 return;
             }
@@ -1350,19 +1073,12 @@
                     </div>
                 `;
             });
-            
-            if(document.getElementById('totalPrice')) document.getElementById('totalPrice').innerText = cartTotalAmount;
             document.getElementById('qrTotal').innerText = cartTotalAmount;
-            
-            let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
-            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-            document.getElementById('directPayLink').href = upiLink;
         };
 
         window.handlePaymentMode = () => {
             let mode = document.getElementById('paymentMode').value;
-            let onlineSection = document.getElementById('onlinePaymentSection');
-            onlineSection.style.display = (mode === 'Online') ? 'block' : 'none';
+            document.getElementById('onlinePaymentSection').style.display = (mode === 'Online') ? 'block' : 'none';
         };
 
         window.submitOrder = () => {
@@ -1373,32 +1089,18 @@
             const utrNumber = document.getElementById('utrNumber').value.trim();
 
             if(!name || !phone || !address) { 
-                window.showToast("Bhai, kripya Naam, Mobile Number aur Address poora bharein!", "error"); 
+                window.showToast("Kripya Naam, Mobile Number aur Address poora bharein!", "error"); 
                 return; 
             }
             if(cart.length === 0) { 
-                window.showToast("Cart me koi product hi nahi hai!", "error"); 
+                window.showToast("Cart me koi product nahi hai!", "error"); 
                 return; 
             }
-            if(paymentMode === 'Online' && utrNumber === "") {
-                window.showToast("Online Payment select kiya hai! UTR ID daalna zaroori hai.", "error");
-                document.getElementById('utrNumber').focus();
-                return;
-            }
-
-            let submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "Processing Order...";
-            submitBtn.disabled = true;
 
             let rawOrderId = Math.floor(100000 + Math.random() * 900000);
             let orderId = rawOrderId.toString();
-
             let now = new Date();
-            let timeStr = now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true});
-            let dateStr = now.toLocaleDateString('en-IN');
-            let fullDateTime = `${dateStr}, ${timeStr}`;
-
-            let productNames = cart.map(item => item.name).join(", ");
+            let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN')}`;
 
             let payload = {
                 action: "new_order", 
@@ -1406,7 +1108,7 @@
                 name: name, 
                 phone: phone,
                 address: address + (paymentMode === 'Online' ? ` (UTR: ${utrNumber})` : ''),
-                productName: productNames, 
+                productName: cart.map(i => i.name).join(", "), 
                 total: cartTotalAmount, 
                 date: fullDateTime
             };
@@ -1415,84 +1117,28 @@
                 method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            })
-            .then(() => {
+            }).then(() => {
                 let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
-                savedOrders.unshift({
-                    orderId: orderId, items: [...cart], total: cartTotalAmount,
-                    date: fullDateTime, status: "Order Confirmed"
-                });
+                savedOrders.unshift({ orderId, items: [...cart], total: cartTotalAmount, date: fullDateTime, status: "Order Confirmed" });
                 localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
 
                 document.getElementById('cartModal').style.display = 'none';
-                const successModal = document.getElementById('successModal');
-                successModal.style.display = 'flex';
-
+                document.getElementById('successModal').style.display = 'flex';
                 cart = [];
                 localStorage.removeItem('arpit_cart');
                 document.getElementById('cartCount').innerText = '0';
-                document.getElementById('custName').value = '';
-                document.getElementById('custPhone').value = '';
-                document.getElementById('custAddress').value = '';
-                document.getElementById('utrNumber').value = '';
-
-                setTimeout(() => { successModal.style.display = 'none'; window.showMyOrders(); }, 2500);
-            })
-            .catch(error => { 
-                console.error("Error:", error); 
-                window.showToast("Internet Error: Order fail ho gaya.", "error"); 
-            })
-            .finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
-        };
-
-        window.shareProduct = (id) => {
-            const p = liveProducts.find(item => item.id === id);
-            if(!p) return;
-
-            let cleanOrigin = window.location.origin;
-            let pathName = window.location.pathname;
-            if(pathName.endsWith('index.html')) { pathName = pathName.substring(0, pathName.lastIndexOf('index.html')); }
-            if(!pathName.endsWith('/')) { pathName += '/'; }
-            
-            let productLink = `${cleanOrigin}${pathName}?id=${encodeURIComponent(p.id)}`;
-            let shareText = `🔥 Check out this premium product!\n\n🛍️ *${p.name}*\n💰 *Price: ₹${p.price}*\n\n👉 Click the link to buy directly:\n${productLink}`;
-            let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-            window.open(whatsappUrl, '_blank');
+                setTimeout(() => { document.getElementById('successModal').style.display = 'none'; window.showMyOrders(); }, 2500);
+            });
         };
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const paramVal = urlParams.get('id');
-            
-            if (paramVal && !window.linkOpened && liveProducts.length > 0) {
+            if (paramVal && liveProducts.length > 0) {
                 const product = liveProducts.find(p => p.id === paramVal);
-                if (product) {
-                    window.linkOpened = true;
-                    window.showProductDetail(paramVal);
-                    return; 
-                }
-                
-                const matchedCategory = liveProducts.some(p => {
-                    let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-                    return productCat.includes(paramVal.toLowerCase());
-                });
-                
-                if (matchedCategory) {
-                    window.linkOpened = true;
-                    let formattedCat = paramVal.charAt(0).toUpperCase() + paramVal.slice(1).toLowerCase();
-                    window.filterCategory(formattedCat);
-                }
+                if (product) window.showProductDetail(paramVal);
             }
         };
-
-        const APP_VERSION = "2.0";
-        if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
-            localStorage.setItem('installed_app_version', APP_VERSION);
-            if ('caches' in window) {
-                caches.keys().then(names => { for (let name of names) caches.delete(name); });
-            }
-            window.location.reload(true);
-        }
 
         window.onload = listenToProducts;
     </script>
