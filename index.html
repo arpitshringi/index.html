@@ -578,6 +578,7 @@
         let selectedColor = "";
         let selectedColorImg = "";
         let selectedSize = "";
+        let selectedImage = ""; // Main image state variable
 
         // PINCH ZOOM, DRAG & LIGHTBOX VARIABLES
         let zoomScale = 1;
@@ -1407,19 +1408,19 @@
         window.selectColor = (colorName, el, imgUrl = '') => {
             selectedColor = colorName;
             selectedColorImg = imgUrl;
+            
+            // Main image state update on color selection
+            if (imgUrl) {
+                selectedImage = imgUrl;
+                const mainImg = document.getElementById('mainProductImage');
+                if (mainImg) mainImg.src = imgUrl;
+            }
+
             const label = document.getElementById('colorLabel');
             if (label) label.innerText = colorName;
             const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
             siblings.forEach(btn => btn.classList.remove('active'));
             if (el) el.classList.add('active');
-
-            if (imgUrl) {
-                const slider = document.querySelector('.detail-slider');
-                if (slider) {
-                    const firstImg = slider.querySelector('.detail-slide-item');
-                    if (firstImg) firstImg.src = imgUrl;
-                }
-            }
         };
 
         window.selectSize = (size, el) => {
@@ -1442,6 +1443,9 @@
             selectedColor = "";
             selectedColorImg = "";
 
+            // Initialize selectedImage state with default product media or first image
+            selectedImage = (p.media && p.media.length > 0) ? formatMediaUrl(p.media[0]) : '';
+
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
@@ -1461,15 +1465,18 @@
                 `;
             }
 
-            let initialImages = p.media || [];
+            // Main image state usage: <img src={selectedImage} alt="Main Product" />
             let mediaHtml = '<div class="detail-slider">';
-            if (initialImages.length > 0) {
-                initialImages.forEach(rawLink => {
-                    let link = formatMediaUrl(rawLink);
-                    mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')">`;
-                });
+            if (selectedImage) {
+                mediaHtml += `<img src="${selectedImage}" id="mainProductImage" class="detail-slide-item" onclick="window.openZoomModal('${selectedImage}')" alt="Main Product">`;
             } else {
-                mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" class="detail-slide-item">`;
+                mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" id="mainProductImage" class="detail-slide-item" alt="Main Product">`;
+            }
+            if (p.media && p.media.length > 1) {
+                p.media.slice(1).forEach(rawLink => {
+                    let link = formatMediaUrl(rawLink);
+                    mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" alt="Product Image">`;
+                });
             }
             mediaHtml += '</div>';
 
@@ -1478,19 +1485,29 @@
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
                 let firstColor = p.colors[0];
                 selectedColor = typeof firstColor === 'object' ? firstColor.name : firstColor;
-                selectedColorImg = (typeof firstColor === 'object' && firstColor.image) ? formatMediaUrl(firstColor.image) : '';
                 
+                // Using color.image[0] fix for chote icons
+                if (typeof firstColor === 'object' && firstColor.image) {
+                    let firstImgSrc = Array.isArray(firstColor.image) ? firstColor.image[0] : firstColor.image;
+                    selectedColorImg = formatMediaUrl(firstImgSrc);
+                    selectedImage = selectedColorImg; // Set default selected image to first color image if available
+                }
+
                 variantHtml += `<div class="variant-section">
                     <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
                     <div class="color-options">`;
 
                 p.colors.forEach((c, idx) => {
                     let cName = typeof c === 'object' ? c.name : c;
-                    let cImg = (typeof c === 'object' && c.image) ? formatMediaUrl(c.image) : '';
+                    let cImg = '';
+                    if (typeof c === 'object' && c.image) {
+                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image; // color.image[0] fix
+                        cImg = formatMediaUrl(imgUrl);
+                    }
                     let active = idx === 0 ? 'active' : '';
 
                     if (cImg) {
-                        variantHtml += `<img src="${cImg}" class="color-thumb ${active}" onclick="window.selectColor('${cName}', this, '${cImg}')" title="${cName}" alt="${cName}">`;
+                        variantHtml += `<img src="${cImg}" class="color-thumb ${active}" onclick="window.selectColor('${cName}', this, '${cImg}')" title="${cName}" alt="color icon">`;
                     } else {
                         variantHtml += `<div class="size-btn ${active}" onclick="window.selectColor('${cName}', this)">🎨 ${cName}</div>`;
                     }
