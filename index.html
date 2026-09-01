@@ -129,10 +129,14 @@
         /* Color & Size Variant Styling */
         .variant-section { margin: 15px 0; background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
-        .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .color-options { display: flex; gap: 12px; overflow-x: auto; padding: 5px 0 8px 0; scrollbar-width: none; align-items: flex-start; }
         .color-options::-webkit-scrollbar { display: none; }
-        .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
-        .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
+        
+        .color-thumb-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; flex-shrink: 0; }
+        .color-thumb { width: 55px; height: 70px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
+        .color-thumb-wrapper.active .color-thumb, .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
+        .thumb-label { font-size: 11px; color: #94a3b8; font-weight: 600; text-align: center; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .color-thumb-wrapper.active .thumb-label { color: #38bdf8; font-weight: 700; }
 
         .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
         .size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px;}
@@ -170,7 +174,7 @@
         .back-link { color: #38bdf8; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; padding: 8px 16px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; transition: 0.3s; }
         .back-link:hover { background: rgba(56, 189, 248, 0.2); }
         
-        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; }
+        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; scroll-behavior: smooth; }
         .detail-slider::-webkit-scrollbar { display: none; }
         .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
         .detail-slider.zoomed { transform: scale(1.4); z-index: 10; }
@@ -1055,6 +1059,26 @@
             return url;
         }
 
+        // Helper for standard color hex fallback
+        function getStandardColorHex(name) {
+            if (!name) return null;
+            const color = name.toLowerCase().trim();
+            const colorMap = {
+                'red': '#ef4444', 'laal': '#ef4444', 'lal': '#ef4444',
+                'blue': '#3b82f6', 'neela': '#3b82f6', 'nila': '#3b82f6',
+                'green': '#22c55e', 'hara': '#22c55e',
+                'yellow': '#eab308', 'peela': '#eab308',
+                'pink': '#ec4899', 'gulaabi': '#ec4899', 'gulabi': '#ec4899',
+                'black': '#000000', 'kaala': '#000000', 'kala': '#000000',
+                'white': '#ffffff', 'safed': '#ffffff',
+                'purple': '#a855f7', 'baingani': '#a855f7',
+                'orange': '#f97316', 'santra': '#f97316',
+                'maroon': '#800000', 'gold': '#ffd700', 'golden': '#ffd700',
+                'silver': '#c0c0c0'
+            };
+            return colorMap[color] || null;
+        }
+
         function listenToProducts() {
             window.checkNetworkStatus();
             fetchLiveStatusForAllOrders();
@@ -1395,13 +1419,39 @@
             });
         }
 
-        window.selectColor = (colorName, el) => {
+        // DYNAMIC COLOR SELECTION AND SCREEN IMAGE UPDATE FUNCTION
+        window.selectColor = (colorName, el, colorImg) => {
             selectedColor = colorName;
             const label = document.getElementById('colorLabel');
             if (label) label.innerText = colorName;
-            const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
-            siblings.forEach(btn => btn.classList.remove('active'));
-            if (el) el.classList.add('active');
+
+            // Remove active class from all color items
+            const parent = el.closest('.color-options') || el.parentElement;
+            if (parent) {
+                const allItems = parent.querySelectorAll('.color-thumb-wrapper, .size-btn, .color-thumb');
+                allItems.forEach(item => item.classList.remove('active'));
+            }
+
+            // Set active class on clicked element wrapper
+            const wrapper = el.closest('.color-thumb-wrapper') || el;
+            wrapper.classList.add('active');
+            if (el.classList.contains('color-thumb')) el.classList.add('active');
+
+            // Update main product detail view image on screen
+            if (colorImg) {
+                const formattedImg = formatMediaUrl(colorImg);
+                const detailSlider = document.querySelector('.detail-slider');
+                if (detailSlider) {
+                    const slideItems = detailSlider.querySelectorAll('.detail-slide-item');
+                    if (slideItems.length > 0) {
+                        slideItems[0].src = formattedImg;
+                        slideItems[0].setAttribute('onclick', `window.openZoomModal('${formattedImg}')`);
+                        detailSlider.scrollLeft = 0;
+                    } else {
+                        detailSlider.innerHTML = `<img src="${formattedImg}" class="detail-slide-item" onclick="window.openZoomModal('${formattedImg}')">`;
+                    }
+                }
+            }
         };
 
         window.selectSize = (size, el) => {
@@ -1454,17 +1504,63 @@
             }
             mediaHtml += '</div>';
 
-            // DYNAMIC COLOR AND SIZE HTML GENERATION
+            // DYNAMIC COLOR THUMBNAILS & VARIANT RENDERING
             let variantHtml = '';
             
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-                selectedColor = typeof p.colors[0] === 'object' ? p.colors[0].name : p.colors[0];
-                variantHtml += `<div class="variant-section"><div class="variant-title">Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div><div class="color-options" style="display: flex; gap: 8px; flex-wrap: wrap;">`;
+                let firstColorObj = p.colors[0];
+                let firstColorName = typeof firstColorObj === 'object' ? (firstColorObj.name || firstColorObj.color || firstColorObj.colorName || 'Color') : firstColorObj.toString();
+                selectedColor = firstColorName;
+
+                variantHtml += `
+                    <div class="variant-section">
+                        <div class="variant-title">Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
+                        <div class="color-options">
+                `;
+
                 p.colors.forEach((c, idx) => {
-                    let cName = typeof c === 'object' ? c.name : c;
-                    let active = idx === 0 ? 'active' : '';
-                    variantHtml += `<div class="size-btn ${active}" onclick="window.selectColor('${cName}', this)">${cName}</div>`;
+                    let cName = '';
+                    let cImg = '';
+                    let cHex = '';
+
+                    if (typeof c === 'object' && c !== null) {
+                        cName = c.name || c.color || c.colorName || c.title || `Color ${idx+1}`;
+                        cImg = c.image || c.img || c.url || c.media || c.colorImage || c.pic || '';
+                        cHex = c.hex || c.code || c.colorCode || '';
+                    } else {
+                        cName = c.toString();
+                    }
+
+                    // Fallback to media array image if direct color object image is absent
+                    if (!cImg && p.media && Array.isArray(p.media) && p.media[idx]) {
+                        cImg = p.media[idx];
+                    }
+
+                    let activeClass = idx === 0 ? 'active' : '';
+
+                    if (cImg) {
+                        let formattedThumb = formatMediaUrl(cImg);
+                        let safeName = cName.replace(/'/g, "\\'");
+                        let safeImg = cImg.replace(/'/g, "\\'");
+                        variantHtml += `
+                            <div class="color-thumb-wrapper ${activeClass}" onclick="window.selectColor('${safeName}', this, '${safeImg}')">
+                                <img src="${formattedThumb}" class="color-thumb" alt="${cName}" loading="lazy" onerror="this.src='https://via.placeholder.com/60x75?text=Color'">
+                                <span class="thumb-label">${cName}</span>
+                            </div>
+                        `;
+                    } else {
+                        let knownColorHex = getStandardColorHex(cName) || cHex;
+                        let colorDotHtml = knownColorHex ? `<span style="width: 12px; height: 12px; border-radius: 50%; background-color: ${knownColorHex}; display: inline-block; border: 1px solid rgba(255,255,255,0.5);"></span>` : '🎨';
+                        let safeName = cName.replace(/'/g, "\\'");
+                        variantHtml += `
+                            <div class="size-btn ${activeClass}" onclick="window.selectColor('${safeName}', this, '')" style="display: inline-flex; align-items: center; gap: 6px;">
+                                ${colorDotHtml}
+                                <span>${cName}</span>
+                            </div>
+                        `;
+                    }
                 });
+
                 variantHtml += `</div></div>`;
             }
 
