@@ -1486,7 +1486,7 @@
                 let firstColor = p.colors[0];
                 selectedColor = typeof firstColor === 'object' ? firstColor.name : firstColor;
                 
-                // Using color.image[0] fix for chote icons
+                // Using color.image fix for specific color thumbnail
                 if (typeof firstColor === 'object' && firstColor.image) {
                     let firstImgSrc = Array.isArray(firstColor.image) ? firstColor.image[0] : firstColor.image;
                     selectedColorImg = formatMediaUrl(firstImgSrc);
@@ -1501,7 +1501,7 @@
                     let cName = typeof c === 'object' ? c.name : c;
                     let cImg = '';
                     if (typeof c === 'object' && c.image) {
-                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image; // color.image[0] fix
+                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
                         cImg = formatMediaUrl(imgUrl);
                     }
                     let active = idx === 0 ? 'active' : '';
