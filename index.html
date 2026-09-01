@@ -18,8 +18,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         html, body {
-            overscroll-behavior-y: none !important;
-            overscroll-behavior-x: none !important; 
+            overscroll-behavior-y: auto !important;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
@@ -32,6 +31,19 @@
         input, textarea, select {
             user-select: text;
             -webkit-user-select: text;
+        }
+
+        /* Pull To Refresh Box */
+        .ptr-box {
+            display: none;
+            text-align: center;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            font-weight: 700;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+            transition: 0.2s ease;
         }
         
         /* Top Announcement Bar */
@@ -58,7 +70,7 @@
         .close-drawer { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-drawer:hover { color: #f8fafc; }
         
-        .user-profile-brief { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .user-profile-brief { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .user-avatar-small { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; background: #38bdf8; color: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
 
         .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
@@ -100,7 +112,7 @@
         .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
 
-        /* Color & Size Variant Styling */
+        /* Variant Styling */
         .variant-section { margin: 15px 0; }
         .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
         .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
@@ -183,7 +195,7 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
-        /* Image Lightbox Modal Zoom & Drag Fix */
+        /* Image Lightbox Modal Zoom & Drag */
         .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
         .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
         .zoom-img:active { cursor: grabbing; }
@@ -199,6 +211,9 @@
     </style>
 </head>
 <body>
+
+    <!-- Pull To Refresh Banner -->
+    <div id="pullToRefresh" class="ptr-box">⬇️ Screen ko niche khichein refresh karne ke liye...</div>
 
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast-container"></div>
@@ -465,13 +480,14 @@
         const UPI_ID = "7665913393@ptsbi";
 
         let liveProducts = [];
-        let cart = JSON.parse(localStorage.getItem('arpit_cart')) || [];
-        let watchlist = JSON.parse(localStorage.getItem('arpit_watchlist')) || [];
         
-        // AUTHENTICATION & USER PROFILE STATE
+        // AUTHENTICATION & USER SPECIFIC DATA
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-        let authMode = 'login'; // 'login' or 'signup'
+        let cart = [];
+        let watchlist = [];
+        let orderStatusInterval = null;
 
+        let authMode = 'login'; // 'login' or 'signup'
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
@@ -493,8 +509,82 @@
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
-        document.getElementById('cartCount').innerText = cart.length;
+        // LOAD LOGGED IN USER SPECIFIC DATA (ISOLATION FIX)
+        function loadUserData() {
+            if (currentUser && currentUser.phone) {
+                cart = JSON.parse(localStorage.getItem(`arpit_cart_${currentUser.phone}`)) || [];
+                watchlist = JSON.parse(localStorage.getItem(`arpit_watchlist_${currentUser.phone}`)) || [];
+            } else {
+                cart = [];
+                watchlist = [];
+            }
+            document.getElementById('cartCount').innerText = cart.length;
+        }
+
+        function saveUserData() {
+            if (currentUser && currentUser.phone) {
+                localStorage.setItem(`arpit_cart_${currentUser.phone}`, JSON.stringify(cart));
+                localStorage.setItem(`arpit_watchlist_${currentUser.phone}`, JSON.stringify(watchlist));
+            }
+        }
+
+        loadUserData();
         updateAuthUI();
+
+        /* PULL TO REFRESH SYSTEM IMPLEMENTATION */
+        let touchStartY = 0;
+        let touchMoveY = 0;
+        const ptrContainer = document.getElementById('pullToRefresh');
+
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                touchStartY = e.touches[0].clientY;
+            } else {
+                touchStartY = 0;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (touchStartY > 0) {
+                touchMoveY = e.touches[0].clientY;
+                let pullDistance = touchMoveY - touchStartY;
+                if (pullDistance > 0 && window.scrollY === 0) {
+                    if (ptrContainer) {
+                        ptrContainer.style.display = 'block';
+                        if (pullDistance > 80) {
+                            ptrContainer.innerHTML = '⚡ Ungli chhodein refresh karne ke liye!';
+                        } else {
+                            ptrContainer.innerHTML = '⬇️ Screen ko niche khichein refresh karne ke liye...';
+                        }
+                    }
+                }
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (touchStartY > 0 && touchMoveY > 0) {
+                let pullDistance = touchMoveY - touchStartY;
+                if (pullDistance > 80 && window.scrollY === 0) {
+                    if (ptrContainer) ptrContainer.innerHTML = '🔄 Data Refresh ho raha hai...';
+                    refreshAppData();
+                } else {
+                    if (ptrContainer) ptrContainer.style.display = 'none';
+                }
+            }
+            touchStartY = 0;
+            touchMoveY = 0;
+        });
+
+        function refreshAppData() {
+            listenToProducts();
+            if (currentUser && currentCategory === 'MyOrders') {
+                fetchLiveStatusForAllOrders();
+            }
+            setTimeout(() => {
+                if (ptrContainer) ptrContainer.style.display = 'none';
+                window.showToast("App Successfully Refreshed! 🔄");
+            }, 1000);
+        }
 
         // AUTHENTICATION & PROFILE FUNCTIONS
         window.toggleAuthModal = () => {
@@ -556,17 +646,17 @@
                 registeredUsers.push(newUser);
                 localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
 
-                // Sync with Google Sheet "User" page
                 syncUserToExcel({ action: 'signup', name, phone, password });
 
                 currentUser = newUser;
                 localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+                loadUserData();
                 window.toggleAuthModal();
                 updateAuthUI();
                 window.showToast("Sign up successful! Welcome.");
+                window.applyFiltersAndRender();
 
             } else {
-                // Login validation
                 let user = registeredUsers.find(u => u.phone === phone && u.password === password);
                 if (!user) {
                     window.showToast("Galat mobile number ya password! Pehle Sign Up karein.", "error");
@@ -574,14 +664,15 @@
                 }
                 currentUser = user;
                 localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+                loadUserData();
                 window.toggleAuthModal();
                 updateAuthUI();
                 window.showToast("Login successful!");
+                window.applyFiltersAndRender();
             }
         };
 
         window.handleGoogleLogin = () => {
-            // Simulated Google Sign-In with popup/prompt fallback
             let googleName = prompt("Enter your Google Account Name:", "Arpit Shringi");
             let googlePhone = prompt("Enter your 10-digit Mobile Number for verification:", "9876543210");
             
@@ -602,9 +693,11 @@
 
             currentUser = user;
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+            loadUserData();
             window.toggleAuthModal();
             updateAuthUI();
             window.showToast("Google Login Successful!");
+            window.applyFiltersAndRender();
         };
 
         function syncUserToExcel(payloadData) {
@@ -668,7 +761,7 @@
 
         function renderSavedAddresses() {
             const listDiv = document.getElementById('savedAddressesList');
-            if (!currentUser.addresses || currentUser.addresses.length === 0) {
+            if (!currentUser || !currentUser.addresses || currentUser.addresses.length === 0) {
                 listDiv.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No saved addresses yet.</p>';
                 return;
             }
@@ -715,9 +808,15 @@
         window.logoutUser = () => {
             currentUser = null;
             localStorage.removeItem('arpit_current_user');
+            cart = [];
+            watchlist = [];
+            document.getElementById('cartCount').innerText = '0';
+            if(orderStatusInterval) clearInterval(orderStatusInterval);
+            
             document.getElementById('profileModal').style.display = 'none';
             updateAuthUI();
             window.showToast("Logged out successfully.");
+            window.goHome();
         };
 
         // Offline Handling
@@ -736,7 +835,7 @@
             history.pushState({ appNav: type }, '');
         }
 
-        // PERFECT MOBILE BACK BUTTON LISTENER
+        // MOBILE BACK BUTTON LISTENER
         window.addEventListener('popstate', (e) => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
@@ -936,7 +1035,7 @@
 
         function listenToProducts() {
             window.checkNetworkStatus();
-            fetchLiveStatusForAllOrders();
+            if (currentUser) fetchLiveStatusForAllOrders();
 
             const productsRef = collection(db, "products");
             onSnapshot(productsRef, (snapshot) => {
@@ -1008,7 +1107,12 @@
         };
 
         window.toggleLike = (id, event) => {
-            if(event) event.stopPropagation(); 
+            if(event) event.stopPropagation();
+            if (!currentUser) {
+                window.showToast("Watchlist ke liye pehle Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
             let isAdding = false;
             if (watchlist.includes(id)) {
                 watchlist = watchlist.filter(itemId => itemId !== id);
@@ -1016,7 +1120,7 @@
                 watchlist.push(id);
                 isAdding = true;
             }
-            localStorage.setItem('arpit_watchlist', JSON.stringify(watchlist));
+            saveUserData();
             window.applyFiltersAndRender();
             const detailLikeBtn = document.getElementById('detailLikeBtn');
             if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
@@ -1024,6 +1128,11 @@
         };
 
         window.showWatchlist = () => {
+            if (!currentUser) {
+                window.showToast("Watchlist dekhne ke liye Pehle Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
             saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
@@ -1037,6 +1146,11 @@
         };
 
         window.showMyOrders = () => {
+            if (!currentUser) {
+                window.showToast("Orders dekhne ke liye Pehle Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
             saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
@@ -1048,6 +1162,16 @@
             pushNavState('orders');
             fetchLiveStatusForAllOrders();
             renderOrdersUI();
+
+            // FAST REAL-TIME ORDER STATUS REFRESH (Every 10 seconds when on MyOrders screen)
+            if(orderStatusInterval) clearInterval(orderStatusInterval);
+            orderStatusInterval = setInterval(() => {
+                if (currentCategory === 'MyOrders' && currentUser) {
+                    fetchLiveStatusForAllOrders();
+                } else {
+                    clearInterval(orderStatusInterval);
+                }
+            }, 10000);
         };
 
         window.filterCategory = (cat) => {
@@ -1180,10 +1304,22 @@
             });
         }
 
+        /* LOGGED-IN USER ISOLATED ORDERS RENDER */
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-            let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+
+            if (!currentUser) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;">
+                        <div style="font-size:50px; margin-bottom:10px;">🔒</div>
+                        <p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye pehle Login karein!</p>
+                        <button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:10px 20px; background:linear-gradient(135deg, #38bdf8, #6366f1); border:none; color:white; font-weight:bold; border-radius:10px; cursor:pointer;">Login / Sign Up 🚀</button>
+                    </div>`;
+                return;
+            }
+
+            let savedOrders = JSON.parse(localStorage.getItem(`arpit_my_orders_${currentUser.phone}`)) || [];
             if(savedOrders.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
                 return;
@@ -1233,25 +1369,28 @@
             });
         }
 
+        /* FAST PARALLEL ORDER STATUS UPDATE SYSTEM */
         function fetchLiveStatusForAllOrders() {
-            if (!navigator.onLine) return;
-            let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+            if (!navigator.onLine || !currentUser) return;
+            let savedOrders = JSON.parse(localStorage.getItem(`arpit_my_orders_${currentUser.phone}`)) || [];
             if (savedOrders.length === 0) return;
             let statusChanged = false;
+
             let fetchPromises = savedOrders.map((ord, index) => {
                 let cleanId = ord.orderId.toString().replace('#', '').trim();
-                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
+                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}&_t=${Date.now()}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data && data.status && data.status !== ord.status) {
                             savedOrders[index].status = data.status;
                             statusChanged = true;
                         }
-                    }).catch(err => console.log("Status error:", err));
+                    }).catch(err => console.log("Status check error:", err));
             });
+
             Promise.all(fetchPromises).then(() => {
-                if(statusChanged) {
-                    localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+                if(statusChanged && currentUser) {
+                    localStorage.setItem(`arpit_my_orders_${currentUser.phone}`, JSON.stringify(savedOrders));
                     if(currentCategory === 'MyOrders') renderOrdersUI();
                 }
             });
@@ -1350,7 +1489,7 @@
             }
             const item = liveProducts.find(p => p.id === id);
             cart.push({ ...item });
-            localStorage.setItem('arpit_cart', JSON.stringify(cart));
+            saveUserData();
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast(`${item.name} added to cart!`);
         };
@@ -1364,7 +1503,7 @@
             const item = liveProducts.find(p => p.id === id);
             if(!item) return;
             cart.push({ ...item });
-            localStorage.setItem('arpit_cart', JSON.stringify(cart));
+            saveUserData();
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast(`${item.name} added to cart!`);
         };
@@ -1381,7 +1520,7 @@
 
         window.removeFromCart = (index) => {
             cart.splice(index, 1);
-            localStorage.setItem('arpit_cart', JSON.stringify(cart));
+            saveUserData();
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
         };
@@ -1430,7 +1569,6 @@
             
             document.getElementById('qrTotal').innerText = cartTotalAmount;
 
-            // Auto-fill customer info
             if (currentUser) {
                 document.getElementById('custName').value = currentUser.name;
                 document.getElementById('custPhone').value = currentUser.phone;
@@ -1441,7 +1579,7 @@
                     currentUser.addresses.forEach(addr => {
                         addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
                     });
-                    document.getElementById('custAddress').value = currentUser.addresses[0]; // Default auto-fill
+                    document.getElementById('custAddress').value = currentUser.addresses[0];
                 } else {
                     document.getElementById('custAddress').value = '';
                 }
@@ -1477,7 +1615,6 @@
                 return;
             }
 
-            // Save address automatically to profile if new
             if (currentUser && !currentUser.addresses.includes(address)) {
                 currentUser.addresses.push(address);
                 updateUserDataInStorage();
@@ -1508,19 +1645,19 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                let savedOrders = JSON.parse(localStorage.getItem('arpit_my_orders')) || [];
+                let savedOrders = JSON.parse(localStorage.getItem(`arpit_my_orders_${currentUser.phone}`)) || [];
                 savedOrders.unshift({
                     orderId: orderId, items: [...cart], total: cartTotalAmount,
                     date: fullDateTime, status: "Order Confirmed"
                 });
-                localStorage.setItem('arpit_my_orders', JSON.stringify(savedOrders));
+                localStorage.setItem(`arpit_my_orders_${currentUser.phone}`, JSON.stringify(savedOrders));
 
                 document.getElementById('cartModal').style.display = 'none';
                 const successModal = document.getElementById('successModal');
                 successModal.style.display = 'flex';
 
                 cart = [];
-                localStorage.removeItem('arpit_cart');
+                saveUserData();
                 document.getElementById('cartCount').innerText = '0';
 
                 setTimeout(() => { successModal.style.display = 'none'; window.showMyOrders(); }, 2500);
@@ -1529,7 +1666,7 @@
             }).finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
         };
 
-        const APP_VERSION = "3.0";
+        const APP_VERSION = "3.1";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) caches.keys().then(names => { for (let name of names) caches.delete(name); });
