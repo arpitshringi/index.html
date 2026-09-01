@@ -34,6 +34,32 @@
             -webkit-user-select: text;
         }
         
+        /* Pull To Refresh CSS */
+        .ptr-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateY(-100%);
+            z-index: 150;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .ptr-text {
+            color: #38bdf8;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
         /* Top Announcement Bar */
         .announcement-bar { background: linear-gradient(135deg, #0284c7, #6366f1); color: white; text-align: center; padding: 8px 15px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
 
@@ -44,8 +70,6 @@
         .logo { font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
         
         .header-right { display: flex; align-items: center; gap: 10px; }
-        .refresh-btn-head { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; padding: 8px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 13px; }
-        .refresh-btn-head:hover { background: #38bdf8; color: #0f172a; }
         .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
         .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
 
@@ -103,7 +127,7 @@
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
 
         /* Color & Size Variant Styling */
-        .variant-section { margin: 15px 0; }
+        .variant-section { margin: 15px 0; background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
         .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .color-options::-webkit-scrollbar { display: none; }
@@ -111,7 +135,7 @@
         .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
 
         .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
-        .size-btn { padding: 6px 14px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px;}
         .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
 
         /* Order Re-buy Items */
@@ -202,6 +226,11 @@
 </head>
 <body>
 
+    <!-- Pull to Refresh Indicator -->
+    <div class="ptr-container" id="ptrContainer">
+        <span class="ptr-text" id="ptrText">Pull down to refresh ↓</span>
+    </div>
+
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast-container"></div>
 
@@ -230,7 +259,6 @@
                 <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
             </div>
 
-            <!-- Google Sign In Option -->
             <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
                 <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
                 Continue with Google
@@ -303,7 +331,6 @@
             <div class="logo" onclick="window.goHome()">Arpit Store</div>
         </div>
         <div class="header-right">
-            <button class="refresh-btn-head" onclick="window.refreshAppData()" title="Refresh App">🔄</button>
             <div id="headerAuthArea"></div>
             <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
         </div>
@@ -358,7 +385,6 @@
 
             <div class="section-title">
                 <span id="pageTitle">All Products</span>
-                <button onclick="window.refreshAppData()" style="background:none; border:none; color:#38bdf8; font-size:13px; font-weight:bold; cursor:pointer;">🔄 Refresh Data</button>
             </div>
             
             <!-- Loading Spinner -->
@@ -433,6 +459,57 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // PULL TO REFRESH LOGIC
+        let ptrStart = 0;
+        let ptrCurrent = 0;
+        let isPtrPulling = false;
+
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                ptrStart = e.touches[0].clientY;
+                isPtrPulling = true;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isPtrPulling) return;
+            ptrCurrent = e.touches[0].clientY;
+            let distance = ptrCurrent - ptrStart;
+            
+            if (distance > 0 && window.scrollY === 0) {
+                if (e.cancelable) e.preventDefault();
+                const ptr = document.getElementById('ptrContainer');
+                const txt = document.getElementById('ptrText');
+                
+                let offset = Math.min(distance / 2, 80) - 60; 
+                ptr.style.transform = `translateY(${offset}px)`;
+                
+                if (distance > 120) {
+                    txt.innerText = "Release to refresh 🔄";
+                    txt.style.borderColor = "#22c55e";
+                    txt.style.color = "#22c55e";
+                } else {
+                    txt.innerText = "Pull down to refresh ↓";
+                    txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                    txt.style.color = "#38bdf8";
+                }
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (!isPtrPulling) return;
+            isPtrPulling = false;
+            let distance = ptrCurrent - ptrStart;
+            
+            const ptr = document.getElementById('ptrContainer');
+            ptr.style.transform = `translateY(-100%)`;
+            
+            if (distance > 120 && window.scrollY === 0) {
+                window.refreshAppData();
+            }
+            document.getElementById('ptrText').innerText = "Pull down to refresh ↓";
+        });
 
         // PREVENT PAGE ZOOM GLOBALLY
         document.addEventListener('touchstart', (e) => {
@@ -525,7 +602,6 @@
             window.applyFiltersAndRender();
         };
 
-        // FAST AUTO-REFRESH STATUS POLLING (EVERY 6 SECONDS)
         setInterval(() => {
             if (currentUser && currentCategory === 'MyOrders') {
                 fetchLiveStatusForAllOrders();
@@ -624,7 +700,7 @@
         };
 
         window.handleGoogleLogin = () => {
-            let googleName = prompt("Enter your Google Account Name:", "Arpit Shringi");
+            let googleName = prompt("Enter your Google Account Name:", "Arpit");
             let googlePhone = prompt("Enter your 10-digit Mobile Number for verification:", "9876543210");
             
             if (!googleName || !googlePhone || googlePhone.length !== 10) {
@@ -755,27 +831,18 @@
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
         }
 
-        // COMPLETE DATA CLEAR ON LOGOUT
         window.logoutUser = () => {
-            // 1. Clear active user
             currentUser = null;
             localStorage.removeItem('arpit_current_user');
-
-            // 2. Clear state and memory variables
             cart = [];
             watchlist = [];
             document.getElementById('cartCount').innerText = '0';
-
-            // 3. Hide profile modal
             document.getElementById('profileModal').style.display = 'none';
-
-            // 4. Update Header & Redirect User to Home / Login Screen
             updateAuthUI();
             window.goHome();
             window.showToast("Logged out successfully! All local data cleared.", "success");
         };
 
-        // Offline Handling
         window.checkNetworkStatus = () => {
             const offlineModal = document.getElementById('offlineModal');
             if (!navigator.onLine) {
@@ -791,7 +858,6 @@
             history.pushState({ appNav: type }, '');
         }
 
-        // PERFECT MOBILE BACK BUTTON LISTENER
         window.addEventListener('popstate', (e) => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
@@ -1204,7 +1270,7 @@
                             <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
                             <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
                             <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">
-                                ${offPercent}% OFF (₹${offAmount} OFF)
+                                ${offPercent}% OFF
                             </span>
                         </div>
                     `;
@@ -1230,7 +1296,7 @@
                             <h3>${p.name}</h3>
                             ${priceHtml}
                         </div>
-                        <button class="add-btn" onclick="event.stopPropagation(); window.addToCart('${p.id}')">Add to Cart</button>
+                        <button class="add-btn" onclick="event.stopPropagation(); window.showProductDetail('${p.id}')">Select Options</button>
                     </div>
                 `;
             });
@@ -1256,12 +1322,19 @@
                 ord.items.forEach(it => {
                     let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
                     if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
+                    
+                    let variantTxt = '';
+                    if (it.selectedColor || it.selectedSize) {
+                        variantTxt = `<div style="color:#cbd5e1; font-size:11px;">${it.selectedColor ? 'Color: '+it.selectedColor : ''} ${it.selectedSize ? '| Size: '+it.selectedSize : ''}</div>`;
+                    }
+                    
                     itemsListHtml += `
                         <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
                                 <div>
                                     <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
+                                    ${variantTxt}
                                     <div style="color: #38bdf8; font-size: 13px; font-weight: bold;">₹${it.price}</div>
                                 </div>
                             </div>
@@ -1322,31 +1395,21 @@
             });
         }
 
-        window.selectColor = (colorName, colorImagesJson, el) => {
+        window.selectColor = (colorName, el) => {
             selectedColor = colorName;
             const label = document.getElementById('colorLabel');
             if (label) label.innerText = colorName;
-            document.querySelectorAll('.color-thumb').forEach(thumb => thumb.classList.remove('active'));
+            const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
+            siblings.forEach(btn => btn.classList.remove('active'));
             if (el) el.classList.add('active');
-
-            let images = [];
-            try { images = JSON.parse(decodeURIComponent(colorImagesJson)); } catch(e) { images = [colorImagesJson]; }
-            if (!Array.isArray(images)) images = [images];
-
-            const slider = document.querySelector('.detail-slider');
-            if (slider && images.length > 0) {
-                let newSliderHtml = "";
-                images.forEach(imgUrl => {
-                    let link = formatMediaUrl(imgUrl);
-                    newSliderHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')">`;
-                });
-                slider.innerHTML = newSliderHtml;
-            }
         };
 
         window.selectSize = (size, el) => {
             selectedSize = size;
-            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            const label = document.getElementById('sizeLabel');
+            if (label) label.innerText = size;
+            const siblings = el.parentElement.querySelectorAll('.size-btn');
+            siblings.forEach(btn => btn.classList.remove('active'));
             if(el) el.classList.add('active');
         };
 
@@ -1356,6 +1419,9 @@
             pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
+
+            selectedSize = "";
+            selectedColor = "";
 
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
@@ -1388,6 +1454,30 @@
             }
             mediaHtml += '</div>';
 
+            // DYNAMIC COLOR AND SIZE HTML GENERATION
+            let variantHtml = '';
+            
+            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
+                selectedColor = typeof p.colors[0] === 'object' ? p.colors[0].name : p.colors[0];
+                variantHtml += `<div class="variant-section"><div class="variant-title">Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div><div class="color-options" style="display: flex; gap: 8px; flex-wrap: wrap;">`;
+                p.colors.forEach((c, idx) => {
+                    let cName = typeof c === 'object' ? c.name : c;
+                    let active = idx === 0 ? 'active' : '';
+                    variantHtml += `<div class="size-btn ${active}" onclick="window.selectColor('${cName}', this)">${cName}</div>`;
+                });
+                variantHtml += `</div></div>`;
+            }
+
+            if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
+                selectedSize = p.sizes[0];
+                variantHtml += `<div class="variant-section"><div class="variant-title">Size: <span id="sizeLabel" style="color:#38bdf8">${selectedSize}</span></div><div class="size-options">`;
+                p.sizes.forEach((s, idx) => {
+                    let active = idx === 0 ? 'active' : '';
+                    variantHtml += `<div class="size-btn ${active}" onclick="window.selectSize('${s}', this)">${s}</div>`;
+                });
+                variantHtml += `</div></div>`;
+            }
+
             document.getElementById('detailContent').innerHTML = `
                 ${mediaHtml}
                 <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
@@ -1398,6 +1488,7 @@
                     <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
                 </div>
                 ${detailPriceHtml}
+                ${variantHtml}
                 <p style="color: #94a3b8; font-size: 15px; margin: 15px 0; line-height: 1.6;">${p.description || 'Premium quality product.'}</p>
                 <div style="display:flex; gap:10px; margin-bottom: 10px;">
                     <button class="add-btn" style="flex:1;" onclick="window.addToCartWithVariants('${p.id}')">Add to Cart</button>
@@ -1408,16 +1499,7 @@
         };
 
         window.addToCart = (id) => {
-            if (!currentUser) {
-                window.showToast("Pehle Sign Up / Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
-            const item = liveProducts.find(p => p.id === id);
-            cart.push({ ...item });
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
-            window.showToast(`${item.name} added to cart!`);
+            window.showProductDetail(id);
         };
 
         window.addToCartWithVariants = (id) => {
@@ -1428,7 +1510,19 @@
             }
             const item = liveProducts.find(p => p.id === id);
             if(!item) return;
-            cart.push({ ...item });
+            
+            if (item.sizes && item.sizes.length > 0 && !selectedSize) {
+                window.showToast("Please select a size first!", "error"); return;
+            }
+            if (item.colors && item.colors.length > 0 && !selectedColor) {
+                window.showToast("Please select a color first!", "error"); return;
+            }
+
+            let cartItem = { ...item };
+            if (selectedSize) cartItem.selectedSize = selectedSize;
+            if (selectedColor) cartItem.selectedColor = selectedColor;
+
+            cart.push(cartItem);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast(`${item.name} added to cart!`);
@@ -1482,10 +1576,20 @@
 
             cart.forEach((item, index) => {
                 cartTotalAmount += Number(item.price);
+                
+                let variantText = '';
+                if (item.selectedColor || item.selectedSize) {
+                    variantText = `<div style="font-size:12px; color:#cbd5e1; margin-bottom:4px;">`;
+                    if (item.selectedColor) variantText += `Color: ${item.selectedColor} `;
+                    if (item.selectedSize) variantText += `| Size: ${item.selectedSize}`;
+                    variantText += `</div>`;
+                }
+
                 cartList.innerHTML += `
                     <div class="cart-item">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
+                            ${variantText}
                             <p>₹${item.price}</p>
                         </div>
                         <button class="remove-btn" onclick="window.removeFromCart(${index})">🗑 Remove</button>
@@ -1553,7 +1657,15 @@
             let orderId = Math.floor(100000 + Math.random() * 900000).toString();
             let now = new Date();
             let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true})}`;
-            let productNames = cart.map(item => item.name).join(", ");
+            
+            // Format Product Names With Variables to send to Google Sheet/Admin
+            let productNames = cart.map(item => {
+                let variantInfo = [];
+                if(item.selectedColor) variantInfo.push(item.selectedColor);
+                if(item.selectedSize) variantInfo.push(item.selectedSize);
+                let variantStr = variantInfo.length > 0 ? ` (${variantInfo.join(', ')})` : '';
+                return item.name + variantStr;
+            }).join(", ");
 
             let payload = {
                 action: "new_order", 
@@ -1593,7 +1705,7 @@
             }).finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
         };
 
-        const APP_VERSION = "3.1";
+        const APP_VERSION = "3.2";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) caches.keys().then(names => { for (let name of names) caches.delete(name); });
