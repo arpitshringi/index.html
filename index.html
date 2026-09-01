@@ -18,7 +18,8 @@
             -webkit-tap-highlight-color: transparent;
         }
         html, body {
-            overscroll-behavior-y: auto !important;
+            overscroll-behavior-y: none !important;
+            overscroll-behavior-x: none !important; 
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
@@ -32,19 +33,6 @@
             user-select: text;
             -webkit-user-select: text;
         }
-
-        /* Pull To Refresh Box */
-        .ptr-box {
-            display: none;
-            text-align: center;
-            padding: 12px;
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-            font-weight: 700;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(56, 189, 248, 0.3);
-            transition: 0.2s ease;
-        }
         
         /* Top Announcement Bar */
         .announcement-bar { background: linear-gradient(135deg, #0284c7, #6366f1); color: white; text-align: center; padding: 8px 15px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
@@ -56,6 +44,8 @@
         .logo { font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
         
         .header-right { display: flex; align-items: center; gap: 10px; }
+        .refresh-btn-head { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #38bdf8; padding: 8px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 13px; }
+        .refresh-btn-head:hover { background: #38bdf8; color: #0f172a; }
         .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
         .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
 
@@ -102,7 +92,7 @@
         .sort-select { padding: 10px 14px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; color: #f8fafc; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(8px); transition: 0.2s; }
         .sort-select option { background: #1e293b; color: white; }
 
-        .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; }
+        .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
         
         /* Banner */
         .saree-offer-banner { display: none; background: linear-gradient(135deg, #4c1d95 0%, #831843 50%, #9f1239 100%); border: 2px dashed #f43f5e; border-radius: 20px; padding: 22px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25); position: relative; overflow: hidden; }
@@ -112,7 +102,7 @@
         .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
 
-        /* Variant Styling */
+        /* Color & Size Variant Styling */
         .variant-section { margin: 15px 0; }
         .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; }
         .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
@@ -195,7 +185,7 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
 
-        /* Image Lightbox Modal Zoom & Drag */
+        /* Image Lightbox Modal Zoom & Drag Fix */
         .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
         .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
         .zoom-img:active { cursor: grabbing; }
@@ -211,9 +201,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Pull To Refresh Banner -->
-    <div id="pullToRefresh" class="ptr-box">⬇️ Screen ko niche khichein refresh karne ke liye...</div>
 
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast-container"></div>
@@ -267,8 +254,8 @@
             
             <div style="text-align: center; margin-bottom: 15px;">
                 <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
-                <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">Arpit</h3>
-                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">9876543210</p>
+                <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
+                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">-</p>
             </div>
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -306,6 +293,7 @@
         <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
         <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
         <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
+        <div class="drawer-item" onclick="window.refreshAppData()" style="color: #38bdf8;">🔄 Refresh App</div>
     </div>
 
     <!-- Header -->
@@ -315,6 +303,7 @@
             <div class="logo" onclick="window.goHome()">Arpit Store</div>
         </div>
         <div class="header-right">
+            <button class="refresh-btn-head" onclick="window.refreshAppData()" title="Refresh App">🔄</button>
             <div id="headerAuthArea"></div>
             <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
         </div>
@@ -367,7 +356,10 @@
                 </div>
             </div>
 
-            <h2 id="pageTitle" class="section-title">All Products</h2>
+            <div class="section-title">
+                <span id="pageTitle">All Products</span>
+                <button onclick="window.refreshAppData()" style="background:none; border:none; color:#38bdf8; font-size:13px; font-weight:bold; cursor:pointer;">🔄 Refresh Data</button>
+            </div>
             
             <!-- Loading Spinner -->
             <div id="loader" class="loader-container">
@@ -481,13 +473,24 @@
 
         let liveProducts = [];
         
-        // AUTHENTICATION & USER SPECIFIC DATA
+        // AUTHENTICATION & USER PROFILE STATE
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-        let cart = [];
-        let watchlist = [];
-        let orderStatusInterval = null;
-
         let authMode = 'login'; // 'login' or 'signup'
+
+        // USER SPECIFIC KEYS & STATE
+        function getUserOrdersKey() {
+            return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
+        }
+        function getUserCartKey() {
+            return currentUser ? 'arpit_cart_' + currentUser.phone : 'arpit_cart_guest';
+        }
+        function getUserWatchlistKey() {
+            return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
+        }
+
+        let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+        let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
+
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
@@ -509,82 +512,25 @@
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
-        // LOAD LOGGED IN USER SPECIFIC DATA (ISOLATION FIX)
-        function loadUserData() {
-            if (currentUser && currentUser.phone) {
-                cart = JSON.parse(localStorage.getItem(`arpit_cart_${currentUser.phone}`)) || [];
-                watchlist = JSON.parse(localStorage.getItem(`arpit_watchlist_${currentUser.phone}`)) || [];
-            } else {
-                cart = [];
-                watchlist = [];
-            }
-            document.getElementById('cartCount').innerText = cart.length;
-        }
-
-        function saveUserData() {
-            if (currentUser && currentUser.phone) {
-                localStorage.setItem(`arpit_cart_${currentUser.phone}`, JSON.stringify(cart));
-                localStorage.setItem(`arpit_watchlist_${currentUser.phone}`, JSON.stringify(watchlist));
-            }
-        }
-
-        loadUserData();
+        document.getElementById('cartCount').innerText = cart.length;
         updateAuthUI();
 
-        /* PULL TO REFRESH SYSTEM IMPLEMENTATION */
-        let touchStartY = 0;
-        let touchMoveY = 0;
-        const ptrContainer = document.getElementById('pullToRefresh');
-
-        document.addEventListener('touchstart', (e) => {
-            if (window.scrollY === 0) {
-                touchStartY = e.touches[0].clientY;
-            } else {
-                touchStartY = 0;
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchmove', (e) => {
-            if (touchStartY > 0) {
-                touchMoveY = e.touches[0].clientY;
-                let pullDistance = touchMoveY - touchStartY;
-                if (pullDistance > 0 && window.scrollY === 0) {
-                    if (ptrContainer) {
-                        ptrContainer.style.display = 'block';
-                        if (pullDistance > 80) {
-                            ptrContainer.innerHTML = '⚡ Ungli chhodein refresh karne ke liye!';
-                        } else {
-                            ptrContainer.innerHTML = '⬇️ Screen ko niche khichein refresh karne ke liye...';
-                        }
-                    }
-                }
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchend', (e) => {
-            if (touchStartY > 0 && touchMoveY > 0) {
-                let pullDistance = touchMoveY - touchStartY;
-                if (pullDistance > 80 && window.scrollY === 0) {
-                    if (ptrContainer) ptrContainer.innerHTML = '🔄 Data Refresh ho raha hai...';
-                    refreshAppData();
-                } else {
-                    if (ptrContainer) ptrContainer.style.display = 'none';
-                }
-            }
-            touchStartY = 0;
-            touchMoveY = 0;
-        });
-
-        function refreshAppData() {
+        // APP REFRESH FUNCTION
+        window.refreshAppData = () => {
+            window.showToast("App data refresh ho raha hai... 🔄");
             listenToProducts();
+            if (currentUser) {
+                fetchLiveStatusForAllOrders();
+            }
+            window.applyFiltersAndRender();
+        };
+
+        // FAST AUTO-REFRESH STATUS POLLING (EVERY 6 SECONDS)
+        setInterval(() => {
             if (currentUser && currentCategory === 'MyOrders') {
                 fetchLiveStatusForAllOrders();
             }
-            setTimeout(() => {
-                if (ptrContainer) ptrContainer.style.display = 'none';
-                window.showToast("App Successfully Refreshed! 🔄");
-            }, 1000);
-        }
+        }, 6000);
 
         // AUTHENTICATION & PROFILE FUNCTIONS
         window.toggleAuthModal = () => {
@@ -618,6 +564,13 @@
             }
         };
 
+        function reloadUserSpecificState() {
+            cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+            watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
+            document.getElementById('cartCount').innerText = cart.length;
+            fetchLiveStatusForAllOrders();
+        }
+
         window.submitAuth = () => {
             const phone = document.getElementById('authPhone').value.trim();
             const password = document.getElementById('authPassword').value.trim();
@@ -650,11 +603,10 @@
 
                 currentUser = newUser;
                 localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                loadUserData();
                 window.toggleAuthModal();
                 updateAuthUI();
+                reloadUserSpecificState();
                 window.showToast("Sign up successful! Welcome.");
-                window.applyFiltersAndRender();
 
             } else {
                 let user = registeredUsers.find(u => u.phone === phone && u.password === password);
@@ -664,11 +616,10 @@
                 }
                 currentUser = user;
                 localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                loadUserData();
                 window.toggleAuthModal();
                 updateAuthUI();
+                reloadUserSpecificState();
                 window.showToast("Login successful!");
-                window.applyFiltersAndRender();
             }
         };
 
@@ -693,11 +644,10 @@
 
             currentUser = user;
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-            loadUserData();
             window.toggleAuthModal();
             updateAuthUI();
+            reloadUserSpecificState();
             window.showToast("Google Login Successful!");
-            window.applyFiltersAndRender();
         };
 
         function syncUserToExcel(payloadData) {
@@ -761,7 +711,7 @@
 
         function renderSavedAddresses() {
             const listDiv = document.getElementById('savedAddressesList');
-            if (!currentUser || !currentUser.addresses || currentUser.addresses.length === 0) {
+            if (!currentUser.addresses || currentUser.addresses.length === 0) {
                 listDiv.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No saved addresses yet.</p>';
                 return;
             }
@@ -805,18 +755,24 @@
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
         }
 
+        // COMPLETE DATA CLEAR ON LOGOUT
         window.logoutUser = () => {
+            // 1. Clear active user
             currentUser = null;
             localStorage.removeItem('arpit_current_user');
+
+            // 2. Clear state and memory variables
             cart = [];
             watchlist = [];
             document.getElementById('cartCount').innerText = '0';
-            if(orderStatusInterval) clearInterval(orderStatusInterval);
-            
+
+            // 3. Hide profile modal
             document.getElementById('profileModal').style.display = 'none';
+
+            // 4. Update Header & Redirect User to Home / Login Screen
             updateAuthUI();
-            window.showToast("Logged out successfully.");
             window.goHome();
+            window.showToast("Logged out successfully! All local data cleared.", "success");
         };
 
         // Offline Handling
@@ -835,7 +791,7 @@
             history.pushState({ appNav: type }, '');
         }
 
-        // MOBILE BACK BUTTON LISTENER
+        // PERFECT MOBILE BACK BUTTON LISTENER
         window.addEventListener('popstate', (e) => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
@@ -1035,7 +991,7 @@
 
         function listenToProducts() {
             window.checkNetworkStatus();
-            if (currentUser) fetchLiveStatusForAllOrders();
+            fetchLiveStatusForAllOrders();
 
             const productsRef = collection(db, "products");
             onSnapshot(productsRef, (snapshot) => {
@@ -1107,20 +1063,16 @@
         };
 
         window.toggleLike = (id, event) => {
-            if(event) event.stopPropagation();
-            if (!currentUser) {
-                window.showToast("Watchlist ke liye pehle Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
+            if(event) event.stopPropagation(); 
             let isAdding = false;
+            let key = getUserWatchlistKey();
             if (watchlist.includes(id)) {
                 watchlist = watchlist.filter(itemId => itemId !== id);
             } else {
                 watchlist.push(id);
                 isAdding = true;
             }
-            saveUserData();
+            localStorage.setItem(key, JSON.stringify(watchlist));
             window.applyFiltersAndRender();
             const detailLikeBtn = document.getElementById('detailLikeBtn');
             if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
@@ -1128,11 +1080,6 @@
         };
 
         window.showWatchlist = () => {
-            if (!currentUser) {
-                window.showToast("Watchlist dekhne ke liye Pehle Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
             saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
@@ -1146,11 +1093,6 @@
         };
 
         window.showMyOrders = () => {
-            if (!currentUser) {
-                window.showToast("Orders dekhne ke liye Pehle Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
             saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
@@ -1162,16 +1104,6 @@
             pushNavState('orders');
             fetchLiveStatusForAllOrders();
             renderOrdersUI();
-
-            // FAST REAL-TIME ORDER STATUS REFRESH (Every 10 seconds when on MyOrders screen)
-            if(orderStatusInterval) clearInterval(orderStatusInterval);
-            orderStatusInterval = setInterval(() => {
-                if (currentCategory === 'MyOrders' && currentUser) {
-                    fetchLiveStatusForAllOrders();
-                } else {
-                    clearInterval(orderStatusInterval);
-                }
-            }, 10000);
         };
 
         window.filterCategory = (cat) => {
@@ -1304,22 +1236,16 @@
             });
         }
 
-        /* LOGGED-IN USER ISOLATED ORDERS RENDER */
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
-
+            
             if (!currentUser) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;">
-                        <div style="font-size:50px; margin-bottom:10px;">🔒</div>
-                        <p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye pehle Login karein!</p>
-                        <button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:10px 20px; background:linear-gradient(135deg, #38bdf8, #6366f1); border:none; color:white; font-weight:bold; border-radius:10px; cursor:pointer;">Login / Sign Up 🚀</button>
-                    </div>`;
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up 🚀</button></div>';
                 return;
             }
 
-            let savedOrders = JSON.parse(localStorage.getItem(`arpit_my_orders_${currentUser.phone}`)) || [];
+            let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
             if(savedOrders.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
                 return;
@@ -1369,28 +1295,28 @@
             });
         }
 
-        /* FAST PARALLEL ORDER STATUS UPDATE SYSTEM */
         function fetchLiveStatusForAllOrders() {
             if (!navigator.onLine || !currentUser) return;
-            let savedOrders = JSON.parse(localStorage.getItem(`arpit_my_orders_${currentUser.phone}`)) || [];
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
             if (savedOrders.length === 0) return;
+            
             let statusChanged = false;
-
             let fetchPromises = savedOrders.map((ord, index) => {
                 let cleanId = ord.orderId.toString().replace('#', '').trim();
-                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}&_t=${Date.now()}`)
+                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data && data.status && data.status !== ord.status) {
                             savedOrders[index].status = data.status;
                             statusChanged = true;
                         }
-                    }).catch(err => console.log("Status check error:", err));
+                    }).catch(err => console.log("Status error:", err));
             });
-
+            
             Promise.all(fetchPromises).then(() => {
-                if(statusChanged && currentUser) {
-                    localStorage.setItem(`arpit_my_orders_${currentUser.phone}`, JSON.stringify(savedOrders));
+                if(statusChanged) {
+                    localStorage.setItem(key, JSON.stringify(savedOrders));
                     if(currentCategory === 'MyOrders') renderOrdersUI();
                 }
             });
@@ -1489,7 +1415,7 @@
             }
             const item = liveProducts.find(p => p.id === id);
             cart.push({ ...item });
-            saveUserData();
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast(`${item.name} added to cart!`);
         };
@@ -1503,7 +1429,7 @@
             const item = liveProducts.find(p => p.id === id);
             if(!item) return;
             cart.push({ ...item });
-            saveUserData();
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast(`${item.name} added to cart!`);
         };
@@ -1520,7 +1446,7 @@
 
         window.removeFromCart = (index) => {
             cart.splice(index, 1);
-            saveUserData();
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.updateCartUI();
         };
@@ -1645,19 +1571,20 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             }).then(() => {
-                let savedOrders = JSON.parse(localStorage.getItem(`arpit_my_orders_${currentUser.phone}`)) || [];
+                let userOrdersKey = getUserOrdersKey();
+                let savedOrders = JSON.parse(localStorage.getItem(userOrdersKey)) || [];
                 savedOrders.unshift({
                     orderId: orderId, items: [...cart], total: cartTotalAmount,
                     date: fullDateTime, status: "Order Confirmed"
                 });
-                localStorage.setItem(`arpit_my_orders_${currentUser.phone}`, JSON.stringify(savedOrders));
+                localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
 
                 document.getElementById('cartModal').style.display = 'none';
                 const successModal = document.getElementById('successModal');
                 successModal.style.display = 'flex';
 
                 cart = [];
-                saveUserData();
+                localStorage.removeItem(getUserCartKey());
                 document.getElementById('cartCount').innerText = '0';
 
                 setTimeout(() => { successModal.style.display = 'none'; window.showMyOrders(); }, 2500);
