@@ -552,6 +552,7 @@
 
         let liveProducts = [];
         let productsUnsubscribe = null;
+        let currentProduct = null;
         
         // AUTHENTICATION & USER PROFILE STATE
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
@@ -1405,22 +1406,57 @@
             });
         }
 
-        window.selectColor = (colorName, el, imgUrl = '') => {
-            selectedColor = colorName;
-            selectedColorImg = imgUrl;
-            
-            // Main image state update on color selection
-            if (imgUrl) {
-                selectedImage = imgUrl;
-                const mainImg = document.getElementById('mainProductImage');
-                if (mainImg) mainImg.src = imgUrl;
+        // --- STRICT COLOR IMAGE FILTERING ENGINE ---
+        function updateGalleryImages(colorName) {
+            if (!currentProduct) return;
+
+            let currentImages = [];
+            const selectedColorData = (currentProduct.colors && Array.isArray(currentProduct.colors)) 
+                ? currentProduct.colors.find(c => (typeof c === 'object' ? c.name : c) === colorName) 
+                : null;
+
+            // STRICT COLOR FILTERING: Root media avoids mixing when color images exist
+            if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
+                let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
+                currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
+            } else if (currentProduct.media && Array.isArray(currentProduct.media) && currentProduct.media.length > 0) {
+                currentImages = currentProduct.media.map(url => formatMediaUrl(url)).filter(url => url);
             }
 
+            if (currentImages.length === 0) {
+                currentImages = ['https://via.placeholder.com/400x300?text=No+Image'];
+            }
+
+            selectedImage = currentImages[0];
+            selectedColorImg = currentImages[0];
+
+            // Re-render slider & main image strictly with currentImages
+            const sliderContainer = document.getElementById('detailSliderContainer');
+            if (sliderContainer) {
+                let mediaHtml = '<div class="detail-slider">';
+                currentImages.forEach((imgUrl, idx) => {
+                    let imgId = idx === 0 ? 'id="mainProductImage"' : '';
+                    mediaHtml += `<img src="${imgUrl}" ${imgId} class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" alt="Product Image">`;
+                });
+                mediaHtml += '</div>';
+                sliderContainer.innerHTML = mediaHtml;
+            }
+        }
+
+        window.selectColor = (colorName, el) => {
+            selectedColor = colorName;
+            
             const label = document.getElementById('colorLabel');
             if (label) label.innerText = colorName;
-            const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
-            siblings.forEach(btn => btn.classList.remove('active'));
-            if (el) el.classList.add('active');
+
+            if (el) {
+                const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
+                siblings.forEach(btn => btn.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            // Strictly filter & refresh gallery images according to color
+            updateGalleryImages(colorName);
         };
 
         window.selectSize = (size, el) => {
@@ -1435,6 +1471,8 @@
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) { window.showToast("Product unavailable!", "error"); return; }
+            
+            currentProduct = p;
             pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
@@ -1442,9 +1480,6 @@
             selectedSize = "";
             selectedColor = "";
             selectedColorImg = "";
-
-            // Initialize selectedImage state with default product media or first image
-            selectedImage = (p.media && p.media.length > 0) ? formatMediaUrl(p.media[0]) : '';
 
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
@@ -1465,34 +1500,12 @@
                 `;
             }
 
-            // Main image state usage: <img src={selectedImage} alt="Main Product" />
-            let mediaHtml = '<div class="detail-slider">';
-            if (selectedImage) {
-                mediaHtml += `<img src="${selectedImage}" id="mainProductImage" class="detail-slide-item" onclick="window.openZoomModal('${selectedImage}')" alt="Main Product">`;
-            } else {
-                mediaHtml += `<img src="https://via.placeholder.com/400x300?text=No+Image" id="mainProductImage" class="detail-slide-item" alt="Main Product">`;
-            }
-            if (p.media && p.media.length > 1) {
-                p.media.slice(1).forEach(rawLink => {
-                    let link = formatMediaUrl(rawLink);
-                    mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" alt="Product Image">`;
-                });
-            }
-            mediaHtml += '</div>';
-
             let variantHtml = '';
             
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-                let firstColor = p.colors[0];
-                selectedColor = typeof firstColor === 'object' ? firstColor.name : firstColor;
+                let firstColorObj = p.colors[0];
+                selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
                 
-                // Using color.image fix for specific color thumbnail
-                if (typeof firstColor === 'object' && firstColor.image) {
-                    let firstImgSrc = Array.isArray(firstColor.image) ? firstColor.image[0] : firstColor.image;
-                    selectedColorImg = formatMediaUrl(firstImgSrc);
-                    selectedImage = selectedColorImg; // Set default selected image to first color image if available
-                }
-
                 variantHtml += `<div class="variant-section">
                     <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
                     <div class="color-options">`;
@@ -1507,7 +1520,7 @@
                     let active = idx === 0 ? 'active' : '';
 
                     if (cImg) {
-                        variantHtml += `<img src="${cImg}" class="color-thumb ${active}" onclick="window.selectColor('${cName}', this, '${cImg}')" title="${cName}" alt="color icon">`;
+                        variantHtml += `<img src="${cImg}" class="color-thumb ${active}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="color icon">`;
                     } else {
                         variantHtml += `<div class="size-btn ${active}" onclick="window.selectColor('${cName}', this)">🎨 ${cName}</div>`;
                     }
@@ -1528,7 +1541,7 @@
             }
 
             document.getElementById('detailContent').innerHTML = `
-                ${mediaHtml}
+                <div id="detailSliderContainer"></div>
                 <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                     <div>
                         <small style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">${categoryTag}</small>
@@ -1544,6 +1557,9 @@
                     <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.buyNowProduct('${p.id}')">Buy Now ⚡</button>
                 </div>
             `;
+
+            // Initial call to strictly load gallery for default/selected color
+            updateGalleryImages(selectedColor);
             window.scrollTo(0, 0);
         };
 
@@ -1571,8 +1587,8 @@
             if (selectedSize) cartItem.selectedSize = selectedSize;
             if (selectedColor) cartItem.selectedColor = selectedColor;
             
-            if (selectedColorImg) {
-                cartItem.media = [selectedColorImg, ...(item.media || [])];
+            if (selectedImage) {
+                cartItem.media = [selectedImage, ...(item.media || [])];
             }
 
             cart.push(cartItem);
