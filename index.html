@@ -551,6 +551,7 @@
         const UPI_ID = "7665913393@ptsbi";
 
         let liveProducts = [];
+        let productsUnsubscribe = null;
         
         // AUTHENTICATION & USER PROFILE STATE
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
@@ -1062,8 +1063,10 @@
             window.checkNetworkStatus();
             fetchLiveStatusForAllOrders();
 
+            if (productsUnsubscribe) productsUnsubscribe();
+
             const productsRef = collection(db, "products");
-            onSnapshot(productsRef, (snapshot) => {
+            productsUnsubscribe = onSnapshot(productsRef, (snapshot) => {
                 if(!snapshot.empty) {
                     liveProducts = [];
                     snapshot.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
@@ -1470,7 +1473,6 @@
             }
             mediaHtml += '</div>';
 
-            // DYNAMIC COLOR AND SIZE HTML GENERATION WITH PRODUCT ICONS/THUMBNAILS
             let variantHtml = '';
             
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
@@ -1696,7 +1698,6 @@
             let now = new Date();
             let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true})}`;
             
-            // Format Product Names With Variables to send to Google Sheet/Admin
             let productNames = cart.map(item => {
                 let variantInfo = [];
                 if(item.selectedColor) variantInfo.push(`Color: ${item.selectedColor}`);
