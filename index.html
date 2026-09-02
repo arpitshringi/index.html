@@ -224,7 +224,48 @@
         .google-auth-btn { width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
         .google-auth-btn:hover { background: #f1f5f9; }
         .address-chip { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+
+
+        .otp-primary-btn { width: 100%; background: linear-gradient(135deg, #f43f5e, #fb7185); color: white; border: 0; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; margin: 4px 0 8px; box-shadow: 0 5px 14px rgba(244,63,94,0.25); }
+        .otp-primary-btn:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(244,63,94,0.4); }
+        .otp-primary-note { color: #cbd5e1; font-size: 11px; text-align: center; margin-bottom: 8px; }
+
+        /* PDF feature additions: secure auth, policy pages and quantity controls */
+        .secure-auth-section { margin-top: 18px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .secure-auth-title { color: #38bdf8; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .secure-auth-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+        .secure-auth-tab { flex: 1; padding: 8px 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(15,23,42,0.6); color: #94a3b8; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .secure-auth-tab.active { background: rgba(56,189,248,0.18); color: #38bdf8; border-color: #38bdf8; }
+        .secure-auth-section .secure-input { margin-bottom: 10px; }
+        .secure-auth-actions { display: flex; gap: 8px; }
+        .secure-auth-actions button { flex: 1; margin-top: 0; padding: 10px 8px; font-size: 12px; }
+        .secure-google-btn { width: 100%; background: #fff; color: #1e293b; border: 0; padding: 10px; border-radius: 9px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .secure-google-btn:hover { background: #e2e8f0; }
+        .secure-help-text { color: #94a3b8; font-size: 11px; line-height: 1.4; margin: 8px 0; }
+        .secure-otp-step { margin-top: 8px; }
+        .store-footer { max-width: 1100px; margin: 35px auto 0; padding: 24px 15px 70px; border-top: 1px solid rgba(255,255,255,0.1); color: #94a3b8; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+        .store-footer h3 { color: #f8fafc; font-size: 15px; margin-bottom: 9px; }
+        .store-footer p, .store-footer li { font-size: 12px; line-height: 1.6; }
+        .store-footer ul { list-style: none; }
+        .store-footer button { background: none; border: 0; color: #94a3b8; cursor: pointer; padding: 2px 0; text-align: left; font: inherit; }
+        .store-footer button:hover { color: #38bdf8; }
+        .policy-modal { display: none; position: fixed; inset: 0; z-index: 450; background: rgba(0,0,0,0.78); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 16px; }
+        .policy-modal.open { display: flex; }
+        .policy-content { width: 100%; max-width: 680px; max-height: 82vh; overflow-y: auto; background: #1e293b; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.45); }
+        .policy-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; background: #1e293b; }
+        .policy-header h2 { color: #38bdf8; font-size: 18px; }
+        .policy-close { background: none; border: 0; color: #94a3b8; font-size: 26px; cursor: pointer; }
+        .policy-body { padding: 20px; color: #cbd5e1; font-size: 13px; line-height: 1.7; }
+        .policy-body h4 { color: #f8fafc; font-size: 16px; margin-bottom: 8px; }
+        .policy-body p { margin-bottom: 10px; }
+        .policy-body strong { color: #f8fafc; }
+        .qty-controls { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
+        .qty-controls button { width: 25px; height: 25px; border: 1px solid rgba(56,189,248,0.45); background: rgba(56,189,248,0.12); color: #f8fafc; border-radius: 6px; cursor: pointer; font-weight: 700; }
+        .qty-controls button:hover { background: #38bdf8; color: #0f172a; }
+        .qty-controls span { min-width: 18px; text-align: center; color: #f8fafc; font-weight: 700; font-size: 13px; }
+        @media (max-width: 700px) { .store-footer { grid-template-columns: 1fr; gap: 15px; padding-bottom: 90px; } }
     </style>
+</head>    </style>
 </head>
 <body>
 
@@ -252,26 +293,42 @@
         <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
     </div>
 
-    <!-- Auth / Login / Signup Modal -->
+    <!-- Auth / Login Modal -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
-            <div class="auth-tab-header">
-                <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
-                <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
-            </div>
+            <!-- PDF authentication flow: Phone OTP and Google only -->
+            <div class="secure-auth-section" style="margin-top:0; padding-top:0; border-top:0;">
+                <div class="secure-auth-title">Secure Login</div>
+                <div class="secure-auth-email-box">
+                    <input type="email" id="secureEmail" class="input-box secure-input" placeholder="Gmail / Email Address">
+                    <button class="add-btn" onclick="window.sendSecureEmailOTP()">Send Gmail OTP / Link</button>
+                    <p class="secure-help-text" style="margin-bottom:10px;">Gmail par sign-in link/OTP bhejkar account banayein ya login karein.</p>
+                </div>
+                <div style="text-align:center; color:#94a3b8; font-size:12px; margin:12px 0;">Or use mobile OTP</div>
+                <button class="otp-primary-btn" onclick="window.showPhoneOtpLogin()">📱 Login with Phone OTP</button>
+                <p class="otp-primary-note">OTP se login karein — password ki zaroorat nahi</p>
 
-            <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
-                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
-                Continue with Google
-            </button>
-            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR with Mobile Number</div>
+                <div id="securePhonePanel">
+                    <div class="secure-auth-actions" id="secureOtpStepOne">
+                        <input type="tel" id="securePhone" class="input-box secure-input" placeholder="10-digit mobile number" style="margin:0;">
+                        <button class="add-btn" onclick="window.sendSecureOTP()">Get OTP</button>
+                    </div>
+                    <div id="secureRecaptchaContainer"></div>
+                    <div id="secureOtpStepTwo" class="secure-otp-step" style="display:none;">
+                        <input type="number" id="secureOtpCode" class="input-box secure-input" placeholder="6-digit OTP">
+                        <div class="secure-auth-actions">
+                            <button class="pay-btn" onclick="window.verifySecureOTP()">Verify OTP</button>
+                            <button class="add-btn" onclick="window.resetSecureOTP()">Change Number</button>
+                        </div>
+                    </div>
+                </div>
 
-            <div id="authFormContainer">
-                <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
-                <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
-                <input type="password" id="authPassword" class="input-box" placeholder="Password">
-                <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
+                <div style="text-align:center; color:#94a3b8; font-size:12px; margin:16px 0 8px;">Or One-Click Login</div>
+                <button class="secure-google-btn" onclick="window.loginWithGoogle()">
+                    <span style="font-size:16px;">G</span> Continue with Google
+                </button>
+                <p class="secure-help-text">Sirf Phone OTP ya Google account se login karein. Firebase Console mein Google aur Phone providers enabled hone chahiye.</p>
             </div>
         </div>
     </div>
@@ -318,11 +375,11 @@
 
         <div id="drawerUserSection"></div>
 
-        <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
-        <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
-        <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
-        <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
-        <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('home')">🏠 Home</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('orders')">📦 My Orders</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('watchlist')" style="color: #fb7185;">❤️ My Watchlist</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('saree')">🥻 Sarees</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('beauty')">💄 Beauty Products</div>
     </div>
 
     <!-- Header -->
@@ -404,7 +461,24 @@
         </div>
     </div>
 
-    <!-- Cart Modal -->
+
+    <!-- PDF policy pages and store footer -->
+    <div class="policy-modal" id="policyModal" onclick="if(event.target === this) window.closePolicyModal()">
+        <div class="policy-content">
+            <div class="policy-header">
+                <h2 id="policyModalTitle">Store Information</h2>
+                <button class="policy-close" onclick="window.closePolicyModal()">&times;</button>
+            </div>
+            <div class="policy-body" id="policyModalBody"></div>
+        </div>
+    </div>
+    <footer class="store-footer">
+        <div><h3>Arpit Store</h3><p>Premium sarees, ethnic wear and beauty products with fast delivery and customer support.</p><p style="margin-top:8px; color:#38bdf8;">Customer Support: +91 7665913393</p></div>
+        <div><h3>Quick Policies</h3><ul><li><button onclick="window.openPolicy('privacy')">Privacy Policy</button></li><li><button onclick="window.openPolicy('terms')">Terms &amp; Conditions</button></li><li><button onclick="window.openPolicy('refund')">Refund &amp; Return Policy</button></li><li><button onclick="window.openPolicy('shipping')">Shipping Policy</button></li></ul></div>
+        <div><h3>Contact &amp; Support</h3><ul><li><button onclick="window.openPolicy('contact')">About Arpit Store</button></li><li>Phone: +91 7665913393</li><li>Location: Rajasthan, India</li></ul></div>
+    </footer>
+
+    <!-- Cart Modal -->    <!-- Cart Modal -->
     <div class="modal" id="cartModal">
         <div class="modal-content">
             <button class="close-btn" onclick="window.toggleCart()">&times;</button>
@@ -460,6 +534,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // PULL TO REFRESH LOGIC (FIXED TOUCH BUG)
         let ptrStart = 0;
@@ -558,6 +633,123 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+        let secureRecaptchaVerifier = null;
+        let secureConfirmationResult = null;
+
+
+
+        // PDF AUTHENTICATION: Phone OTP and Google login.
+        window.showPhoneOtpLogin = () => {
+            const section = document.querySelector('.secure-auth-section');
+            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const phoneInput = document.getElementById('securePhone');
+            if (phoneInput) setTimeout(() => phoneInput.focus(), 250);
+        };
+
+        function normalizeFirebasePhone(user) {
+            if (user && user.phoneNumber) return user.phoneNumber.replace(/\D/g, '').slice(-10);
+            return user && user.email ? user.email : 'firebase_' + (user ? user.uid : 'user');
+        }
+
+        function adoptFirebaseUser(user) {
+            if (!user) return;
+            const phoneKey = normalizeFirebasePhone(user);
+            const registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            const previous = registeredUsers.find(item => item.phone === phoneKey);
+            const name = user.displayName || (user.email ? user.email.split('@')[0] : '') || (previous && previous.name) || 'Customer';
+            const legacyUser = { name, phone: phoneKey, password: '', addresses: (previous && previous.addresses) || [], firebaseUid: user.uid, email: user.email || '' };
+            const existingIndex = registeredUsers.findIndex(item => item.phone === phoneKey);
+            if (existingIndex >= 0) registeredUsers[existingIndex] = { ...registeredUsers[existingIndex], ...legacyUser };
+            else registeredUsers.push(legacyUser);
+            localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+            currentUser = legacyUser;
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            reloadUserSpecificState();
+            if (window.showToast) window.showToast('Secure Firebase login successful!');
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && (!currentUser || currentUser.firebaseUid !== user.uid)) adoptFirebaseUser(user);
+        });
+
+        // PDF email OTP flow: Firebase sends a password-free sign-in link to Gmail.
+        window.sendSecureEmailOTP = () => {
+            const emailInput = document.getElementById('secureEmail');
+            const email = emailInput ? emailInput.value.trim() : '';
+            if (!email || !email.includes('@')) {
+                window.showToast('Valid Gmail / Email address bharein.', 'error');
+                return;
+            }
+            const actionCodeSettings = {
+                url: window.location.href.split('?')[0],
+                handleCodeInApp: true
+            };
+            sendSignInLinkToEmail(auth, email, actionCodeSettings)
+                .then(() => {
+                    localStorage.setItem('arpit_email_for_signin', email);
+                    window.showToast('Gmail sign-in link/OTP bhej diya gaya hai. Inbox ya spam check karein.');
+                })
+                .catch(error => window.showToast('Gmail OTP error: ' + error.message, 'error'));
+        };
+
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let emailForLink = localStorage.getItem('arpit_email_for_signin');
+            if (!emailForLink) emailForLink = window.prompt('Confirmation ke liye apna Gmail enter karein:');
+            if (emailForLink) {
+                signInWithEmailLink(auth, emailForLink, window.location.href)
+                    .then(result => {
+                        localStorage.removeItem('arpit_email_for_signin');
+                        adoptFirebaseUser(result.user);
+                        window.showToast('Gmail login successful!');
+                    })
+                    .catch(error => window.showToast('Gmail link verification error: ' + error.message, 'error'));
+            }
+        }
+
+        // Same Google popup flow as the PDF implementation, using Firebase's modular API.
+        window.loginWithGoogle = () => {
+            signInWithPopup(auth, new GoogleAuthProvider())
+                .then(result => { adoptFirebaseUser(result.user); window.toggleAuthModal(); })
+                .catch(error => window.showToast('Google login error: ' + error.message, 'error'));
+        };
+
+        window.setupSecureRecaptcha = () => {
+            if (!secureRecaptchaVerifier) secureRecaptchaVerifier = new RecaptchaVerifier(auth, 'secureRecaptchaContainer', { size: 'invisible' });
+            return secureRecaptchaVerifier;
+        };
+
+        window.sendSecureOTP = () => {
+            const rawPhone = document.getElementById('securePhone').value.trim().replace(/\D/g, '');
+            if (rawPhone.length < 10) { window.showToast('Valid 10-digit mobile number bharein.', 'error'); return; }
+            signInWithPhoneNumber(auth, '+91' + rawPhone.slice(-10), window.setupSecureRecaptcha())
+                .then(result => {
+                    secureConfirmationResult = result;
+                    document.getElementById('secureOtpStepOne').style.display = 'none';
+                    document.getElementById('secureOtpStepTwo').style.display = 'block';
+                    window.showToast('OTP SMS se bhej diya gaya hai.');
+                })
+                .catch(error => {
+                    if (secureRecaptchaVerifier) { secureRecaptchaVerifier.clear(); secureRecaptchaVerifier = null; }
+                    window.showToast('OTP send error: ' + error.message, 'error');
+                });
+        };
+
+        window.verifySecureOTP = () => {
+            const code = document.getElementById('secureOtpCode').value.trim();
+            if (!secureConfirmationResult || code.length !== 6) { window.showToast('6-digit OTP enter karein.', 'error'); return; }
+            secureConfirmationResult.confirm(code)
+                .then(result => { adoptFirebaseUser(result.user); window.toggleAuthModal(); })
+                .catch(error => window.showToast('OTP verification error: ' + error.message, 'error'));
+        };
+
+        window.resetSecureOTP = () => {
+            document.getElementById('secureOtpStepOne').style.display = 'flex';
+            document.getElementById('secureOtpStepTwo').style.display = 'none';
+            document.getElementById('secureOtpCode').value = '';
+            secureConfirmationResult = null;
+        };
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
@@ -568,8 +760,6 @@
         
         // AUTHENTICATION & USER PROFILE STATE
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-        let authMode = 'login'; // 'login' or 'signup'
-
         // USER SPECIFIC KEYS & STATE
         function getUserOrdersKey() {
             return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
@@ -581,7 +771,7 @@
             return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
         }
 
-        let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+        let cart = (JSON.parse(localStorage.getItem(getUserCartKey())) || []).map(item => ({ ...item, qty: Math.max(1, Number(item.qty) || 1) }));
         let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
 
         let currentCategory = 'All';
@@ -607,7 +797,7 @@
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
-        document.getElementById('cartCount').innerText = cart.length;
+        document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
         updateAuthUI();
 
         // APP REFRESH FUNCTION
@@ -638,111 +828,12 @@
             }
         };
 
-        window.switchAuthTab = (mode) => {
-            authMode = mode;
-            const loginBtn = document.getElementById('tabLoginBtn');
-            const signupBtn = document.getElementById('tabSignupBtn');
-            const nameInput = document.getElementById('authName');
-            const submitBtn = document.getElementById('authSubmitBtn');
-
-            if (mode === 'login') {
-                loginBtn.classList.add('active');
-                signupBtn.classList.remove('active');
-                nameInput.style.display = 'none';
-                submitBtn.innerText = 'Login';
-            } else {
-                signupBtn.classList.add('active');
-                loginBtn.classList.remove('active');
-                nameInput.style.display = 'block';
-                submitBtn.innerText = 'Sign Up';
-            }
-        };
-
         function reloadUserSpecificState() {
-            cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+            cart = (JSON.parse(localStorage.getItem(getUserCartKey())) || []).map(item => ({ ...item, qty: Math.max(1, Number(item.qty) || 1) }));
             watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
-            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
             fetchLiveStatusForAllOrders();
         }
-
-        window.submitAuth = () => {
-            const phone = document.getElementById('authPhone').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            const name = document.getElementById('authName').value.trim();
-
-            if (!phone || phone.length !== 10 || !password) {
-                window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
-                return;
-            }
-
-            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-
-            if (authMode === 'signup') {
-                if (!name) {
-                    window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
-                    return;
-                }
-                let existing = registeredUsers.find(u => u.phone === phone);
-                if (existing) {
-                    window.showToast("Yeh mobile number pehle se registered hai! Login karein.", "error");
-                    window.switchAuthTab('login');
-                    return;
-                }
-
-                let newUser = { name, phone, password, addresses: [] };
-                registeredUsers.push(newUser);
-                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-
-                syncUserToExcel({ action: 'signup', name, phone, password });
-
-                currentUser = newUser;
-                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                window.toggleAuthModal();
-                updateAuthUI();
-                reloadUserSpecificState();
-                window.showToast("Sign up successful! Welcome.");
-
-            } else {
-                let user = registeredUsers.find(u => u.phone === phone && u.password === password);
-                if (!user) {
-                    window.showToast("Galat mobile number ya password! Pehle Sign Up karein.", "error");
-                    return;
-                }
-                currentUser = user;
-                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                window.toggleAuthModal();
-                updateAuthUI();
-                reloadUserSpecificState();
-                window.showToast("Login successful!");
-            }
-        };
-
-        window.handleGoogleLogin = () => {
-            let googleName = prompt("Enter your Google Account Name:", "Arpit");
-            let googlePhone = prompt("Enter your 10-digit Mobile Number for verification:", "9876543210");
-            
-            if (!googleName || !googlePhone || googlePhone.length !== 10) {
-                window.showToast("Google login cancelled or invalid details.", "error");
-                return;
-            }
-
-            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-            let user = registeredUsers.find(u => u.phone === googlePhone);
-
-            if (!user) {
-                user = { name: googleName, phone: googlePhone, password: 'google_auth_user', addresses: [] };
-                registeredUsers.push(user);
-                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-                syncUserToExcel({ action: 'signup', name: googleName, phone: googlePhone, password: 'google_auth_user' });
-            }
-
-            currentUser = user;
-            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-            window.toggleAuthModal();
-            updateAuthUI();
-            reloadUserSpecificState();
-            window.showToast("Google Login Successful!");
-        };
 
         function syncUserToExcel(payloadData) {
             if (!navigator.onLine) return;
@@ -774,11 +865,11 @@
                 `;
             } else {
                 headerAuthArea.innerHTML = `
-                    <button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Sign Up</button>
+                    <button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Login</button>
                 `;
                 drawerUserSection.innerHTML = `
                     <div style="margin-bottom: 20px;">
-                        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login / Sign Up 🚀</button>
+                        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login 🚀</button>
                     </div>
                 `;
             }
@@ -850,6 +941,7 @@
         }
 
         window.logoutUser = () => {
+            signOut(auth).catch(() => {});
             currentUser = null;
             localStorage.removeItem('arpit_current_user');
             cart = [];
@@ -1119,11 +1211,28 @@
         window.toggleDrawer = () => {
             const drawer = document.getElementById('drawer');
             const overlay = document.getElementById('overlay');
+            if (!drawer || !overlay) return;
             drawer.classList.toggle('open');
             const isOpen = drawer.classList.contains('open');
             overlay.style.display = isOpen ? 'block' : 'none';
             if(isOpen) pushNavState('drawer');
             else if (history.state && history.state.appNav === 'drawer') history.back();
+        };
+
+        window.closeDrawer = () => {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('overlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.style.display = 'none';
+        };
+
+        window.handleDrawerAction = (action) => {
+            window.closeDrawer();
+            if (action === 'home') window.goHome();
+            else if (action === 'orders') window.showMyOrders();
+            else if (action === 'watchlist') window.showWatchlist();
+            else if (action === 'saree') window.filterCategory('Saree');
+            else if (action === 'beauty') window.filterCategory('Beauty');
         };
 
         window.goHome = () => {
@@ -1168,7 +1277,9 @@
         window.showWatchlist = () => {
             saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
-            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            window.closeDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const watchTab = document.getElementById('tab-Watchlist');
             if(watchTab) watchTab.classList.add('active');
@@ -1181,7 +1292,9 @@
         window.showMyOrders = () => {
             saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
-            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            window.closeDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const orderTab = document.getElementById('tab-Orders');
             if(orderTab) orderTab.classList.add('active');
@@ -1192,12 +1305,28 @@
             renderOrdersUI();
         };
 
+        function normalizeCategoryName(value) {
+            return String(value || '').toLowerCase().replace(/sarees?/g, 'saree').replace(/beauty products?/g, 'beauty').replace(/[^a-z0-9]/g, '');
+        }
+
+        window.selectDrawerCategory = (cat) => {
+            window.closeDrawer();
+            window.filterCategory(cat);
+        };
+
         window.filterCategory = (cat) => {
+            if (cat === 'Sarees') cat = 'Saree';
+            if (cat === 'Beauty Products') cat = 'Beauty';
             saveActiveTab(cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
             if(cat === 'MyOrders') { window.showMyOrders(); return; }
             currentCategory = cat;
-            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('overlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.style.display = 'none';
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const activeTab = document.getElementById('tab-' + cat);
             if(activeTab) activeTab.classList.add('active');
@@ -1229,8 +1358,8 @@
             else if (currentCategory === 'All') filtered = [...liveProducts];
             else {
                 filtered = liveProducts.filter(p => {
-                    let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-                    let target = currentCategory.toLowerCase();
+                    let productCat = normalizeCategoryName(p.category || p.type || p.cat);
+                    let target = normalizeCategoryName(currentCategory);
                     return productCat.includes(target) || target.includes(productCat);
                 });
             }
@@ -1327,7 +1456,7 @@
             grid.innerHTML = '';
             
             if (!currentUser) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up 🚀</button></div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login 🚀</button></div>';
                 return;
             }
 
@@ -1577,7 +1706,7 @@
 
         window.addToCartWithVariants = (id) => {
             if (!currentUser) {
-                window.showToast("Pehle Sign Up / Login karein!", "error");
+                window.showToast("Pehle Login karein!", "error");
                 window.toggleAuthModal();
                 return;
             }
@@ -1599,15 +1728,18 @@
                 cartItem.media = [selectedImage, ...(item.media || [])];
             }
 
-            cart.push(cartItem);
+            cartItem.qty = 1;
+            const existingCartItem = cart.find(existing => existing.id === cartItem.id && existing.selectedSize === cartItem.selectedSize && existing.selectedColor === cartItem.selectedColor);
+            if (existingCartItem) existingCartItem.qty = (Number(existingCartItem.qty) || 1) + 1;
+            else cart.push(cartItem);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('cartCount').innerText = cart.reduce((sum, cartEntry) => sum + (Number(cartEntry.qty) || 1), 0);
             window.showToast(`${item.name} added to cart!`);
         };
 
         window.buyNowProduct = (id) => {
             if (!currentUser) {
-                window.showToast("Kripya pehle Sign Up karein!", "error");
+                window.showToast("Kripya pehle Login karein!", "error");
                 window.toggleAuthModal();
                 return;
             }
@@ -1618,7 +1750,16 @@
         window.removeFromCart = (index) => {
             cart.splice(index, 1);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+            window.updateCartUI();
+        };
+
+        window.changeCartQty = (index, change) => {
+            if (!cart[index]) return;
+            cart[index].qty = (Number(cart[index].qty) || 1) + change;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
             window.updateCartUI();
         };
 
@@ -1652,7 +1793,8 @@
             }
 
             cart.forEach((item, index) => {
-                cartTotalAmount += Number(item.price);
+                const itemQty = Math.max(1, Number(item.qty) || 1);
+                cartTotalAmount += Number(item.price) * itemQty;
                 
                 let imgUrl = 'https://via.placeholder.com/60?text=No+Img';
                 if (item.media && item.media.length > 0) imgUrl = formatMediaUrl(item.media[0]);
@@ -1671,7 +1813,12 @@
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
                             ${variantText}
-                            <p>₹${item.price}</p>
+                            <p>₹${item.price} × ${Math.max(1, Number(item.qty) || 1)}</p>
+                            <div class="qty-controls">
+                                <button onclick="window.changeCartQty(${index}, -1)">−</button>
+                                <span>${Math.max(1, Number(item.qty) || 1)}</span>
+                                <button onclick="window.changeCartQty(${index}, 1)">+</button>
+                            </div>
                         </div>
                         <button class="remove-btn" onclick="window.removeFromCart(${index})">🗑 Remove</button>
                     </div>
@@ -1744,7 +1891,8 @@
                 if(item.selectedColor) variantInfo.push(`Color: ${item.selectedColor}`);
                 if(item.selectedSize) variantInfo.push(`Size: ${item.selectedSize}`);
                 let variantStr = variantInfo.length > 0 ? ` (${variantInfo.join(', ')})` : '';
-                return item.name + variantStr;
+                const itemQty = Math.max(1, Number(item.qty) || 1);
+                return item.name + variantStr + (itemQty > 1 ? ` × ${itemQty}` : '');
             }).join(", ");
 
             let payload = {
@@ -1785,7 +1933,25 @@
             }).finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
         };
 
-        const APP_VERSION = "3.2";
+
+
+        // PDF POLICY PAGES
+        const policyContent = {
+            privacy: { title: 'Privacy Policy', body: '<h4>Privacy Policy</h4><p>Arpit Store aapki basic details jaise naam, phone, email aur delivery address ko order process aur status updates ke liye use karta hai.</p><p>Hum aapki personal information ko sell ya rent nahi karte. User data ko Firebase aur aapke configured store systems mein store kiya ja sakta hai.</p>' },
+            terms: { title: 'Terms & Conditions', body: '<h4>Terms & Conditions</h4><p>Arpit Store use karne par aap product listing, price aur availability ke change hone ko accept karte hain. Order tabhi confirmed maana jayega jab checkout process successfully complete ho.</p><p>Galat delivery address ya contact details ki wajah se hone wali delay ke liye customer responsible hoga.</p>' },
+            refund: { title: 'Refund & Return Policy', body: '<h4>Refund & Return Policy</h4><p>Defective, damaged ya wrong product receive hone par delivery ke 7 din ke andar return/replacement request raise karein.</p><p>Approval ke baad refund original payment method par 3–5 business days mein process kiya ja sakta hai. Support ke liye +91 7665913393 par contact karein.</p>' },
+            shipping: { title: 'Shipping & Delivery Policy', body: '<h4>Shipping & Delivery Policy</h4><p>India ke andar delivery available hai. Standard orders dispatch ke baad aam taur par 4–7 business days mein deliver hote hain.</p><p>Shipping aur tracking updates available hone par SMS/WhatsApp ke through bheje jayenge.</p>' },
+            contact: { title: 'About Us & Customer Support', body: '<h4>About Arpit Store</h4><p>Arpit Store premium sarees, ethnic wear aur beauty products ke liye online shopping destination hai.</p><p><strong>Customer Support:</strong> +91 7665913393<br><strong>Location:</strong> Rajasthan, India</p>' }
+        };
+        window.openPolicy = (type) => {
+            const policy = policyContent[type] || policyContent.contact;
+            document.getElementById('policyModalTitle').innerText = policy.title;
+            document.getElementById('policyModalBody').innerHTML = policy.body;
+            document.getElementById('policyModal').classList.add('open');
+        };
+        window.closePolicyModal = () => document.getElementById('policyModal').classList.remove('open');
+
+        const APP_VERSION = "3.3-pdf-merge";
         if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
             localStorage.setItem('installed_app_version', APP_VERSION);
             if ('caches' in window) caches.keys().then(names => { for (let name of names) caches.delete(name); });
