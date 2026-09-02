@@ -323,7 +323,6 @@
         <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
         <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
         <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
-        <div class="drawer-item" onclick="window.refreshAppData()" style="color: #38bdf8;">🔄 Refresh App</div>
     </div>
 
     <!-- Header -->
@@ -462,15 +461,18 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // PULL TO REFRESH LOGIC
+        // PULL TO REFRESH LOGIC (FIXED TOUCH BUG)
         let ptrStart = 0;
         let ptrCurrent = 0;
         let isPtrPulling = false;
 
         document.addEventListener('touchstart', (e) => {
-            if (window.scrollY === 0) {
+            if (window.scrollY === 0 && e.touches.length === 1) {
                 ptrStart = e.touches[0].clientY;
+                ptrCurrent = e.touches[0].clientY;
                 isPtrPulling = true;
+            } else {
+                isPtrPulling = false;
             }
         }, { passive: true });
 
@@ -480,37 +482,47 @@
             let distance = ptrCurrent - ptrStart;
             
             if (distance > 0 && window.scrollY === 0) {
-                if (e.cancelable) e.preventDefault();
                 const ptr = document.getElementById('ptrContainer');
                 const txt = document.getElementById('ptrText');
-                
-                let offset = Math.min(distance / 2, 80) - 60; 
-                ptr.style.transform = `translateY(${offset}px)`;
-                
-                if (distance > 120) {
-                    txt.innerText = "Release to refresh 🔄";
-                    txt.style.borderColor = "#22c55e";
-                    txt.style.color = "#22c55e";
-                } else {
-                    txt.innerText = "Pull down to refresh ↓";
-                    txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
-                    txt.style.color = "#38bdf8";
+                if (ptr && txt) {
+                    let offset = Math.min(distance / 2, 80) - 60; 
+                    ptr.style.transform = `translateY(${offset}px)`;
+                    
+                    if (distance > 120) {
+                        txt.innerText = "Release to refresh 🔄";
+                        txt.style.borderColor = "#22c55e";
+                        txt.style.color = "#22c55e";
+                    } else {
+                        txt.innerText = "Pull down to refresh ↓";
+                        txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                        txt.style.color = "#38bdf8";
+                    }
                 }
             }
-        }, { passive: false });
+        }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
             if (!isPtrPulling) return;
-            isPtrPulling = false;
             let distance = ptrCurrent - ptrStart;
+            isPtrPulling = false;
             
             const ptr = document.getElementById('ptrContainer');
-            ptr.style.transform = `translateY(-100%)`;
+            if (ptr) {
+                ptr.style.transform = `translateY(-100%)`;
+            }
             
             if (distance > 120 && window.scrollY === 0) {
                 window.refreshAppData();
             }
-            document.getElementById('ptrText').innerText = "Pull down to refresh ↓";
+
+            ptrStart = 0;
+            ptrCurrent = 0;
+            const txt = document.getElementById('ptrText');
+            if (txt) {
+                txt.innerText = "Pull down to refresh ↓";
+                txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                txt.style.color = "#38bdf8";
+            }
         });
 
         // PREVENT PAGE ZOOM GLOBALLY
@@ -579,7 +591,7 @@
         let selectedColor = "";
         let selectedColorImg = "";
         let selectedSize = "";
-        let selectedImage = ""; // Main image state variable
+        let selectedImage = "";
 
         // PINCH ZOOM, DRAG & LIGHTBOX VARIABLES
         let zoomScale = 1;
@@ -1415,7 +1427,6 @@
                 ? currentProduct.colors.find(c => (typeof c === 'object' ? c.name : c) === colorName) 
                 : null;
 
-            // STRICT COLOR FILTERING: Root media avoids mixing when color images exist
             if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
                 let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
                 currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
@@ -1430,7 +1441,6 @@
             selectedImage = currentImages[0];
             selectedColorImg = currentImages[0];
 
-            // Re-render slider & main image strictly with currentImages
             const sliderContainer = document.getElementById('detailSliderContainer');
             if (sliderContainer) {
                 let mediaHtml = '<div class="detail-slider">';
@@ -1455,7 +1465,6 @@
                 el.classList.add('active');
             }
 
-            // Strictly filter & refresh gallery images according to color
             updateGalleryImages(colorName);
         };
 
@@ -1558,7 +1567,6 @@
                 </div>
             `;
 
-            // Initial call to strictly load gallery for default/selected color
             updateGalleryImages(selectedColor);
             window.scrollTo(0, 0);
         };
