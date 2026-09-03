@@ -531,6 +531,31 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+   //firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
+            authDomain: "arpit-store.firebaseapp.com",
+            projectId: "arpit-store",
+            storageBucket: "arpit-store.firebasestorage.app",
+            messagingSenderId: "607228237560",
+            appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
+            measurementId: "G-9T9Q26ZC9M"
+        };
+// 1. Firebase App aur Services Initialize kar
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// 2. User Login/Logout status check karne ke liye Listener
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("User logged in hai:", user.uid);
+    // User login hai toh uske orders/profile load karne ka logic yahan aayega
+  } else {
+    console.log("User logged out hai");
+    // Logout UI state
+  }
+});
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
