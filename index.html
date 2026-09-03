@@ -1580,7 +1580,7 @@ onAuthStateChanged(auth, (user) => {
             }
         };
 
-        window.showProductDetail = (productId) => {
+              window.showProductDetail = (productId) => {
             const product = liveProducts.find(p => p.id === productId);
             if (!product) return;
             currentProduct = product;
@@ -1598,17 +1598,11 @@ onAuthStateChanged(auth, (user) => {
             let colorHtml = '';
             if (product.colors && product.colors.length > 0) {
                 colorHtml += `<div class="variant-section"><div class="variant-title">🎨 Select Color: <span id="selectedColorLabel">${selectedColor}</span></div><div class="color-options">`;
-                product.colors.forEach(c => {
-                    let cName = typeof c === 'object' ? c.name : c;
-                    let cHex = typeof c === 'object' ? (c.hex || c.code || '#38bdf8') : '#38bdf8';
-                    let cImg = typeof c === 'object' && c.image ? formatMediaUrl(Array.isArray(c.image) ? c.image[0] : c.image) : '';
-                    let activeClass = selectedColor === cName ? 'active' : '';
-
-                    if (cImg) {
-                        colorHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectProductColor('${cName}')" title="${cName}">`;
-                    } else {
-                        colorHtml += `<button class="size-btn ${activeClass}" style="background:${cHex}; width:40px; height:40px; border-radius:50%; padding:0;" onclick="window.selectProductColor('${cName}')" title="${cName}"></button>`;
-                    }
+                product.colors.forEach((col) => {
+                    let colName = typeof col === 'object' ? col.name : col;
+                    let colImg = typeof col === 'object' && col.image ? formatMediaUrl(col.image) : (product.media && product.media[0] ? formatMediaUrl(product.media[0]) : '');
+                    let activeClass = colName === selectedColor ? 'active' : '';
+                    colorHtml += `<img src="${colImg}" class="color-thumb ${activeClass}" onclick="window.selectColorOption('${colName}', '${colImg}', this)" title="${colName}" alt="${colName}">`;
                 });
                 colorHtml += `</div></div>`;
             }
@@ -1616,9 +1610,9 @@ onAuthStateChanged(auth, (user) => {
             let sizeHtml = '';
             if (product.sizes && product.sizes.length > 0) {
                 sizeHtml += `<div class="variant-section"><div class="variant-title">📏 Select Size: <span id="selectedSizeLabel">${selectedSize}</span></div><div class="size-options">`;
-                product.sizes.forEach(s => {
-                    let activeClass = selectedSize === s ? 'active' : '';
-                    sizeHtml += `<button class="size-btn ${activeClass}" onclick="window.selectProductSize('${s}')">${s}</button>`;
+                product.sizes.forEach((sz) => {
+                    let activeClass = sz === selectedSize ? 'active' : '';
+                    sizeHtml += `<button class="size-btn ${activeClass}" onclick="window.selectSizeOption('${sz}', this)">${sz}</button>`;
                 });
                 sizeHtml += `</div></div>`;
             }
@@ -1630,90 +1624,102 @@ onAuthStateChanged(auth, (user) => {
                 initialImages = ['https://via.placeholder.com/400x350?text=No+Image'];
             }
 
-            let sliderHtml = '<div class="detail-slider" id="detailSlider">';
+            let sliderHtml = `<div class="detail-slider" id="detailSlider">`;
             initialImages.forEach(imgUrl => {
                 sliderHtml += `<img src="${imgUrl}" class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
             });
-            sliderHtml += '</div>';
+            sliderHtml += `</div>`;
 
             let isLiked = watchlist.includes(product.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
-
             let sellingPrice = Number(product.price) || 0;
             let mrpPrice = Number(product.mrp) || 0;
-            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; font-weight: 800; margin-bottom: 12px;">₹${sellingPrice}</h3>`;
 
+            let priceDisplayHtml = `<p style="font-size: 24px; font-weight: 800; color: #38bdf8; margin: 10px 0;">₹${sellingPrice}</p>`;
             if (mrpPrice > sellingPrice) {
                 let offAmount = mrpPrice - sellingPrice;
                 let offPercent = Math.round((offAmount / mrpPrice) * 100);
-                detailPriceHtml = `
-                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="color: #38bdf8; font-size: 24px; font-weight: 800;">₹${sellingPrice}</span>
+                priceDisplayHtml = `
+                    <div style="margin: 10px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="font-size: 26px; font-weight: 800; color: #38bdf8;">₹${sellingPrice}</span>
                         <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${mrpPrice}</span>
-                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 8px;">
-                            ${offPercent}% OFF (Total Saving: ₹${offAmount})
+                        <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">
+                            ${offPercent}% OFF (Save ₹${offAmount})
                         </span>
                     </div>
                 `;
             }
 
-            const detailContent = document.getElementById('detailContent');
-            detailContent.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
-                    <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;">${product.category || product.type || product.cat || 'General'}</span>
-                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${product.id}')">${heartIcon}</button>
+            const detailContainer = document.getElementById('detailContent');
+            detailContainer.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;">${product.category || product.type || 'Collection'}</span>
+                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${product.id}', event)">${heartIcon}</button>
                 </div>
-                <h2 style="color: white; font-size: 22px; margin: 10px 0 6px 0;">${product.name}</h2>
-                ${detailPriceHtml}
                 ${sliderHtml}
+                <h2 style="color: white; font-size: 22px; margin-bottom: 8px;">${product.name}</h2>
+                ${priceDisplayHtml}
                 ${colorHtml}
                 ${sizeHtml}
-                <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin: 15px 0; white-space: pre-line;">${product.description || 'No description available.'}</p>
-                <button class="pay-btn" onclick="window.addCurrentProductToCart()" style="background: linear-gradient(135deg, #38bdf8, #6366f1); margin-top: 15px;">Add to Cart 🛒</button>
+                <div style="display: flex; gap: 10px; margin: 20px 0;">
+                    <button class="add-btn" style="flex: 1; padding: 14px; font-size: 15px; font-weight: 700;" onclick="window.addToCart('${product.id}', false)">🛒 Add to Cart</button>
+                    <button class="pay-btn" style="flex: 1; margin-top: 0; padding: 14px; font-size: 15px;" onclick="window.addToCart('${product.id}', true)">⚡ Buy Now</button>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color: #38bdf8; margin-bottom: 8px;">Description</h4>
+                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">${product.description || 'No description available for this product.'}</p>
+                </div>
             `;
+            
+            if (selectedColor) {
+                window.updateGalleryImages(selectedColor);
+            }
         };
 
-        window.selectProductColor = (colorName) => {
+        window.selectColorOption = (colorName, imgUrl, el) => {
             selectedColor = colorName;
-            const label = document.getElementById('selectedColorLabel');
-            if(label) label.innerText = colorName;
-            document.querySelectorAll('.color-options img, .color-options button').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.color-thumb').forEach(thumb => thumb.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const lbl = document.getElementById('selectedColorLabel');
+            if (lbl) lbl.innerText = colorName;
             window.updateGalleryImages(colorName);
         };
 
-        window.selectProductSize = (sizeName) => {
+        window.selectSizeOption = (sizeName, el) => {
             selectedSize = sizeName;
-            const label = document.getElementById('selectedSizeLabel');
-            if(label) label.innerText = sizeName;
-            document.querySelectorAll('.size-options button').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            if (el) el.classList.add('active');
+            const lbl = document.getElementById('selectedSizeLabel');
+            if (lbl) lbl.innerText = sizeName;
         };
 
-        window.addCurrentProductToCart = () => {
-            if (!currentProduct) return;
-            let mainImg = (currentProduct.media && currentProduct.media.length > 0) ? formatMediaUrl(currentProduct.media[0]) : '';
-            
-            let cartItem = {
-                id: currentProduct.id,
-                name: currentProduct.name,
-                price: Number(currentProduct.price) || 0,
-                media: [mainImg],
-                selectedColor: selectedColor || '',
-                selectedSize: selectedSize || '',
-                qty: 1
-            };
+        window.addToCart = (productId, buyNow = false) => {
+            const product = liveProducts.find(p => p.id === productId) || currentProduct;
+            if (!product) return;
 
-            let existingIndex = cart.findIndex(item => item.id === cartItem.id && item.selectedColor === cartItem.selectedColor && item.selectedSize === cartItem.selectedSize);
+            const existingIndex = cart.findIndex(item => item.id === product.id && item.selectedColor === selectedColor && item.selectedSize === selectedSize);
+            
             if (existingIndex >= 0) {
                 cart[existingIndex].qty += 1;
             } else {
-                cart.push(cartItem);
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: Number(product.price) || 0,
+                    media: product.media || [],
+                    selectedColor: selectedColor,
+                    selectedSize: selectedSize,
+                    qty: 1
+                });
             }
 
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
-            window.showToast("Product added to cart successfully!");
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            window.showToast("Product added to cart!");
+
+            if (buyNow) {
+                window.toggleCart();
+            }
         };
 
         window.toggleCart = () => {
@@ -1721,99 +1727,97 @@ onAuthStateChanged(auth, (user) => {
             const isOpen = modal.style.display === 'flex';
             modal.style.display = isOpen ? 'none' : 'flex';
             if (!isOpen) {
-                renderCartUI();
+                window.renderCart();
                 pushNavState('cart');
             } else if (history.state && history.state.appNav === 'cart') {
                 history.back();
             }
         };
 
-        function renderCartUI() {
-            const listDiv = document.getElementById('cartList');
-            listDiv.innerHTML = '';
-            
+        window.renderCart = () => {
+            const cartList = document.getElementById('cartList');
+            if (!cartList) return;
+
             if (cart.length === 0) {
-                listDiv.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
+                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
                 cartTotalAmount = 0;
-                document.getElementById('qrTotal').innerText = '0';
-                return;
+            } else {
+                cartList.innerHTML = '';
+                cartTotalAmount = 0;
+
+                cart.forEach((item, idx) => {
+                    let itemTotal = item.price * item.qty;
+                    cartTotalAmount += itemTotal;
+                    let imgUrl = item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/55';
+
+                    let variantStr = '';
+                    if (item.selectedColor || item.selectedSize) {
+                        variantStr = `<div style="font-size: 11px; color: #cbd5e1;">${item.selectedColor ? 'Color: ' + item.selectedColor : ''} ${item.selectedSize ? ' | Size: ' + item.selectedSize : ''}</div>`;
+                    }
+
+                    cartList.innerHTML += `
+                        <div class="cart-item">
+                            <img src="${imgUrl}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/55'">
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                ${variantStr}
+                                <p>₹${item.price}</p>
+                                <div class="qty-controls">
+                                    <button onclick="window.updateCartQty(${idx}, -1)">-</button>
+                                    <span>${item.qty}</span>
+                                    <button onclick="window.updateCartQty(${idx}, 1)">+</button>
+                                </div>
+                            </div>
+                            <button class="remove-btn" onclick="window.removeFromCart(${idx})">✕</button>
+                        </div>
+                    `;
+                });
             }
 
-            cartTotalAmount = 0;
-            cart.forEach((item, index) => {
-                let itemTotal = (Number(item.price) || 0) * (Number(item.qty) || 1);
-                cartTotalAmount += itemTotal;
-                let imgUrl = (item.media && item.media.length > 0) ? item.media[0] : 'https://via.placeholder.com/55?text=No+Img';
-                
-                let variantTxt = '';
-                if (item.selectedColor || item.selectedSize) {
-                    variantTxt = `<div style="color:#cbd5e1; font-size:11px; display:flex; gap:6px; margin-top:2px;">`;
-                    if (item.selectedColor) variantTxt += `<span>🎨 ${item.selectedColor}</span>`;
-                    if (item.selectedSize) variantTxt += `<span>📏 ${item.selectedSize}</span>`;
-                    variantTxt += `</div>`;
-                }
-
-                listDiv.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${imgUrl}" class="cart-item-img">
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            ${variantTxt}
-                            <p>₹${item.price} x ${item.qty} = ₹${itemTotal}</p>
-                            <div class="qty-controls">
-                                <button onclick="window.updateCartQty(${index}, -1)">-</button>
-                                <span>${item.qty}</span>
-                                <button onclick="window.updateCartQty(${index}, 1)">+</button>
-                            </div>
-                        </div>
-                        <button class="remove-btn" onclick="window.removeFromCart(${index})">Remove</button>
-                    </div>
-                `;
-            });
-
-            document.getElementById('qrTotal').innerText = cartTotalAmount;
+            const qrTotal = document.getElementById('qrTotal');
+            if (qrTotal) qrTotal.innerText = cartTotalAmount;
 
             if (currentUser) {
                 document.getElementById('custName').value = currentUser.name || '';
                 document.getElementById('custPhone').value = currentUser.phone || '';
                 
-                const addressSelect = document.getElementById('checkoutAddressSelect');
-                if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    document.getElementById('checkoutAddressSection').style.display = 'block';
-                    addressSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
-                    currentUser.addresses.forEach(addr => {
-                        addressSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
-                    });
-                } else {
-                    document.getElementById('checkoutAddressSection').style.display = 'none';
+                const selectBox = document.getElementById('checkoutAddressSelect');
+                if (selectBox) {
+                    selectBox.innerHTML = '<option value="">-- Choose Saved Address --</option>';
+                    if (currentUser.addresses && currentUser.addresses.length > 0) {
+                        currentUser.addresses.forEach((a) => {
+                            selectBox.innerHTML += `<option value="${a}">📍 ${a}</option>`;
+                        });
+                    }
                 }
-            } else {
-                document.getElementById('custName').value = 'Guest Customer';
-                document.getElementById('custPhone').value = '9999999999';
-                document.getElementById('checkoutAddressSection').style.display = 'none';
             }
-        }
 
-        window.updateCartQty = (index, delta) => {
-            cart[index].qty = (Number(cart[index].qty) || 1) + delta;
-            if (cart[index].qty < 1) cart[index].qty = 1;
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
-            renderCartUI();
+            window.handlePaymentMode();
         };
 
-        window.removeFromCart = (index) => {
-            cart.splice(index, 1);
+        window.updateCartQty = (idx, delta) => {
+            if (cart[idx]) {
+                cart[idx].qty += delta;
+                if (cart[idx].qty <= 0) {
+                    cart.splice(idx, 1);
+                }
+                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+                document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+                window.renderCart();
+            }
+        };
+
+        window.removeFromCart = (idx) => {
+            cart.splice(idx, 1);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
-            renderCartUI();
-            window.showToast("Item removed from cart.");
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            window.renderCart();
         };
 
         window.handleCheckoutAddressSelect = () => {
-            const select = document.getElementById('checkoutAddressSelect');
-            if (select.value) {
-                document.getElementById('custAddress').value = select.value;
+            const selectBox = document.getElementById('checkoutAddressSelect');
+            if (selectBox && selectBox.value) {
+                document.getElementById('custAddress').value = selectBox.value;
             }
         };
 
@@ -1822,58 +1826,75 @@ onAuthStateChanged(auth, (user) => {
             const onlineSec = document.getElementById('onlinePaymentSection');
             if (mode === 'Online') {
                 onlineSec.style.display = 'block';
-                let amount = cartTotalAmount;
-                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${UPI_ID}%26pn=ArpitStore%26am=${amount}%26cu=INR`;
-                document.getElementById('directPayLink').href = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${amount}&cu=INR`;
+                const upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiLink;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
             } else {
                 onlineSec.style.display = 'none';
             }
         };
 
         window.submitOrder = () => {
+            if (!currentUser) {
+                window.showToast("Order place karne ke liye pehle Login karein!", "error");
+                window.toggleAuthModal();
+                return;
+            }
+
             if (cart.length === 0) {
                 window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            if (!address) {
-                window.showToast("Delivery Address bharna zaroori hai!", "error");
+            const payMode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber').value.trim();
+
+            if (!name || !phone || !address) {
+                window.showToast("Naam, Mobile number aur Address bharna zaroori hai!", "error");
                 return;
             }
 
-            const paymentMode = document.getElementById('paymentMode').value;
-            let utr = "";
-            if (paymentMode === 'Online') {
-                utr = document.getElementById('utrNumber').value.trim();
-                if (utr.length < 6) {
-                    window.showToast("Valid 12-digit UTR Transaction number daalein!", "error");
-                    return;
-                }
+            if (payMode === 'Online' && !utr) {
+                window.showToast("Online payment ke liye UTR/Transaction Number dalein!", "error");
+                return;
             }
 
-            const orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
+            const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
             const orderData = {
                 orderId: orderId,
-                date: new Date().toLocaleString(),
-                items: [...cart],
+                date: new Date().toLocaleString('en-IN'),
+                items: cart,
                 total: cartTotalAmount,
+                customerName: name,
+                customerPhone: phone,
                 address: address,
-                paymentMode: paymentMode,
+                paymentMode: payMode,
                 utr: utr,
-                status: "Your order is placed"
+                status: "Pending"
             };
 
-            let key = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(orderData);
-            localStorage.setItem(key, JSON.stringify(savedOrders));
+            const key = getUserOrdersKey();
+            let orders = JSON.parse(localStorage.getItem(key)) || [];
+            orders.unshift(orderData);
+            localStorage.setItem(key, JSON.stringify(orders));
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            }).catch(err => console.log("Google Sheets submission error:", err));
 
             cart = [];
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            localStorage.removeItem(getUserCartKey());
             document.getElementById('cartCount').innerText = '0';
-            
+
             document.getElementById('cartModal').style.display = 'none';
             document.getElementById('successModal').style.display = 'flex';
+
             setTimeout(() => {
                 document.getElementById('successModal').style.display = 'none';
                 window.showMyOrders();
@@ -1882,33 +1903,34 @@ onAuthStateChanged(auth, (user) => {
 
         window.openPolicy = (type) => {
             const modal = document.getElementById('policyModal');
-            const titleEl = document.getElementById('policyModalTitle');
-            const bodyEl = document.getElementById('policyModalBody');
-            modal.classList.add('open');
+            const title = document.getElementById('policyModalTitle');
+            const body = document.getElementById('policyModalBody');
 
             if (type === 'privacy') {
-                titleEl.innerText = 'Privacy Policy';
-                bodyEl.innerHTML = `<h4>Privacy & Data Protection</h4><p>At Arpit Store, we protect your personal information and delivery details with industry standards.</p>`;
+                title.innerText = 'Privacy Policy';
+                body.innerHTML = '<h4>Privacy Policy</h4><p>Arpit Store aapke data ki suraksha ka poora dhyan rakhta hai. Hum aapki personal information sirf order processing aur delivery ke liye istemal karte hain.</p>';
             } else if (type === 'terms') {
-                titleEl.innerText = 'Terms & Conditions';
-                bodyEl.innerHTML = `<h4>Terms of Use</h4><p>By using Arpit Store, you agree to our hassle-free shipping, cash on delivery, and return policies.</p>`;
+                title.innerText = 'Terms & Conditions';
+                body.innerHTML = '<h4>Terms & Conditions</h4><p>Hamari website par order karke aap hamari terms & conditions se sehamat hote hain. Sabhi orders verification ke baad dispatch kiye jaate hain.</p>';
             } else if (type === 'refund') {
-                titleEl.innerText = 'Refund & Return Policy';
-                bodyEl.innerHTML = `<h4>Easy Returns</h4><p>We offer 100% risk-free shopping with easy returns on eligible items.</p>`;
+                title.innerText = 'Refund & Return Policy';
+                body.innerHTML = '<h4>Refund & Return Policy</h4><p>Pasand na aane par ya koi defect hone par aap 7 din ke andar return request kar sakte hain. Saree offer me baaki sarees bilkul free return ki ja sakti hain.</p>';
             } else if (type === 'shipping') {
-                titleEl.innerText = 'Shipping Policy';
-                bodyEl.innerText = 'Fast and secure shipping across India with zero delivery charges on special combo offers.';
+                title.innerText = 'Shipping Policy';
+                body.innerHTML = '<h4>Shipping Policy</h4><p>Hum pure India me FREE fast shipping dete hain. Fast dispatch 24-48 ghante me ho jata hai.</p>';
             } else if (type === 'contact') {
-                titleEl.innerText = 'About Arpit Store';
-                bodyEl.innerHTML = `<h4>Arpit Store</h4><p>Your trusted destination for sarees, ethnic wear and beauty products. Contact: +91 7665913393</p>`;
+                title.innerText = 'About Arpit Store';
+                body.innerHTML = '<h4>About Arpit Store</h4><p>Arpit Store Rajasthan me sthit premium saree aur beauty collection provider hai. Customer support: +91 7665913393.</p>';
             }
+
+            modal.classList.add('open');
         };
 
         window.closePolicyModal = () => {
-            document.getElementById('policyModal').classList.remove('open');
+            const modal = document.getElementById('policyModal');
+            if (modal) modal.classList.remove('open');
         };
 
-        // Initialize App
         listenToProducts();
     </script>
 </body>
