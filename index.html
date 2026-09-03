@@ -242,14 +242,12 @@
         .secure-google-btn:hover { background: #e2e8f0; }
         .secure-help-text { color: #94a3b8; font-size: 11px; line-height: 1.4; margin: 8px 0; }
         .secure-otp-step { margin-top: 8px; }
-        
         .store-footer { max-width: 1100px; margin: 35px auto 0; padding: 24px 15px 70px; border-top: 1px solid rgba(255,255,255,0.1); color: #94a3b8; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
         .store-footer h3 { color: #f8fafc; font-size: 15px; margin-bottom: 9px; }
         .store-footer p, .store-footer li { font-size: 12px; line-height: 1.6; }
         .store-footer ul { list-style: none; }
         .store-footer button { background: none; border: 0; color: #94a3b8; cursor: pointer; padding: 2px 0; text-align: left; font: inherit; }
         .store-footer button:hover { color: #38bdf8; }
-        
         .policy-modal { display: none; position: fixed; inset: 0; z-index: 450; background: rgba(0,0,0,0.78); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 16px; }
         .policy-modal.open { display: flex; }
         .policy-content { width: 100%; max-width: 680px; max-height: 82vh; overflow-y: auto; background: #1e293b; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.45); }
@@ -260,7 +258,6 @@
         .policy-body h4 { color: #f8fafc; font-size: 16px; margin-bottom: 8px; }
         .policy-body p { margin-bottom: 10px; }
         .policy-body strong { color: #f8fafc; }
-        
         .qty-controls { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
         .qty-controls button { width: 25px; height: 25px; border: 1px solid rgba(56,189,248,0.45); background: rgba(56,189,248,0.12); color: #f8fafc; border-radius: 6px; cursor: pointer; font-weight: 700; }
         .qty-controls button:hover { background: #38bdf8; color: #0f172a; }
@@ -461,7 +458,6 @@
         </div>
     </div>
 
-
     <!-- PDF policy pages and store footer -->
     <div class="policy-modal" id="policyModal" onclick="if(event.target === this) window.closePolicyModal()">
         <div class="policy-content">
@@ -487,10 +483,10 @@
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
-                <input type="text" id="custName" class="input-box" placeholder="Full Name">
-                <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number">
+                <input type="text" id="custName" class="input-box" placeholder="Full Name" readonly>
+                <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number" readonly>
                 
-                <div id="checkoutAddressSection" style="display:none;">
+                <div id="checkoutAddressSection">
                     <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
                     <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
                 </div>
@@ -637,6 +633,60 @@
         let secureRecaptchaVerifier = null;
         let secureConfirmationResult = null;
 
+        // --- FIREBASE OTP AUTHENTICATION HANDLER (INTEGRATED) ---
+        let confirmationResultGlobal = null;
+
+        window.setupRecaptcha = function(phoneNumber, recaptchaContainerId) {
+            const authInstance = getAuth();
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
+            }
+
+            window.recaptchaVerifier = new RecaptchaVerifier(authInstance, recaptchaContainerId, {
+                'size': 'invisible',
+                'callback': (response) => {
+                    window.sendVerificationCode(phoneNumber);
+                },
+                'expired-callback': () => {
+                    console.log("reCAPTCHA expired. Please try again.");
+                }
+            });
+
+            return window.recaptchaVerifier;
+        };
+
+        window.sendVerificationCode = async function(phoneNumber) {
+            const authInstance = getAuth();
+            const appVerifier = window.recaptchaVerifier;
+
+            try {
+                console.log("Sending OTP to:", phoneNumber);
+                confirmationResultGlobal = await signInWithPhoneNumber(authInstance, phoneNumber, appVerifier);
+                console.log("OTP sent successfully!");
+                return { success: true, message: "OTP sent successfully!" };
+            } catch (error) {
+                console.error("Error during sending OTP:", error);
+                return { success: false, error: error.message };
+            }
+        };
+
+        window.verifyOTP = async function(otpCode) {
+            if (!confirmationResultGlobal) {
+                throw new Error("No verification session found. Please request OTP again.");
+            }
+
+            try {
+                const result = await confirmationResultGlobal.confirm(otpCode);
+                const user = result.user;
+                console.log("User signed in successfully:", user.uid);
+                return { success: true, user: user };
+            } catch (error) {
+                console.error("Invalid OTP:", error);
+                return { success: false, error: error.message };
+            }
+        };
+
         // PDF AUTHENTICATION: Phone OTP and Google login.
         window.showPhoneOtpLogin = () => {
             const section = document.querySelector('.secure-auth-section');
@@ -672,6 +722,7 @@
             if (user && (!currentUser || currentUser.firebaseUid !== user.uid)) adoptFirebaseUser(user);
         });
 
+        // PDF email OTP flow: Firebase sends a password-free sign-in link to Gmail.
         window.sendSecureEmailOTP = () => {
             const emailInput = document.getElementById('secureEmail');
             const email = emailInput ? emailInput.value.trim() : '';
@@ -755,7 +806,6 @@
         let currentProduct = null;
         
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-        
         function getUserOrdersKey() {
             return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
         }
@@ -826,15 +876,6 @@
             watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
             document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
             fetchLiveStatusForAllOrders();
-        }
-
-        function syncUserToExcel(payloadData) {
-            if (!navigator.onLine) return;
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payloadData)
-            }).catch(err => console.log("Excel user sync error:", err));
         }
 
         function updateAuthUI() {
@@ -1302,11 +1343,6 @@
             return String(value || '').toLowerCase().replace(/sarees?/g, 'saree').replace(/beauty products?/g, 'beauty').replace(/[^a-z0-9]/g, '');
         }
 
-        window.selectDrawerCategory = (cat) => {
-            window.closeDrawer();
-            window.filterCategory(cat);
-        };
-
         window.filterCategory = (cat) => {
             if (cat === 'Sarees') cat = 'Saree';
             if (cat === 'Beauty Products') cat = 'Beauty';
@@ -1540,7 +1576,8 @@
             });
         }
 
-        function updateGalleryImages(colorName) {
+        // --- STRICT COLOR VARIANT MAPPING & IMAGE HANDLING ENGINE ---
+        window.updateGalleryImages = function(colorName) {
             if (!currentProduct) return;
 
             let currentImages = [];
@@ -1550,172 +1587,161 @@
 
             if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
                 let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
-                currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
-            } else if (currentProduct.media && Array.isArray(currentProduct.media) && currentProduct.media.length > 0) {
-                currentImages = currentProduct.media.map(url => formatMediaUrl(url)).filter(url => url);
+                currentImages = imgs.map(url => formatMediaUrl(url));
+            } else if (currentProduct.variants && Array.isArray(currentProduct.variants)) {
+                const variantData = currentProduct.variants.find(v => v.color === colorName);
+                if (variantData && variantData.image) {
+                    currentImages = [formatMediaUrl(variantData.image)];
+                }
             }
 
-            if (currentImages.length === 0) {
-                currentImages = ['https://via.placeholder.com/400x300?text=No+Image'];
+            if (currentImages.length === 0 && currentProduct.media) {
+                currentImages = currentProduct.media.map(url => formatMediaUrl(url));
             }
 
-            selectedImage = currentImages[0];
-            selectedColorImg = currentImages[0];
-
-            const sliderContainer = document.getElementById('detailSliderContainer');
-            if (sliderContainer) {
-                let mediaHtml = '<div class="detail-slider">';
-                currentImages.forEach((imgUrl, idx) => {
-                    let imgId = idx === 0 ? 'id="mainProductImage"' : '';
-                    mediaHtml += `<img src="${imgUrl}" ${imgId} class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" alt="Product Image">`;
+            const slider = document.getElementById('detailSlider');
+            if (slider && currentImages.length > 0) {
+                slider.innerHTML = '';
+                currentImages.forEach(imgUrl => {
+                    slider.innerHTML += `<img src="${imgUrl}" class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
                 });
-                mediaHtml += '</div>';
-                sliderContainer.innerHTML = mediaHtml;
             }
-        }
-
-        window.selectColor = (colorName, el) => {
-            selectedColor = colorName;
-            
-            const label = document.getElementById('colorLabel');
-            if (label) label.innerText = colorName;
-
-            if (el) {
-                const siblings = el.parentElement.querySelectorAll('.color-thumb');
-                siblings.forEach(btn => btn.classList.remove('active'));
-                el.classList.add('active');
-            }
-
-            updateGalleryImages(colorName);
         };
 
-        window.selectSize = (size, el) => {
-            selectedSize = size;
-            const label = document.getElementById('sizeLabel');
-            if (label) label.innerText = size;
-            const siblings = el.parentElement.querySelectorAll('.size-btn');
-            siblings.forEach(btn => btn.classList.remove('active'));
-            if(el) el.classList.add('active');
-        };
-
-        window.showProductDetail = (id) => {
-            const p = liveProducts.find(item => item.id === id);
-            if(!p) { window.showToast("Product unavailable!", "error"); return; }
+        window.showProductDetail = (productId) => {
+            const product = liveProducts.find(p => p.id === productId);
+            if (!product) return;
+            currentProduct = product;
             
-            currentProduct = p;
-            pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
+            window.scrollTo(0, 0);
 
-            selectedSize = "";
-            selectedColor = "";
-            selectedColorImg = "";
+            selectedColor = product.colors && product.colors.length > 0 
+                ? (typeof product.colors[0] === 'object' ? product.colors[0].name : product.colors[0]) 
+                : (product.variants && product.variants.length > 0 ? product.variants[0].color : "");
 
-            let isLiked = watchlist.includes(p.id);
-            let heartIcon = isLiked ? '❤️' : '🤍';
-            let categoryTag = p.category || p.type || p.cat || 'General';
-            let detailSellingPrice = Number(p.price) || 0;
-            let detailMrpPrice = Number(p.mrp) || 0;
-            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
-
-            if (detailMrpPrice > detailSellingPrice) {
-                let offAmount = detailMrpPrice - detailSellingPrice;
-                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
-                detailPriceHtml = `
-                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="font-weight: 800; color: #38bdf8; font-size: 24px;">₹${detailSellingPrice}</span>
-                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
-                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">
-                            ${offPercent}% OFF
-                        </span>
-                    </div>
-                `;
-            }
+            selectedSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : "";
 
             let colorHtml = '';
-            if (p.colors && p.colors.length > 0) {
-                colorHtml += `<div class="variant-section"><div class="variant-title">Colors <span id="colorLabel" style="color:#38bdf8; font-weight:bold; margin-left:5px;"></span></div><div class="color-options">`;
-                p.colors.forEach(c => {
-                    let colorName = typeof c === 'object' ? c.name : c;
-                    let thumb = typeof c === 'object' && c.thumb ? formatMediaUrl(c.thumb) : (p.media ? formatMediaUrl(p.media[0]) : '');
-                    colorHtml += `<img src="${thumb}" class="color-thumb" onclick="window.selectColor('${colorName}', this)" title="${colorName}">`;
+            if (product.colors && product.colors.length > 0) {
+                colorHtml += `<div class="variant-section"><div class="variant-title">🎨 Select Color: <span id="selectedColorLabel">${selectedColor}</span></div><div class="color-options">`;
+                product.colors.forEach(c => {
+                    let cName = typeof c === 'object' ? c.name : c;
+                    let cHex = typeof c === 'object' ? (c.hex || c.code || '#38bdf8') : '#38bdf8';
+                    let cImg = typeof c === 'object' && c.image ? formatMediaUrl(Array.isArray(c.image) ? c.image[0] : c.image) : '';
+                    let activeClass = selectedColor === cName ? 'active' : '';
+
+                    if (cImg) {
+                        colorHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectProductColor('${cName}')" title="${cName}">`;
+                    } else {
+                        colorHtml += `<button class="size-btn ${activeClass}" style="background:${cHex}; width:40px; height:40px; border-radius:50%;" onclick="window.selectProductColor('${cName}')" title="${cName}"></button>`;
+                    }
+                });
+                colorHtml += `</div></div>`;
+            } else if (product.variants && product.variants.length > 0) {
+                colorHtml += `<div class="variant-section"><div class="variant-title">🎨 Select Variant: <span id="selectedColorLabel">${selectedColor}</span></div><div class="color-options">`;
+                product.variants.forEach(v => {
+                    let activeClass = selectedColor === v.color ? 'active' : '';
+                    let vImg = v.image ? formatMediaUrl(v.image) : '';
+                    if (vImg) {
+                        colorHtml += `<img src="${vImg}" class="color-thumb ${activeClass}" onclick="window.selectProductColor('${v.color}')" title="${v.color}">`;
+                    } else {
+                        colorHtml += `<button class="size-btn ${activeClass}" style="background:${v.hex || '#38bdf8'}; width:35px; height:35px; border-radius:50%;" onclick="window.selectProductColor('${v.color}')" title="${v.color}"></button>`;
+                    }
                 });
                 colorHtml += `</div></div>`;
             }
 
             let sizeHtml = '';
-            if (p.sizes && p.sizes.length > 0) {
-                sizeHtml += `<div class="variant-section"><div class="variant-title">Sizes <span id="sizeLabel" style="color:#38bdf8; font-weight:bold; margin-left:5px;"></span></div><div class="size-options">`;
-                p.sizes.forEach(s => {
-                    sizeHtml += `<div class="size-btn" onclick="window.selectSize('${s}', this)">${s}</div>`;
+            if (product.sizes && product.sizes.length > 0) {
+                sizeHtml += `<div class="variant-section"><div class="variant-title">📏 Select Size: <span id="selectedSizeLabel">${selectedSize}</span></div><div class="size-options">`;
+                product.sizes.forEach(s => {
+                    let activeClass = selectedSize === s ? 'active' : '';
+                    sizeHtml += `<button class="size-btn ${activeClass}" onclick="window.selectProductSize('${s}')">${s}</button>`;
                 });
                 sizeHtml += `</div></div>`;
             }
 
+            let initialImgs = [];
+            if (product.media && product.media.length > 0) {
+                initialImgs = product.media.map(m => formatMediaUrl(m));
+            }
+
+            let sliderHtml = '<div class="detail-slider" id="detailSlider">';
+            initialImgs.forEach(img => {
+                sliderHtml += `<img src="${img}" class="detail-slide-item" onclick="window.openZoomModal('${img}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
+            });
+            sliderHtml += '</div>';
+
+            let isLiked = watchlist.includes(product.id);
+            let heartIcon = isLiked ? '❤️' : '🤍';
+
             let detailContent = document.getElementById('detailContent');
             detailContent.innerHTML = `
-                <div id="detailSliderContainer" style="position:relative;">
-                    <div class="detail-slider">
-                        ${p.media && p.media.length > 0 ? p.media.map(m => `<img src="${formatMediaUrl(m)}" class="detail-slide-item" onclick="window.openZoomModal('${formatMediaUrl(m)}')">`).join('') : '<img src="https://via.placeholder.com/400x300?text=No+Image" class="detail-slide-item">'}
-                    </div>
-                </div>
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top: 15px;">
+                ${sliderHtml}
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
                     <div>
-                        <small style="color:#94a3b8; font-weight:bold;">${categoryTag}</small>
-                        <h2 style="color:white; font-size:20px; margin-bottom:10px;">${p.name}</h2>
+                        <small style="color:#94a3b8; font-size:12px; text-transform:uppercase;">${product.category || product.type || 'General'}</small>
+                        <h2 style="color:white; font-size:20px; margin-top:4px;">${product.name}</h2>
+                        <p style="color:#38bdf8; font-size:22px; font-weight:bold; margin-top:6px;">₹${product.price}</p>
                     </div>
-                    <button id="detailLikeBtn" class="detail-like-btn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
+                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${product.id}', event)">${heartIcon}</button>
                 </div>
-                ${detailPriceHtml}
                 ${colorHtml}
                 ${sizeHtml}
-                <div style="margin-top:20px;">
-                    <h4 style="color:white; margin-bottom:10px;">Description</h4>
-                    <p style="color:#cbd5e1; font-size:14px; line-height:1.6;">${p.description || 'No description available for this product.'}</p>
-                </div>
-                <button class="pay-btn" style="margin-top:25px; font-size:16px; display:flex; justify-content:center; gap:10px; align-items:center;" onclick="window.addToCart('${p.id}')">
-                    Add to Cart 🛒
-                </button>
+                <p style="color:#cbd5e1; font-size:14px; line-height:1.6; margin:15px 0;">${product.description || 'No description available.'}</p>
+                <button class="pay-btn" onclick="window.addCurrentProductToCart()" style="background: linear-gradient(135deg, #38bdf8, #6366f1); margin-top:20px;">Add to Cart 🛒</button>
             `;
 
-            window.scrollTo(0, 0);
-
-            if (p.colors && p.colors.length > 0) {
-                let firstColor = document.querySelector('.color-thumb');
-                if(firstColor) firstColor.click();
+            if (selectedColor) {
+                window.updateGalleryImages(selectedColor);
             }
-            if (p.sizes && p.sizes.length > 0) {
-                let firstSize = document.querySelector('.size-btn');
-                if(firstSize) firstSize.click();
-            }
+            pushNavState('detail');
         };
 
-        window.addToCart = (id) => {
-            const p = currentProduct;
-            if (p.colors && p.colors.length > 0 && !selectedColor) { window.showToast('Please select a color', 'error'); return; }
-            if (p.sizes && p.sizes.length > 0 && !selectedSize) { window.showToast('Please select a size', 'error'); return; }
+        window.selectProductColor = (colorName) => {
+            selectedColor = colorName;
+            const label = document.getElementById('selectedColorLabel');
+            if (label) label.innerText = colorName;
             
-            let key = getUserCartKey();
-            let existingItem = cart.find(item => item.id === id && item.selectedColor === selectedColor && item.selectedSize === selectedSize);
-            
-            if (existingItem) {
-                existingItem.qty += 1;
+            document.querySelectorAll('.color-thumb, .color-options button').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            window.updateGalleryImages(colorName);
+        };
+
+        window.selectProductSize = (sizeName) => {
+            selectedSize = sizeName;
+            const label = document.getElementById('selectedSizeLabel');
+            if (label) label.innerText = sizeName;
+            document.querySelectorAll('.size-options button').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        };
+
+        window.addCurrentProductToCart = () => {
+            if (!currentProduct) return;
+            let cartKey = getUserCartKey();
+            let cartItem = {
+                id: currentProduct.id,
+                name: currentProduct.name,
+                price: currentProduct.price,
+                media: currentProduct.media,
+                selectedColor: selectedColor,
+                selectedSize: selectedSize,
+                qty: 1
+            };
+
+            let existingIndex = cart.findIndex(item => item.id === cartItem.id && item.selectedColor === cartItem.selectedColor && item.selectedSize === cartItem.selectedSize);
+            if (existingIndex >= 0) {
+                cart[existingIndex].qty = (Number(cart[existingIndex].qty) || 1) + 1;
             } else {
-                cart.push({
-                    id: p.id,
-                    name: p.name,
-                    price: Number(p.price),
-                    media: p.media,
-                    selectedColor: selectedColor,
-                    selectedColorImg: selectedColorImg || (p.media && p.media.length > 0 ? p.media[0] : ''),
-                    selectedSize: selectedSize,
-                    qty: 1
-                });
+                cart.push(cartItem);
             }
-            
-            localStorage.setItem(key, JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
-            window.showToast('Added to Cart! 🛒');
+
+            localStorage.setItem(cartKey, JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+            window.showToast("Product added to cart!");
+            window.toggleCart();
         };
 
         window.toggleCart = () => {
@@ -1724,172 +1750,188 @@
             modal.style.display = isOpen ? 'none' : 'flex';
             if (!isOpen) {
                 renderCartUI();
-                if (currentUser) {
-                    document.getElementById('custName').value = currentUser.name || '';
-                    document.getElementById('custPhone').value = currentUser.phone || '';
-                    renderCheckoutAddresses();
-                }
+                pushNavState('cart');
+            } else if (history.state && history.state.appNav === 'cart') {
+                history.back();
             }
-        };
-
-        function renderCheckoutAddresses() {
-            const select = document.getElementById('checkoutAddressSelect');
-            const section = document.getElementById('checkoutAddressSection');
-            if (!currentUser || !currentUser.addresses || currentUser.addresses.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-            section.style.display = 'block';
-            select.innerHTML = '<option value="">-- Choose saved address --</option>';
-            currentUser.addresses.forEach(addr => {
-                select.innerHTML += `<option value="${addr}">${addr}</option>`;
-            });
-        }
-
-        window.handleCheckoutAddressSelect = () => {
-            const select = document.getElementById('checkoutAddressSelect');
-            const textarea = document.getElementById('custAddress');
-            if (select.value) textarea.value = select.value;
         };
 
         function renderCartUI() {
-            const list = document.getElementById('cartList');
-            list.innerHTML = '';
-            cartTotalAmount = 0;
-            
+            const listDiv = document.getElementById('cartList');
+            listDiv.innerHTML = '';
             if (cart.length === 0) {
-                list.innerHTML = '<p style="color:#94a3b8; text-align:center;">Cart is empty!</p>';
+                listDiv.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
                 document.getElementById('qrTotal').innerText = '0';
                 return;
             }
-            
-            cart.forEach((item, index) => {
-                cartTotalAmount += (item.price * item.qty);
-                let img = item.selectedColorImg || (item.media && item.media.length > 0 ? item.media[0] : 'https://via.placeholder.com/55');
+
+            let total = 0;
+            cart.forEach((item, idx) => {
+                let itemTotal = (Number(item.price) || 0) * (Number(item.qty) || 1);
+                total += itemTotal;
+                let imgUrl = item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/55?text=No+Img';
                 
-                list.innerHTML += `
+                let variantInfo = '';
+                if (item.selectedColor || item.selectedSize) {
+                    variantInfo = `<div style="font-size:11px; color:#cbd5e1; margin-top:2px;">`;
+                    if (item.selectedColor) variantInfo += `🎨 ${item.selectedColor} `;
+                    if (item.selectedSize) variantInfo += `📏 ${item.selectedSize}`;
+                    variantInfo += `</div>`;
+                }
+
+                listDiv.innerHTML += `
                     <div class="cart-item">
-                        <img src="${formatMediaUrl(img)}" class="cart-item-img">
+                        <img src="${imgUrl}" class="cart-item-img">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
-                            <div style="font-size:11px; color:#cbd5e1; margin-bottom:4px;">
-                                ${item.selectedColor ? `Color: ${item.selectedColor}` : ''} 
-                                ${item.selectedSize ? `| Size: ${item.selectedSize}` : ''}
-                            </div>
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <p>₹${item.price}</p>
-                                <div class="qty-controls">
-                                    <button onclick="window.updateCartQty(${index}, -1)">-</button>
-                                    <span>${item.qty}</span>
-                                    <button onclick="window.updateCartQty(${index}, 1)">+</button>
-                                </div>
+                            ${variantInfo}
+                            <p>₹${item.price} × ${item.qty || 1} = <b>₹${itemTotal}</b></p>
+                            <div class="qty-controls">
+                                <button onclick="window.changeCartQty(${idx}, -1)">-</button>
+                                <span>${item.qty || 1}</span>
+                                <button onclick="window.changeCartQty(${idx}, 1)">+</button>
                             </div>
                         </div>
-                        <button class="remove-btn" onclick="window.removeFromCart(${index})">✕</button>
+                        <button class="remove-btn" onclick="window.removeFromCart(${idx})">Remove</button>
                     </div>
                 `;
             });
+
+            cartTotalAmount = total;
+            document.getElementById('qrTotal').innerText = total;
             
-            document.getElementById('qrTotal').innerText = cartTotalAmount;
-            window.handlePaymentMode();
+            if (currentUser) {
+                document.getElementById('custName').value = currentUser.name || '';
+                document.getElementById('custPhone').value = currentUser.phone || '';
+                const addrSelect = document.getElementById('checkoutAddressSelect');
+                if (currentUser.addresses && currentUser.addresses.length > 0) {
+                    addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                    currentUser.addresses.forEach(addr => {
+                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
+                    });
+                    document.getElementById('checkoutAddressSection').style.display = 'block';
+                } else {
+                    document.getElementById('checkoutAddressSection').style.display = 'none';
+                }
+            } else {
+                document.getElementById('custName').value = 'Guest Customer';
+                document.getElementById('custPhone').value = '9999999999';
+                document.getElementById('checkoutAddressSection').style.display = 'none';
+            }
         }
 
-        window.updateCartQty = (index, change) => {
-            if (cart[index].qty + change > 0) {
-                cart[index].qty += change;
+        window.changeCartQty = (idx, delta) => {
+            let currentQty = Number(cart[idx].qty) || 1;
+            let newQty = currentQty + delta;
+            if (newQty <= 0) {
+                cart.splice(idx, 1);
             } else {
-                cart.splice(index, 1);
+                cart[idx].qty = newQty;
             }
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
             renderCartUI();
         };
 
-        window.removeFromCart = (index) => {
-            cart.splice(index, 1);
+        window.removeFromCart = (idx) => {
+            cart.splice(idx, 1);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
             renderCartUI();
+            window.showToast("Item removed from cart.");
+        };
+
+        window.handleCheckoutAddressSelect = () => {
+            const select = document.getElementById('checkoutAddressSelect');
+            if (select.value) {
+                document.getElementById('custAddress').value = select.value;
+            }
         };
 
         window.handlePaymentMode = () => {
             const mode = document.getElementById('paymentMode').value;
-            const onlineSection = document.getElementById('onlinePaymentSection');
+            const onlineSec = document.getElementById('onlinePaymentSection');
             if (mode === 'Online') {
-                onlineSection.style.display = 'block';
-                const upiString = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
-                document.getElementById('directPayLink').href = upiString;
-                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiString)}`;
+                onlineSec.style.display = 'block';
+                let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiLink;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
             } else {
-                onlineSection.style.display = 'none';
+                onlineSec.style.display = 'none';
             }
         };
 
         window.submitOrder = () => {
-            if (cart.length === 0) { window.showToast('Cart is empty!', 'error'); return; }
-            
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
+            if (cart.length === 0) {
+                window.showToast("Aapka cart khaali hai!", "error");
+                return;
+            }
             const address = document.getElementById('custAddress').value.trim();
-            const payMode = document.getElementById('paymentMode').value;
-            const utr = document.getElementById('utrNumber').value.trim();
-            
-            if (!name || !phone || !address) { window.showToast('Please fill all delivery details!', 'error'); return; }
-            if (payMode === 'Online' && utr.length < 12) { window.showToast('Please enter valid 12-digit UTR!', 'error'); return; }
-            
-            const orderId = 'ORD' + Date.now().toString().slice(-6);
-            const orderData = {
-                orderId,
-                date: new Date().toLocaleString(),
-                name, phone, address,
+            if (!address) {
+                window.showToast("Delivery address bharna zaroori hai!", "error");
+                return;
+            }
+            const paymentMode = document.getElementById('paymentMode').value;
+            let utr = '';
+            if (paymentMode === 'Online') {
+                utr = document.getElementById('utrNumber').value.trim();
+                if (!utr || utr.length < 6) {
+                    window.showToast("Valid 12-digit UTR transaction number daalein!", "error");
+                    return;
+                }
+            }
+
+            const orderId = 'ART' + Math.floor(100000 + Math.random() * 900000);
+            const newOrder = {
+                orderId: orderId,
+                items: [...cart],
                 total: cartTotalAmount,
-                paymentMode: payMode,
-                utr: payMode === 'Online' ? utr : 'N/A',
-                status: 'Order Placed',
-                items: cart
+                address: address,
+                paymentMode: paymentMode,
+                utr: utr,
+                status: "Your order is ready",
+                date: new Date().toLocaleString()
             };
-            
-            let key = getUserOrdersKey();
-            let orders = JSON.parse(localStorage.getItem(key)) || [];
-            orders.unshift(orderData);
-            localStorage.setItem(key, JSON.stringify(orders));
-            
-            syncUserToExcel({ type: 'new_order', order: orderData });
-            
+
+            let ordersKey = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(ordersKey)) || [];
+            savedOrders.unshift(newOrder);
+            localStorage.setItem(ordersKey, JSON.stringify(savedOrders));
+
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
             
             document.getElementById('cartModal').style.display = 'none';
             document.getElementById('successModal').style.display = 'flex';
-            
             setTimeout(() => {
                 document.getElementById('successModal').style.display = 'none';
                 window.showMyOrders();
-            }, 2500);
+            }, 2000);
         };
 
         window.openPolicy = (type) => {
             const modal = document.getElementById('policyModal');
             const title = document.getElementById('policyModalTitle');
             const body = document.getElementById('policyModalBody');
-            
             modal.classList.add('open');
+
             if (type === 'privacy') {
-                title.innerText = 'Privacy Policy';
-                body.innerHTML = '<p>Your privacy is important to us. We securely store your data and do not share it with third parties.</p>';
+                title.innerText = "Privacy Policy";
+                body.innerHTML = `<h4>Privacy & Data Protection</h4><p>At Arpit Store, we respect your privacy and protect your personal information.</p><p>We collect only necessary details required for order delivery such as name, phone number, and address.</p>`;
             } else if (type === 'terms') {
-                title.innerText = 'Terms & Conditions';
-                body.innerHTML = '<p>By using Arpit Store, you agree to our terms of service.</p>';
+                title.innerText = "Terms & Conditions";
+                body.innerHTML = `<h4>Terms of Use</h4><p>By accessing Arpit Store, you agree to comply with our store guidelines and policies.</p>`;
             } else if (type === 'refund') {
-                title.innerText = 'Refund & Return Policy';
-                body.innerHTML = '<p>We offer a 7-day hassle-free return policy. Contact support for assistance.</p>';
+                title.innerText = "Refund & Return Policy";
+                body.json = "";
+                body.innerHTML = `<h4>Return Guidelines</h4><p>We offer hassle-free returns on eligible products within specified trial windows.</p>`;
             } else if (type === 'shipping') {
-                title.innerText = 'Shipping Policy';
-                body.innerHTML = '<p>Orders are dispatched within 24 hours. Delivery takes 3-5 business days.</p>';
+                title.innerText = "Shipping Policy";
+                body.innerHTML = `<h4>Fast Shipping</h4><p>All orders are processed and dispatched with express courier services across India.</p>`;
             } else if (type === 'contact') {
-                title.innerText = 'About & Contact';
-                body.innerHTML = '<p>Arpit Store provides premium products at best prices.<br>Email: support@arpitstore.com<br>Phone: +91 7665913393</p>';
+                title.innerText = "About Arpit Store";
+                body.innerHTML = `<h4>Arpit Store Rajasthan</h4><p>Your trusted destination for premium sarees, ethnic fashion, and beauty essentials.</p>`;
             }
         };
 
@@ -1897,15 +1939,7 @@
             document.getElementById('policyModal').classList.remove('open');
         };
 
-        window.checkSharedLink = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
-            if (id) {
-                setTimeout(() => { window.showProductDetail(id); }, 500);
-            }
-        };
-
-        // INITIALIZE APP
+        // Initialize App data on load
         listenToProducts();
     </script>
 </body>
