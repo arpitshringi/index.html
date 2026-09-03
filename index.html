@@ -642,16 +642,6 @@ onAuthStateChanged(auth, (user) => {
         document.addEventListener('gesturechange', (e) => e.preventDefault());
         document.addEventListener('gestureend', (e) => e.preventDefault());
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
-            authDomain: "arpit-store.firebaseapp.com",
-            projectId: "arpit-store",
-            storageBucket: "arpit-store.firebasestorage.app",
-            messagingSenderId: "607228237560",
-            appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
-            measurementId: "G-9T9Q26ZC9M"
-        };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
