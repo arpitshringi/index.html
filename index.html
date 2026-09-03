@@ -224,6 +224,45 @@
         .google-auth-btn { width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
         .google-auth-btn:hover { background: #f1f5f9; }
         .address-chip { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+
+        .otp-primary-btn { width: 100%; background: linear-gradient(135deg, #f43f5e, #fb7185); color: white; border: 0; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 800; cursor: pointer; margin: 4px 0 8px; box-shadow: 0 5px 14px rgba(244,63,94,0.25); }
+        .otp-primary-btn:hover { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(244,63,94,0.4); }
+        .otp-primary-note { color: #cbd5e1; font-size: 11px; text-align: center; margin-bottom: 8px; }
+
+        /* Secure auth and policy pages */
+        .secure-auth-section { margin-top: 18px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .secure-auth-title { color: #38bdf8; font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        .secure-auth-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+        .secure-auth-tab { flex: 1; padding: 8px 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(15,23,42,0.6); color: #94a3b8; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .secure-auth-tab.active { background: rgba(56,189,248,0.18); color: #38bdf8; border-color: #38bdf8; }
+        .secure-auth-section .secure-input { margin-bottom: 10px; }
+        .secure-auth-actions { display: flex; gap: 8px; }
+        .secure-auth-actions button { flex: 1; margin-top: 0; padding: 10px 8px; font-size: 12px; }
+        .secure-google-btn { width: 100%; background: #fff; color: #1e293b; border: 0; padding: 10px; border-radius: 9px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .secure-google-btn:hover { background: #e2e8f0; }
+        .secure-help-text { color: #94a3b8; font-size: 11px; line-height: 1.4; margin: 8px 0; }
+        .secure-otp-step { margin-top: 8px; }
+        .store-footer { max-width: 1100px; margin: 35px auto 0; padding: 24px 15px 70px; border-top: 1px solid rgba(255,255,255,0.1); color: #94a3b8; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+        .store-footer h3 { color: #f8fafc; font-size: 15px; margin-bottom: 9px; }
+        .store-footer p, .store-footer li { font-size: 12px; line-height: 1.6; }
+        .store-footer ul { list-style: none; }
+        .store-footer button { background: none; border: 0; color: #94a3b8; cursor: pointer; padding: 2px 0; text-align: left; font: inherit; }
+        .store-footer button:hover { color: #38bdf8; }
+        .policy-modal { display: none; position: fixed; inset: 0; z-index: 450; background: rgba(0,0,0,0.78); backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 16px; }
+        .policy-modal.open { display: flex; }
+        .policy-content { width: 100%; max-width: 680px; max-height: 82vh; overflow-y: auto; background: #1e293b; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.45); }
+        .policy-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; background: #1e293b; }
+        .policy-header h2 { color: #38bdf8; font-size: 18px; }
+        .policy-close { background: none; border: 0; color: #94a3b8; font-size: 26px; cursor: pointer; }
+        .policy-body { padding: 20px; color: #cbd5e1; font-size: 13px; line-height: 1.7; }
+        .policy-body h4 { color: #f8fafc; font-size: 16px; margin-bottom: 8px; }
+        .policy-body p { margin-bottom: 10px; }
+        .policy-body strong { color: #f8fafc; }
+        .qty-controls { display: flex; align-items: center; gap: 7px; margin-top: 8px; }
+        .qty-controls button { width: 25px; height: 25px; border: 1px solid rgba(56,189,248,0.45); background: rgba(56,189,248,0.12); color: #f8fafc; border-radius: 6px; cursor: pointer; font-weight: 700; }
+        .qty-controls button:hover { background: #38bdf8; color: #0f172a; }
+        .qty-controls span { min-width: 18px; text-align: center; color: #f8fafc; font-weight: 700; font-size: 13px; }
+        @media (max-width: 700px) { .store-footer { grid-template-columns: 1fr; gap: 15px; padding-bottom: 90px; } }
     </style>
 </head>
 <body>
@@ -252,33 +291,41 @@
         <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
     </div>
 
-    <!-- Auth / Login / Signup Modal -->
+    <!-- Auth / Login Modal -->
     <div class="modal" id="authModal">
         <div class="modal-content">
             <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
-            <div class="auth-tab-header">
-                <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
-                <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
-            </div>
+            <div class="secure-auth-section" style="margin-top:0; padding-top:0; border-top:0;">
+                <div class="secure-auth-title">Secure Login / Signup</div>
+                <div class="secure-auth-email-box">
+                    <input type="email" id="secureEmail" class="input-box secure-input" placeholder="Gmail / Email Address">
+                    <button class="add-btn" onclick="window.sendSecureEmailOTP()">Send Gmail OTP / Link</button>
+                    <p class="secure-help-text" style="margin-bottom:10px;">Gmail par sign-in link/OTP bhejkar account banayein ya login karein.</p>
+                </div>
+                <div style="text-align:center; color:#94a3b8; font-size:12px; margin:12px 0;">Or use mobile OTP</div>
+                <button class="otp-primary-btn" onclick="window.showPhoneOtpLogin()">📱 Login with Phone OTP</button>
+                <p class="otp-primary-note">OTP se login karein — password ki zaroorat nahi</p>
 
-            <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
-                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
-                Continue with Google
-            </button>
-            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR with Mobile Number</div>
-
-            <div id="authFormContainer">
-                <input type="text" id="authName" class="input-box" placeholder="Full Name (Customer Name)" style="display:none;">
-                <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
-                
-                <!-- OTP Setup Section Added -->
-                <div id="otpSection" style="display:none; margin-bottom: 15px;">
-                    <input type="text" id="authOtpInput" class="input-box" placeholder="Enter 6-Digit OTP Sent to All Numbers">
-                    <button class="pay-btn" style="background:#0284c7; padding:10px; margin-top:5px;" onclick="window.verifyOtpCode()">Verify OTP 🔑</button>
+                <div id="securePhonePanel">
+                    <div class="secure-auth-actions" id="secureOtpStepOne">
+                        <input type="tel" id="securePhone" class="input-box secure-input" placeholder="10-digit mobile number" style="margin:0;">
+                        <button class="add-btn" onclick="window.sendSecureOTP()">Get OTP</button>
+                    </div>
+                    <div id="secureRecaptchaContainer"></div>
+                    <div id="secureOtpStepTwo" class="secure-otp-step" style="display:none;">
+                        <input type="number" id="secureOtpCode" class="input-box secure-input" placeholder="6-digit OTP">
+                        <div class="secure-auth-actions">
+                            <button class="pay-btn" onclick="window.verifySecureOTP()">Verify OTP</button>
+                            <button class="add-btn" onclick="window.resetSecureOTP()">Change Number</button>
+                        </div>
+                    </div>
                 </div>
 
-                <input type="password" id="authPassword" class="input-box" placeholder="Password">
-                <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
+                <div style="text-align:center; color:#94a3b8; font-size:12px; margin:16px 0 8px;">Or One-Click Login</div>
+                <button class="secure-google-btn" onclick="window.loginWithGoogle()">
+                    <span style="font-size:16px;">G</span> Continue with Google
+                </button>
+                <p class="secure-help-text">Sirf Phone OTP ya Google account se login karein. Firebase Console mein Google aur Phone providers enabled hone chahiye.</p>
             </div>
         </div>
     </div>
@@ -292,12 +339,7 @@
             <div style="text-align: center; margin-bottom: 15px;">
                 <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
                 <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
-                <!-- Added option to update profile customer name directly -->
-                <div style="margin-top: 10px; display: flex; gap: 8px;">
-                    <input type="text" id="updateProfileNameInput" class="input-box" placeholder="Update Customer Name" style="margin-bottom:0;">
-                    <button class="add-btn" onclick="window.updateCustomerProfileName()" style="width: auto; padding: 0 15px;">Save</button>
-                </div>
-                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px; margin-top: 10px;">-</p>
+                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">-</p>
             </div>
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -330,12 +372,11 @@
 
         <div id="drawerUserSection"></div>
 
-        <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
-        <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
-        <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
-        <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
-        <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
-        <div class="drawer-item" onclick="window.refreshAppData()" style="color: #38bdf8;">🔄 Refresh App</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('home')">🏠 Home</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('orders')">📦 My Orders</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('watchlist')" style="color: #fb7185;">❤️ My Watchlist</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('saree')">🥻 Sarees</div>
+        <div class="drawer-item" onclick="window.handleDrawerAction('beauty')">💄 Beauty Products</div>
     </div>
 
     <!-- Header -->
@@ -417,6 +458,22 @@
         </div>
     </div>
 
+    <!-- PDF policy pages and store footer -->
+    <div class="policy-modal" id="policyModal" onclick="if(event.target === this) window.closePolicyModal()">
+        <div class="policy-content">
+            <div class="policy-header">
+                <h2 id="policyModalTitle">Store Information</h2>
+                <button class="policy-close" onclick="window.closePolicyModal()">&times;</button>
+            </div>
+            <div class="policy-body" id="policyModalBody"></div>
+        </div>
+    </div>
+    <footer class="store-footer">
+        <div><h3>Arpit Store</h3><p>Premium sarees, ethnic wear and beauty products with fast delivery and customer support.</p><p style="margin-top:8px; color:#38bdf8;">Customer Support: +91 7665913393</p></div>
+        <div><h3>Quick Policies</h3><ul><li><button onclick="window.openPolicy('privacy')">Privacy Policy</button></li><li><button onclick="window.openPolicy('terms')">Terms &amp; Conditions</button></li><li><button onclick="window.openPolicy('refund')">Refund &amp; Return Policy</button></li><li><button onclick="window.openPolicy('shipping')">Shipping Policy</button></li></ul></div>
+        <div><h3>Contact &amp; Support</h3><ul><li><button onclick="window.openPolicy('contact')">About Arpit Store</button></li><li>Phone: +91 7665913393</li><li>Location: Rajasthan, India</li></ul></div>
+    </footer>
+
     <!-- Cart Modal -->
     <div class="modal" id="cartModal">
         <div class="modal-content">
@@ -473,6 +530,24 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        // FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
+            authDomain: "arpit-store.firebaseapp.com",
+            projectId: "arpit-store",
+            storageBucket: "arpit-store.firebasestorage.app",
+            messagingSenderId: "607228237560",
+            appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
+            measurementId: "G-9T9Q26ZC9M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let secureRecaptchaVerifier = null;
+        let secureConfirmationResult = null;
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -480,9 +555,12 @@
         let isPtrPulling = false;
 
         document.addEventListener('touchstart', (e) => {
-            if (window.scrollY === 0) {
+            if (window.scrollY === 0 && e.touches.length === 1) {
                 ptrStart = e.touches[0].clientY;
+                ptrCurrent = e.touches[0].clientY;
                 isPtrPulling = true;
+            } else {
+                isPtrPulling = false;
             }
         }, { passive: true });
 
@@ -492,37 +570,47 @@
             let distance = ptrCurrent - ptrStart;
             
             if (distance > 0 && window.scrollY === 0) {
-                if (e.cancelable) e.preventDefault();
                 const ptr = document.getElementById('ptrContainer');
                 const txt = document.getElementById('ptrText');
-                
-                let offset = Math.min(distance / 2, 80) - 60; 
-                ptr.style.transform = `translateY(${offset}px)`;
-                
-                if (distance > 120) {
-                    txt.innerText = "Release to refresh 🔄";
-                    txt.style.borderColor = "#22c55e";
-                    txt.style.color = "#22c55e";
-                } else {
-                    txt.innerText = "Pull down to refresh ↓";
-                    txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
-                    txt.style.color = "#38bdf8";
+                if (ptr && txt) {
+                    let offset = Math.min(distance / 2, 80) - 60; 
+                    ptr.style.transform = `translateY(${offset}px)`;
+                    
+                    if (distance > 120) {
+                        txt.innerText = "Release to refresh 🔄";
+                        txt.style.borderColor = "#22c55e";
+                        txt.style.color = "#22c55e";
+                    } else {
+                        txt.innerText = "Pull down to refresh ↓";
+                        txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                        txt.style.color = "#38bdf8";
+                    }
                 }
             }
-        }, { passive: false });
+        }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
             if (!isPtrPulling) return;
-            isPtrPulling = false;
             let distance = ptrCurrent - ptrStart;
+            isPtrPulling = false;
             
             const ptr = document.getElementById('ptrContainer');
-            ptr.style.transform = `translateY(-100%)`;
+            if (ptr) {
+                ptr.style.transform = `translateY(-100%)`;
+            }
             
             if (distance > 120 && window.scrollY === 0) {
                 window.refreshAppData();
             }
-            document.getElementById('ptrText').innerText = "Pull down to refresh ↓";
+
+            ptrStart = 0;
+            ptrCurrent = 0;
+            const txt = document.getElementById('ptrText');
+            if (txt) {
+                txt.innerText = "Pull down to refresh ↓";
+                txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                txt.style.color = "#38bdf8";
+            }
         });
 
         // PREVENT PAGE ZOOM GLOBALLY
@@ -546,18 +634,144 @@
         document.addEventListener('gesturechange', (e) => e.preventDefault());
         document.addEventListener('gestureend', (e) => e.preventDefault());
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
-            authDomain: "arpit-store.firebaseapp.com",
-            projectId: "arpit-store",
-            storageBucket: "arpit-store.firebasestorage.app",
-            messagingSenderId: "607228237560",
-            appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
-            measurementId: "G-9T9Q26ZC9M"
+        // --- FIREBASE AUTHENTICATION HANDLERS ---
+        window.showPhoneOtpLogin = () => {
+            const section = document.querySelector('.secure-auth-section');
+            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const phoneInput = document.getElementById('securePhone');
+            if (phoneInput) setTimeout(() => phoneInput.focus(), 250);
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        function normalizeFirebasePhone(user) {
+            if (user && user.phoneNumber) return user.phoneNumber.replace(/\D/g, '').slice(-10);
+            return user && user.email ? user.email : 'firebase_' + (user ? user.uid : 'user');
+        }
+
+        function adoptFirebaseUser(user) {
+            if (!user) return;
+            const phoneKey = normalizeFirebasePhone(user);
+            const registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            const previous = registeredUsers.find(item => item.phone === phoneKey);
+            const name = user.displayName || (user.email ? user.email.split('@')[0] : '') || (previous && previous.name) || 'Customer';
+            const legacyUser = { name, phone: phoneKey, password: '', addresses: (previous && previous.addresses) || [], firebaseUid: user.uid, email: user.email || '' };
+            const existingIndex = registeredUsers.findIndex(item => item.phone === phoneKey);
+            if (existingIndex >= 0) registeredUsers[existingIndex] = { ...registeredUsers[existingIndex], ...legacyUser };
+            else registeredUsers.push(legacyUser);
+            localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+            currentUser = legacyUser;
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            reloadUserSpecificState();
+            if (window.showToast) window.showToast('Secure Firebase login successful!');
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && (!currentUser || currentUser.firebaseUid !== user.uid)) adoptFirebaseUser(user);
+        });
+
+        window.sendSecureEmailOTP = () => {
+            const emailInput = document.getElementById('secureEmail');
+            const email = emailInput ? emailInput.value.trim() : '';
+            if (!email || !email.includes('@')) {
+                window.showToast('Valid Gmail / Email address bharein.', 'error');
+                return;
+            }
+            const actionCodeSettings = {
+                url: window.location.href.split('?')[0],
+                handleCodeInApp: true
+            };
+            sendSignInLinkToEmail(auth, email, actionCodeSettings)
+                .then(() => {
+                    localStorage.setItem('arpit_email_for_signin', email);
+                    window.showToast('Gmail sign-in link/OTP bhej diya gaya hai. Inbox ya spam check karein.');
+                })
+                .catch(error => window.showToast('Gmail OTP error: ' + error.message, 'error'));
+        };
+
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let emailForLink = localStorage.getItem('arpit_email_for_signin');
+            if (!emailForLink) emailForLink = window.prompt('Confirmation ke liye apna Gmail enter karein:');
+            if (emailForLink) {
+                signInWithEmailLink(auth, emailForLink, window.location.href)
+                    .then(result => {
+                        localStorage.removeItem('arpit_email_for_signin');
+                        adoptFirebaseUser(result.user);
+                        window.showToast('Gmail login successful!');
+                    })
+                    .catch(error => window.showToast('Gmail link verification error: ' + error.message, 'error'));
+            }
+        }
+
+        window.loginWithGoogle = () => {
+            signInWithPopup(auth, new GoogleAuthProvider())
+                .then(result => { adoptFirebaseUser(result.user); window.toggleAuthModal(); })
+                .catch(error => window.showToast('Google login error: ' + error.message, 'error'));
+        };
+
+        window.setupSecureRecaptcha = () => {
+            if (!secureRecaptchaVerifier) {
+                secureRecaptchaVerifier = new RecaptchaVerifier(auth, 'secureRecaptchaContainer', { 
+                    'size': 'invisible',
+                    'callback': (response) => {
+                        console.log("reCAPTCHA solved");
+                    },
+                    'expired-callback': () => {
+                        if (secureRecaptchaVerifier) {
+                            try { secureRecaptchaVerifier.clear(); } catch(e){}
+                            secureRecaptchaVerifier = null;
+                        }
+                    }
+                });
+            }
+            return secureRecaptchaVerifier;
+        };
+
+        window.sendSecureOTP = () => {
+            const rawPhone = document.getElementById('securePhone').value.trim().replace(/\D/g, '');
+            if (rawPhone.length < 10) { window.showToast('Valid 10-digit mobile number bharein.', 'error'); return; }
+            const phoneNumber = '+91' + rawPhone.slice(-10);
+            
+            try {
+                const appVerifier = window.setupSecureRecaptcha();
+                signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                    .then(result => {
+                        secureConfirmationResult = result;
+                        document.getElementById('secureOtpStepOne').style.display = 'none';
+                        document.getElementById('secureOtpStepTwo').style.display = 'block';
+                        window.showToast('OTP SMS se bhej diya gaya hai.');
+                    })
+                    .catch(error => {
+                        console.error("OTP Send Error:", error);
+                        if (secureRecaptchaVerifier) { 
+                            try { secureRecaptchaVerifier.clear(); } catch(e){}
+                            secureRecaptchaVerifier = null; 
+                        }
+                        window.showToast('OTP send error: ' + error.message, 'error');
+                    });
+            } catch(err) {
+                console.error("Recaptcha init error:", err);
+                if (secureRecaptchaVerifier) { 
+                    try { secureRecaptchaVerifier.clear(); } catch(e){}
+                    secureRecaptchaVerifier = null; 
+                }
+                window.showToast('reCAPTCHA reset kiya. Dobara Get OTP dabein.', 'error');
+            }
+        };
+
+        window.verifySecureOTP = () => {
+            const code = document.getElementById('secureOtpCode').value.trim();
+            if (!secureConfirmationResult || code.length !== 6) { window.showToast('6-digit OTP enter karein.', 'error'); return; }
+            secureConfirmationResult.confirm(code)
+                .then(result => { adoptFirebaseUser(result.user); window.toggleAuthModal(); })
+                .catch(error => window.showToast('OTP verification error: ' + error.message, 'error'));
+        };
+
+        window.resetSecureOTP = () => {
+            document.getElementById('secureOtpStepOne').style.display = 'flex';
+            document.getElementById('secureOtpStepTwo').style.display = 'none';
+            document.getElementById('secureOtpCode').value = '';
+            secureConfirmationResult = null;
+        };
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
@@ -566,12 +780,7 @@
         let productsUnsubscribe = null;
         let currentProduct = null;
         
-        // AUTHENTICATION & USER PROFILE STATE
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-        let authMode = 'login'; // 'login' or 'signup'
-        let generatedOtpCode = "";
-
-        // USER SPECIFIC KEYS & STATE
         function getUserOrdersKey() {
             return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
         }
@@ -582,7 +791,7 @@
             return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
         }
 
-        let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+        let cart = (JSON.parse(localStorage.getItem(getUserCartKey())) || []).map(item => ({ ...item, qty: Math.max(1, Number(item.qty) || 1) }));
         let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
 
         let currentCategory = 'All';
@@ -592,7 +801,7 @@
         let selectedColor = "";
         let selectedColorImg = "";
         let selectedSize = "";
-        let selectedImage = ""; // Main image state variable
+        let selectedImage = "";
 
         // PINCH ZOOM, DRAG & LIGHTBOX VARIABLES
         let zoomScale = 1;
@@ -608,10 +817,9 @@
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
-        document.getElementById('cartCount').innerText = cart.length;
+        document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
         updateAuthUI();
 
-        // APP REFRESH FUNCTION
         window.refreshAppData = () => {
             window.showToast("App data refresh ho raha hai... 🔄");
             listenToProducts();
@@ -627,7 +835,6 @@
             }
         }, 6000);
 
-        // AUTHENTICATION & PROFILE FUNCTIONS
         window.toggleAuthModal = () => {
             const modal = document.getElementById('authModal');
             const isOpen = modal.style.display === 'flex';
@@ -639,145 +846,11 @@
             }
         };
 
-        window.switchAuthTab = (mode) => {
-            authMode = mode;
-            const loginBtn = document.getElementById('tabLoginBtn');
-            const signupBtn = document.getElementById('tabSignupBtn');
-            const nameInput = document.getElementById('authName');
-            const submitBtn = document.getElementById('authSubmitBtn');
-            const otpSection = document.getElementById('otpSection');
-
-            if (mode === 'login') {
-                loginBtn.classList.add('active');
-                signupBtn.classList.remove('active');
-                nameInput.style.display = 'none';
-                if(otpSection) otpSection.style.display = 'none';
-                submitBtn.innerText = 'Login';
-            } else {
-                signupBtn.classList.add('active');
-                loginBtn.classList.remove('active');
-                nameInput.style.display = 'block';
-                submitBtn.innerText = 'Send OTP & Register';
-            }
-        };
-
         function reloadUserSpecificState() {
-            cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+            cart = (JSON.parse(localStorage.getItem(getUserCartKey())) || []).map(item => ({ ...item, qty: Math.max(1, Number(item.qty) || 1) }));
             watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
-            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
             fetchLiveStatusForAllOrders();
-        }
-
-        window.submitAuth = () => {
-            const phone = document.getElementById('authPhone').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            const name = document.getElementById('authName').value.trim();
-
-            if (!phone || phone.length !== 10 || !password) {
-                window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
-                return;
-            }
-
-            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-
-            if (authMode === 'signup') {
-                if (!name) {
-                    window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
-                    return;
-                }
-                let existing = registeredUsers.find(u => u.phone === phone);
-                if (existing) {
-                    window.showToast("Yeh mobile number pehle se registered hai! Login karein.", "error");
-                    window.switchAuthTab('login');
-                    return;
-                }
-
-                // Multi-number OTP configuration & trigger for all numbers
-                generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-                window.showToast(`OTP Sent to all numbers: ${generatedOtpCode}`);
-                
-                // Sync OTP request to backend/Excel/Telegram setup
-                syncUserToExcel({ action: 'otp_send', name, phone, otp: generatedOtpCode });
-
-                document.getElementById('otpSection').style.display = 'block';
-                document.getElementById('authSubmitBtn').innerText = 'Complete Registration';
-                document.getElementById('authSubmitBtn').setAttribute('onclick', 'window.verifyAndRegisterNewUser()');
-
-            } else {
-                let user = registeredUsers.find(u => u.phone === phone && u.password === password);
-                if (!user) {
-                    window.showToast("Galat mobile number ya password! Pehle Sign Up karein.", "error");
-                    return;
-                }
-                currentUser = user;
-                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                window.toggleAuthModal();
-                updateAuthUI();
-                reloadUserSpecificState();
-                window.showToast("Login successful!");
-            }
-        };
-
-        window.verifyAndRegisterNewUser = () => {
-            const enteredOtp = document.getElementById('authOtpInput').value.trim();
-            const phone = document.getElementById('authPhone').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            const name = document.getElementById('authName').value.trim();
-
-            if (enteredOtp !== generatedOtpCode) {
-                window.showToast("Galat OTP dala hai! Dobara check karein.", "error");
-                return;
-            }
-
-            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-            let newUser = { name, phone, password, addresses: [] };
-            registeredUsers.push(newUser);
-            localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-
-            syncUserToExcel({ action: 'signup', name, phone, password });
-
-            currentUser = newUser;
-            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-            window.toggleAuthModal();
-            updateAuthUI();
-            reloadUserSpecificState();
-            window.showToast("OTP verified & Sign up successful!");
-        };
-
-        window.handleGoogleLogin = () => {
-            let googleName = prompt("Enter your Google Account Name:", "Arpit");
-            let googlePhone = prompt("Enter your 10-digit Mobile Number for verification:", "9876543210");
-            
-            if (!googleName || !googlePhone || googlePhone.length !== 10) {
-                window.showToast("Google login cancelled or invalid details.", "error");
-                return;
-            }
-
-            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-            let user = registeredUsers.find(u => u.phone === googlePhone);
-
-            if (!user) {
-                user = { name: googleName, phone: googlePhone, password: 'google_auth_user', addresses: [] };
-                registeredUsers.push(user);
-                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-                syncUserToExcel({ action: 'signup', name: googleName, phone: googlePhone, password: 'google_auth_user' });
-            }
-
-            currentUser = user;
-            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-            window.toggleAuthModal();
-            updateAuthUI();
-            reloadUserSpecificState();
-            window.showToast("Google Login Successful!");
-        };
-
-        function syncUserToExcel(payloadData) {
-            if (!navigator.onLine) return;
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payloadData)
-            }).catch(err => console.log("Excel user sync error:", err));
         }
 
         function updateAuthUI() {
@@ -801,11 +874,11 @@
                 `;
             } else {
                 headerAuthArea.innerHTML = `
-                    <button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Sign Up</button>
+                    <button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Login</button>
                 `;
                 drawerUserSection.innerHTML = `
                     <div style="margin-bottom: 20px;">
-                        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login / Sign Up 🚀</button>
+                        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login 🚀</button>
                     </div>
                 `;
             }
@@ -822,27 +895,12 @@
             if (!isOpen) {
                 document.getElementById('profileAvatarDisplay').innerText = currentUser.name.charAt(0).toUpperCase();
                 document.getElementById('profileNameDisplay').innerText = currentUser.name;
-                document.getElementById('updateProfileNameInput').value = currentUser.name;
                 document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
                 renderSavedAddresses();
                 pushNavState('profile');
             } else if (history.state && history.state.appNav === 'profile') {
                 history.back();
             }
-        };
-
-        window.updateCustomerProfileName = () => {
-            const newName = document.getElementById('updateProfileNameInput').value.trim();
-            if(!newName) {
-                window.showToast("Naam khali nahi ho sakta!", "error");
-                return;
-            }
-            currentUser.name = newName;
-            updateUserDataInStorage();
-            document.getElementById('profileNameDisplay').innerText = newName;
-            document.getElementById('profileAvatarDisplay').innerText = newName.charAt(0).toUpperCase();
-            updateAuthUI();
-            window.showToast("Customer name updated successfully!");
         };
 
         function renderSavedAddresses() {
@@ -892,6 +950,7 @@
         }
 
         window.logoutUser = () => {
+            signOut(auth).catch(() => {});
             currentUser = null;
             localStorage.removeItem('arpit_current_user');
             cart = [];
@@ -1161,11 +1220,28 @@
         window.toggleDrawer = () => {
             const drawer = document.getElementById('drawer');
             const overlay = document.getElementById('overlay');
+            if (!drawer || !overlay) return;
             drawer.classList.toggle('open');
             const isOpen = drawer.classList.contains('open');
             overlay.style.display = isOpen ? 'block' : 'none';
             if(isOpen) pushNavState('drawer');
             else if (history.state && history.state.appNav === 'drawer') history.back();
+        };
+
+        window.closeDrawer = () => {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('overlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.style.display = 'none';
+        };
+
+        window.handleDrawerAction = (action) => {
+            window.closeDrawer();
+            if (action === 'home') window.goHome();
+            else if (action === 'orders') window.showMyOrders();
+            else if (action === 'watchlist') window.showWatchlist();
+            else if (action === 'saree') window.filterCategory('Saree');
+            else if (action === 'beauty') window.filterCategory('Beauty');
         };
 
         window.goHome = () => {
@@ -1210,7 +1286,9 @@
         window.showWatchlist = () => {
             saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
-            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            window.closeDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const watchTab = document.getElementById('tab-Watchlist');
             if(watchTab) watchTab.classList.add('active');
@@ -1223,7 +1301,9 @@
         window.showMyOrders = () => {
             saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
-            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            window.closeDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const orderTab = document.getElementById('tab-Orders');
             if(orderTab) orderTab.classList.add('active');
@@ -1234,12 +1314,23 @@
             renderOrdersUI();
         };
 
+        function normalizeCategoryName(value) {
+            return String(value || '').toLowerCase().replace(/sarees?/g, 'saree').replace(/beauty products?/g, 'beauty').replace(/[^a-z0-9]/g, '');
+        }
+
         window.filterCategory = (cat) => {
+            if (cat === 'Sarees') cat = 'Saree';
+            if (cat === 'Beauty Products') cat = 'Beauty';
             saveActiveTab(cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
             if(cat === 'MyOrders') { window.showMyOrders(); return; }
             currentCategory = cat;
-            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('overlay');
+            if (drawer) drawer.classList.remove('open');
+            if (overlay) overlay.style.display = 'none';
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const activeTab = document.getElementById('tab-' + cat);
             if(activeTab) activeTab.classList.add('active');
@@ -1271,8 +1362,8 @@
             else if (currentCategory === 'All') filtered = [...liveProducts];
             else {
                 filtered = liveProducts.filter(p => {
-                    let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-                    let target = currentCategory.toLowerCase();
+                    let productCat = normalizeCategoryName(p.category || p.type || p.cat);
+                    let target = normalizeCategoryName(currentCategory);
                     return productCat.includes(target) || target.includes(productCat);
                 });
             }
@@ -1332,7 +1423,7 @@
                             <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
                             <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
                             <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">
-                                ${offPercent}% OFF
+                                ${offPercent}% OFF (Save ₹${offAmount})
                             </span>
                         </div>
                     `;
@@ -1369,7 +1460,7 @@
             grid.innerHTML = '';
             
             if (!currentUser) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up 🚀</button></div>';
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login 🚀</button></div>';
                 return;
             }
 
@@ -1460,7 +1551,7 @@
             });
         }
 
-        function updateGalleryImages(colorName) {
+        window.updateGalleryImages = function(colorName) {
             if (!currentProduct) return;
 
             let currentImages = [];
@@ -1470,370 +1561,443 @@
 
             if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
                 let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
-                currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
-            } else if (currentProduct.media && Array.isArray(currentProduct.media) && currentProduct.media.length > 0) {
-                currentImages = currentProduct.media.map(url => formatMediaUrl(url)).filter(url => url);
+                currentImages = imgs.map(url => formatMediaUrl(url));
+            } else if (currentProduct.variants && Array.isArray(currentProduct.variants)) {
+                const variantData = currentProduct.variants.find(v => v.color === colorName);
+                if (variantData && variantData.image) {
+                    currentImages = [formatMediaUrl(variantData.image)];
+                }
             }
 
-            if (currentImages.length === 0) {
-                currentImages = ['https://via.placeholder.com/400x300?text=No+Image'];
+            if (currentImages.length === 0 && currentProduct.media) {
+                currentImages = currentProduct.media.map(url => formatMediaUrl(url));
             }
 
-            selectedImage = currentImages[0];
-            selectedColorImg = currentImages[0];
-
-            const sliderContainer = document.getElementById('detailSliderContainer');
-            if (sliderContainer) {
-                let mediaHtml = '<div class="detail-slider">';
-                currentImages.forEach((imgUrl, idx) => {
-                    let imgId = idx === 0 ? 'id="mainProductImage"' : '';
-                    mediaHtml += `<img src="${imgUrl}" ${imgId} class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" alt="Product Image">`;
+            const slider = document.getElementById('detailSlider');
+            if (slider && currentImages.length > 0) {
+                slider.innerHTML = '';
+                currentImages.forEach(imgUrl => {
+                    slider.innerHTML += `<img src="${imgUrl}" class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
                 });
-                mediaHtml += '</div>';
-                sliderContainer.innerHTML = mediaHtml;
             }
-        }
-
-        window.selectColor = (colorName, el) => {
-            selectedColor = colorName;
-            const label = document.getElementById('colorLabel');
-            if (label) label.innerText = colorName;
-
-            if (el) {
-                const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
-                siblings.forEach(btn => btn.classList.remove('active'));
-                el.classList.add('active');
-            }
-            updateGalleryImages(colorName);
         };
 
-        window.selectSize = (size, el) => {
-            selectedSize = size;
-            const label = document.getElementById('sizeLabel');
-            if (label) label.innerText = size;
-            const siblings = el.parentElement.querySelectorAll('.size-btn');
-            siblings.forEach(btn => btn.classList.remove('active'));
-            if(el) el.classList.add('active');
-        };
-
-        window.showProductDetail = (id) => {
-            const p = liveProducts.find(item => item.id === id);
-            if(!p) { window.showToast("Product unavailable!", "error"); return; }
+        window.showProductDetail = (productId) => {
+            const product = liveProducts.find(p => p.id === productId);
+            if (!product) return;
+            currentProduct = product;
             
-            currentProduct = p;
-            pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
+            window.scrollTo(0, 0);
 
-            selectedSize = "";
-            selectedColor = "";
-            selectedColorImg = "";
+            selectedColor = product.colors && product.colors.length > 0 
+                ? (typeof product.colors[0] === 'object' ? product.colors[0].name : product.colors[0]) 
+                : (product.variants && product.variants.length > 0 ? product.variants[0].color : "");
 
-            let isLiked = watchlist.includes(p.id);
-            let heartIcon = isLiked ? '❤️' : '🤍';
-            let categoryTag = p.category || p.type || p.cat || 'General';
-            let detailSellingPrice = Number(p.price) || 0;
-            let detailMrpPrice = Number(p.mrp) || 0;
-            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
+            selectedSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : "";
 
-            if (detailMrpPrice > detailSellingPrice) {
-                let offAmount = detailMrpPrice - detailSellingPrice;
-                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
-                detailPriceHtml = `
-                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
-                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
-                        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAVE ₹${offAmount} (${offPercent}% OFF)</span>
+            let colorHtml = '';
+            if (product.colors && product.colors.length > 0) {
+                colorHtml += `<div class="variant-section"><div class="variant-title">🎨 Select Color:</div><div class="color-options">`;
+                product.colors.forEach((c) => {
+                    let name = typeof c === 'object' ? c.name : c;
+                    let img = typeof c === 'object' && c.image ? formatMediaUrl(Array.isArray(c.image) ? c.image[0] : c.image) : '';
+                    let activeClass = name === selectedColor ? 'active' : '';
+                    if (img) {
+                        colorHtml += `<img src="${img}" class="color-thumb ${activeClass}" title="${name}" onclick="window.selectColor('${name}', '${img}', this)">`;
+                    } else {
+                        colorHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${name}', '', this)">${name}</button>`;
+                    }
+                });
+                colorHtml += `</div></div>`;
+            } else if (product.variants && product.variants.length > 0) {
+                colorHtml += `<div class="variant-section"><div class="variant-title">🎨 Select Color:</div><div class="color-options">`;
+                product.variants.forEach((v) => {
+                    let activeClass = v.color === selectedColor ? 'active' : '';
+                    let img = v.image ? formatMediaUrl(v.image) : '';
+                    if (img) {
+                        colorHtml += `<img src="${img}" class="color-thumb ${activeClass}" title="${v.color}" onclick="window.selectColor('${v.color}', '${img}', this)">`;
+                    } else {
+                        colorHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${v.color}', '', this)">${v.color}</button>`;
+                    }
+                });
+                colorHtml += `</div></div>`;
+            }
+
+            let sizeHtml = '';
+            if (product.sizes && product.sizes.length > 0) {
+                sizeHtml += `<div class="variant-section"><div class="variant-title">📏 Select Size:</div><div class="size-options">`;
+                product.sizes.forEach((s) => {
+                    let activeClass = s === selectedSize ? 'active' : '';
+                    sizeHtml += `<button class="size-btn ${activeClass}" onclick="window.selectSize('${s}', this)">${s}</button>`;
+                });
+                sizeHtml += `</div></div>`;
+            }
+
+            let initialImages = [];
+            if (product.media && product.media.length > 0) {
+                initialImages = product.media.map(url => formatMediaUrl(url));
+            } else {
+                initialImages = ['https://via.placeholder.com/400x350?text=No+Image'];
+            }
+
+            let sliderHtml = '<div class="detail-slider" id="detailSlider">';
+            initialImages.forEach(imgUrl => {
+                sliderHtml += `<img src="${imgUrl}" class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
+            });
+            sliderHtml += '</div>';
+
+            let sellingPrice = Number(product.price) || 0;
+            let mrpPrice = Number(product.mrp) || 0;
+            let priceHtml = `<div style="font-size:24px; font-weight:800; color:#38bdf8; margin:10px 0;">₹${sellingPrice}</div>`;
+            if (mrpPrice > sellingPrice) {
+                let offAmount = mrpPrice - sellingPrice;
+                let offPercent = Math.round((offAmount / mrpPrice) * 100);
+                priceHtml = `
+                    <div style="margin: 10px 0; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size: 26px; font-weight: 800; color: #38bdf8;">₹${sellingPrice}</span>
+                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${mrpPrice}</span>
+                        <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">
+                            ${offPercent}% OFF
+                        </span>
                     </div>
                 `;
             }
 
-            let variantHtml = '';
-            
-            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-                let firstColorObj = p.colors[0];
-                selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
-                
-                variantHtml += `<div class="variant-section">
-                    <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
-                    <div class="color-options">`;
-
-                p.colors.forEach((c, idx) => {
-                    let cName = typeof c === 'object' ? c.name : c;
-                    let cImg = '';
-                    if (typeof c === 'object' && c.image) {
-                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
-                        cImg = formatMediaUrl(imgUrl);
-                    }
-                    let active = idx === 0 ? 'active' : '';
-
-                    if (cImg) {
-                        variantHtml += `<img src="${cImg}" class="color-thumb ${active}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="color icon">`;
-                    } else {
-                        variantHtml += `<div class="size-btn ${active}" onclick="window.selectColor('${cName}', this)">🎨 ${cName}</div>`;
-                    }
-                });
-                variantHtml += `</div></div>`;
-            }
-
-            if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
-                selectedSize = p.sizes[0];
-                variantHtml += `<div class="variant-section">
-                    <div class="variant-title">📏 Size: <span id="sizeLabel" style="color:#38bdf8">${selectedSize}</span></div>
-                    <div class="size-options">`;
-                p.sizes.forEach((s, idx) => {
-                    let active = idx === 0 ? 'active' : '';
-                    variantHtml += `<div class="size-btn ${active}" onclick="window.selectSize('${s}', this)">📏 ${s}</div>`;
-                });
-                variantHtml += `</div></div>`;
-            }
-
-            document.getElementById('detailContent').innerHTML = `
-                <div id="detailSliderContainer"></div>
-                <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            let isLiked = watchlist.includes(product.id);
+            let detailContainer = document.getElementById('detailContent');
+            detailContainer.innerHTML = `
+                ${sliderHtml}
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
                     <div>
-                        <small style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">${categoryTag}</small>
-                        <h2 style="color: white; margin: 0;">${p.name}</h2>
+                        <small style="color:#94a3b8; text-transform:uppercase; font-size:12px; font-weight:700;">${product.category || product.type || 'General'}</small>
+                        <h2 style="color:white; font-size:22px; margin-top:4px;">${product.name}</h2>
                     </div>
-                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
+                    <button id="detailLikeBtn" class="detail-like-btn" onclick="window.toggleLike('${product.id}')">${isLiked ? '❤️' : '🤍'}</button>
                 </div>
-                ${detailPriceHtml}
-                ${variantHtml}
-                <p style="color: #94a3b8; font-size: 15px; margin: 15px 0; line-height: 1.6;">${p.description || 'Premium quality product.'}</p>
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <button class="add-btn" style="flex:1;" onclick="window.addToCartWithVariants('${p.id}')">Add to Cart 🛒</button>
-                    <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.buyNowProduct('${p.id}')">Buy Now ⚡</button>
+                ${priceHtml}
+                ${colorHtml}
+                ${sizeHtml}
+                <div style="margin:20px 0; background:rgba(15,23,42,0.5); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color:#38bdf8; margin-bottom:8px;">Description</h4>
+                    <p style="color:#cbd5e1; font-size:14px; line-height:1.6;">${product.description || 'No detailed description available.'}</p>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="add-btn" style="padding:14px; font-size:16px; flex:1;" onclick="window.addToCartFromDetail()">Add to Cart 🛒</button>
+                    <button class="pay-btn" style="margin-top:0; padding:14px; font-size:16px; flex:1;" onclick="window.buyNowFromDetail()">Buy Now ⚡</button>
                 </div>
             `;
 
-            updateGalleryImages(selectedColor);
-            window.scrollTo(0, 0);
+            if (selectedColor) window.updateGalleryImages(selectedColor);
+            pushNavState('detail');
         };
 
-        window.addToCart = (id) => {
-            window.showProductDetail(id);
+        window.selectColor = (colorName, imgUrl, el) => {
+            selectedColor = colorName;
+            if (el && el.parentElement) {
+                el.parentElement.querySelectorAll('.color-thumb, .size-btn').forEach(child => child.classList.remove('active'));
+                el.classList.add('active');
+            }
+            window.updateGalleryImages(colorName);
         };
 
-        window.addToCartWithVariants = (id) => {
-            if (!currentUser) {
-                window.showToast("Pehle Sign Up / Login karein!", "error");
-                window.toggleAuthModal();
-                return;
+        window.selectSize = (sizeName, el) => {
+            selectedSize = sizeName;
+            if (el && el.parentElement) {
+                el.parentElement.querySelectorAll('.size-btn').forEach(child => child.classList.remove('active'));
+                el.classList.add('active');
             }
-            const item = liveProducts.find(p => p.id === id);
-            if(!item) return;
-            
-            if (item.sizes && item.sizes.length > 0 && !selectedSize) {
-                window.showToast("Please select a size first!", "error"); return;
-            }
-            if (item.colors && item.colors.length > 0 && !selectedColor) {
-                window.showToast("Please select a color first!", "error"); return;
-            }
-
-            let cartItem = { ...item };
-            if (selectedSize) cartItem.selectedSize = selectedSize;
-            if (selectedColor) cartItem.selectedColor = selectedColor;
-            
-            if (selectedImage) {
-                cartItem.media = [selectedImage, ...(item.media || [])];
-            }
-
-            cart.push(cartItem);
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
-            window.showToast(`${item.name} added to cart!`);
         };
 
-        window.buyNowProduct = (id) => {
-            if (!currentUser) {
-                window.showToast("Kripya pehle Sign Up karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
-            window.addToCartWithVariants(id);
+        window.addToCartFromDetail = () => {
+            if (!currentProduct) return;
+            window.addToCart(currentProduct.id, selectedColor, selectedSize);
+        };
+
+        window.buyNowFromDetail = () => {
+            if (!currentProduct) return;
+            window.addToCart(currentProduct.id, selectedColor, selectedSize);
             window.toggleCart();
         };
 
-        window.removeFromCart = (index) => {
-            cart.splice(index, 1);
+        window.addToCart = (productId, color = "", size = "") => {
+            const prod = liveProducts.find(p => p.id === productId);
+            if (!prod) return;
+
+            let existingIndex = cart.findIndex(item => item.id === productId && item.selectedColor === color && item.selectedSize === size);
+            if (existingIndex > -1) {
+                cart[existingIndex].qty = (Number(cart[existingIndex].qty) || 1) + 1;
+            } else {
+                cart.push({
+                    id: prod.id,
+                    name: prod.name,
+                    price: Number(prod.price) || 0,
+                    media: prod.media || [],
+                    selectedColor: color,
+                    selectedSize: size,
+                    qty: 1
+                });
+            }
+
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
-            window.updateCartUI();
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+            window.showToast("Product added to Cart! 🛒");
         };
 
         window.toggleCart = () => {
-            if (!currentUser) {
-                window.showToast("Cart dekhne ya order karne ke liye Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
             const modal = document.getElementById('cartModal');
-            const isOpening = modal.style.display !== 'flex';
-            modal.style.display = isOpening ? 'flex' : 'none';
-            if (isOpening) {
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                window.renderCartUI();
                 pushNavState('cart');
-                window.updateCartUI();
-                window.handlePaymentMode();
             } else if (history.state && history.state.appNav === 'cart') {
                 history.back();
             }
         };
 
-        window.updateCartUI = () => {
+        window.renderCartUI = () => {
             const cartList = document.getElementById('cartList');
-            cartTotalAmount = 0;
             cartList.innerHTML = '';
-            
-            if(cart.length === 0) {
-                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center; padding: 20px 0;">Your cart is empty!</p>';
-                document.getElementById('qrTotal').innerText = "0";
-                return;
+
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">Aapka Cart khaali hai!</p>';
+                cartTotalAmount = 0;
+            } else {
+                cartTotalAmount = 0;
+                cart.forEach((item, index) => {
+                    let itemTotal = (Number(item.price) || 0) * (Number(item.qty) || 1);
+                    cartTotalAmount += itemTotal;
+                    let imgUrl = item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/55?text=No+Img';
+                    
+                    let variantInfo = '';
+                    if (item.selectedColor || item.selectedSize) {
+                        variantInfo = '<div style="font-size:11px; color:#cbd5e1; margin-top:2px;">';
+                        if (item.selectedColor) variantInfo += `Color: ${item.selectedColor} `;
+                        if (item.selectedSize) variantInfo += `Size: ${item.selectedSize}`;
+                        variantInfo += '</div>';
+                    }
+
+                    cartList.innerHTML += `
+                        <div class="cart-item">
+                            <img src="${imgUrl}" class="cart-item-img">
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                ${variantInfo}
+                                <p>₹${item.price} × ${item.qty} = ₹${itemTotal}</p>
+                                <div class="qty-controls">
+                                    <button onclick="window.updateCartQty(${index}, -1)">-</button>
+                                    <span>${item.qty}</span>
+                                    <button onclick="window.updateCartQty(${index}, 1)">+</button>
+                                </div>
+                            </div>
+                            <button class="remove-btn" onclick="window.removeFromCart(${index})">Remove</button>
+                        </div>
+                    `;
+                });
             }
 
-            cart.forEach((item, index) => {
-                cartTotalAmount += Number(item.price);
-                
-                let imgUrl = 'https://via.placeholder.com/60?text=No+Img';
-                if (item.media && item.media.length > 0) imgUrl = formatMediaUrl(item.media[0]);
-
-                let variantText = '';
-                if (item.selectedColor || item.selectedSize) {
-                    variantText = `<div style="font-size:12px; color:#cbd5e1; margin-bottom:4px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">`;
-                    if (item.selectedColor) variantText += `<span style="background:rgba(56,189,248,0.2); padding:1px 6px; border-radius:4px; border:1px solid rgba(56,189,248,0.3);">🎨 ${item.selectedColor}</span>`;
-                    if (item.selectedSize) variantText += `<span style="background:rgba(244,63,94,0.2); padding:1px 6px; border-radius:4px; border:1px solid rgba(244,63,94,0.3);">📏 ${item.selectedSize}</span>`;
-                    variantText += `</div>`;
-                }
-
-                cartList.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${imgUrl}" class="cart-item-img" loading="lazy">
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            ${variantText}
-                            <p>₹${item.price}</p>
-                        </div>
-                        <button class="remove-btn" onclick="window.removeFromCart(${index})">🗑 Remove</button>
-                    </div>
-                `;
-            });
-            
             document.getElementById('qrTotal').innerText = cartTotalAmount;
+            
+            // Auto fill customer details if logged in
+            const nameInput = document.getElementById('custName');
+            const phoneInput = document.getElementById('custPhone');
+            const addressSelect = document.getElementById('checkoutAddressSelect');
+            const addressSection = document.getElementById('checkoutAddressSection');
+            const addressInput = document.getElementById('custAddress');
 
             if (currentUser) {
-                document.getElementById('custName').value = currentUser.name;
-                document.getElementById('custPhone').value = currentUser.phone;
-                
-                let addrSelect = document.getElementById('checkoutAddressSelect');
-                addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                nameInput.value = currentUser.name || '';
+                phoneInput.value = currentUser.phone || '';
+
                 if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    currentUser.addresses.forEach(addr => {
-                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
+                    addressSection.style.display = 'block';
+                    addressSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
+                    currentUser.addresses.forEach((addr, idx) => {
+                        addressSelect.innerHTML += `<option value="${addr}">📍 Address ${idx + 1}: ${addr}</option>`;
                     });
-                    document.getElementById('custAddress').value = currentUser.addresses[0];
                 } else {
-                    document.getElementById('custAddress').value = '';
+                    addressSection.style.display = 'none';
                 }
+            } else {
+                nameInput.value = '';
+                phoneInput.value = '';
+                nameInput.readOnly = false;
+                phoneInput.readOnly = false;
+                addressSection.style.display = 'none';
             }
 
-            let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
-            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-            document.getElementById('directPayLink').href = upiLink;
+            window.handlePaymentMode();
+        };
+
+        window.updateCartQty = (index, delta) => {
+            if (cart[index]) {
+                cart[index].qty = (Number(cart[index].qty) || 1) + delta;
+                if (cart[index].qty <= 0) {
+                    cart.splice(index, 1);
+                }
+                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+                document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+                window.renderCartUI();
+            }
+        };
+
+        window.removeFromCart = (index) => {
+            cart.splice(index, 1);
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+            window.renderCartUI();
         };
 
         window.handleCheckoutAddressSelect = () => {
-            let selectedAddr = document.getElementById('checkoutAddressSelect').value;
-            if (selectedAddr) {
-                document.getElementById('custAddress').value = selectedAddr;
+            const select = document.getElementById('checkoutAddressSelect');
+            const addressInput = document.getElementById('custAddress');
+            if (select.value) {
+                addressInput.value = select.value;
             }
         };
 
         window.handlePaymentMode = () => {
-            let mode = document.getElementById('paymentMode').value;
-            let onlineSection = document.getElementById('onlinePaymentSection');
-            onlineSection.style.display = (mode === 'Online') ? 'block' : 'none';
+            const mode = document.getElementById('paymentMode').value;
+            const onlineSec = document.getElementById('onlinePaymentSection');
+            if (mode === 'Online') {
+                onlineSec.style.display = 'block';
+                let upiUrl = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiUrl;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+            } else {
+                onlineSec.style.display = 'none';
+            }
         };
 
         window.submitOrder = () => {
-            const address = document.getElementById('custAddress').value.trim();
-            const paymentMode = document.getElementById('paymentMode').value;
-            const utrNumber = document.getElementById('utrNumber').value.trim();
-
-            if(!address) { window.showToast("Kripya delivery address select ya enter karein!", "error"); return; }
-            if(cart.length === 0) { window.showToast("Cart khaali hai!", "error"); return; }
-            if(paymentMode === 'Online' && utrNumber === "") {
-                window.showToast("Online payment ke liye UTR number daalna zaroori hai.", "error");
+            if (!currentUser) {
+                window.showToast("Order place karne ke liye pehle Login karein!", "error");
+                window.toggleCart();
+                window.toggleAuthModal();
                 return;
             }
 
-            if (currentUser && !currentUser.addresses.includes(address)) {
-                currentUser.addresses.push(address);
-                updateUserDataInStorage();
+            if (cart.length === 0) {
+                window.showToast("Cart khaali hai!", "error");
+                return;
             }
 
-            let submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "Processing Order...";
-            submitBtn.disabled = true;
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const mode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber').value.trim();
 
-            let orderId = Math.floor(100000 + Math.random() * 900000).toString();
-            let now = new Date();
-            let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true})}`;
-            
-            let productNames = cart.map(item => {
-                let variantInfo = [];
-                if(item.selectedColor) variantInfo.push(`Color: ${item.selectedColor}`);
-                if(item.selectedSize) variantInfo.push(`Size: ${item.selectedSize}`);
-                let variantStr = variantInfo.length > 0 ? ` (${variantInfo.join(', ')})` : '';
-                return item.name + variantStr;
-            }).join(", ");
+            if (!name || !phone || !address) {
+                window.showToast("Naam, Mobile Number aur Address bharna zaroori hai!", "error");
+                return;
+            }
 
-            // Payload configured to sync with Google Sheet (Excel) and Telegram notifications
-            let payload = {
-                action: "new_order", 
-                orderId: orderId, 
-                name: currentUser.name, 
-                phone: currentUser.phone,
-                address: address + (paymentMode === 'Online' ? ` (UTR: ${utrNumber})` : ''),
-                productName: productNames, 
-                total: cartTotalAmount, 
-                date: fullDateTime
+            if (mode === 'Online' && (!utr || utr.length < 6)) {
+                window.showToast("12-Digit UTR / Transaction Number daalna zaroori hai!", "error");
+                return;
+            }
+
+            const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            const orderDate = new Date().toLocaleString('en-IN');
+
+            const orderData = {
+                orderId: orderId,
+                date: orderDate,
+                customerName: name,
+                phone: phone,
+                address: address,
+                paymentMode: mode,
+                utr: utr,
+                items: cart,
+                total: cartTotalAmount,
+                status: "Order Received"
             };
 
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing Order...";
+
+            // Send order to Google Sheet script
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
+                method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(orderData)
             }).then(() => {
-                let userOrdersKey = getUserOrdersKey();
-                let savedOrders = JSON.parse(localStorage.getItem(userOrdersKey)) || [];
-                savedOrders.unshift({
-                    orderId: orderId, items: [...cart], total: cartTotalAmount,
-                    date: fullDateTime, status: "Order Confirmed"
-                });
-                localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
-
-                cart = [];
-                localStorage.removeItem(getUserCartKey());
-                document.getElementById('cartCount').innerText = '0';
-                
-                submitBtn.innerText = "Confirm & Place Order";
-                submitBtn.disabled = false;
-                document.getElementById('cartModal').style.display = 'none';
-
-                let successModal = document.getElementById('successModal');
-                successModal.style.display = 'flex';
-                setTimeout(() => { successModal.style.display = 'none'; }, 2500);
-
-                window.showMyOrders();
-                window.showToast("Order placed successfully! Telegram & Excel updated.");
+                saveOrderLocally(orderData);
             }).catch(err => {
-                console.log("Order submission error:", err);
-                submitBtn.innerText = "Confirm & Place Order";
-                submitBtn.disabled = false;
-                window.showToast("Order placed locally! Network sync pending.", "error");
+                console.error("Order Sheet Sync Error:", err);
+                saveOrderLocally(orderData);
             });
         };
 
+        function saveOrderLocally(orderData) {
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            savedOrders.unshift(orderData);
+            localStorage.setItem(key, JSON.stringify(savedOrders));
+
+            // Clear Cart
+            cart = [];
+            localStorage.removeItem(getUserCartKey());
+            document.getElementById('cartCount').innerText = '0';
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Confirm & Place Order";
+
+            window.toggleCart();
+
+            const successModal = document.getElementById('successModal');
+            successModal.style.display = 'flex';
+            setTimeout(() => {
+                successModal.style.display = 'none';
+                window.showMyOrders();
+            }, 2000);
+        }
+
+        window.openPolicy = (type) => {
+            const modal = document.getElementById('policyModal');
+            const title = document.getElementById('policyModalTitle');
+            const body = document.getElementById('policyModalBody');
+
+            if (type === 'privacy') {
+                title.innerText = "Privacy Policy";
+                body.innerHTML = `<h4>Privacy Policy</h4><p>At Arpit Store, we prioritize your privacy. We collect minimal personal details such as your Name, Phone Number, and Delivery Address solely for the purpose of fulfilling your order and providing support.</p><p>Your data is securely processed via Firebase and Google Cloud, and is never sold or shared with third parties.</p>`;
+            } else if (type === 'terms') {
+                title.innerText = "Terms & Conditions";
+                body.innerHTML = `<h4>Terms & Conditions</h4><p>By placing an order on Arpit Store, you agree to provide authentic delivery details and accept Cash on Delivery or Online Payment rules.</p><p>Orders placed can be tracked directly from the 'My Orders' section in the app.</p>`;
+            } else if (type === 'refund') {
+                title.innerText = "Refund & Return Policy";
+                body.innerHTML = `<h4>Refund & Return Policy</h4><p>We offer hassle-free 7-day returns for damaged or defective products. For saree combo trial offers, you can keep 1 saree and return the remaining ones without extra charges.</p><p>For refund queries, contact our support team at +91 7665913393.</p>`;
+            } else if (type === 'shipping') {
+                title.innerText = "Shipping Policy";
+                body.innerHTML = `<h4>Shipping Policy</h4><p>We offer fast, FREE delivery across India. Standard delivery time is 3-7 working days depending on your location.</p>`;
+            } else if (type === 'contact') {
+                title.innerText = "About Arpit Store";
+                body.innerHTML = `<h4>About Arpit Store</h4><p>Arpit Store is your premium online destination for Sarees, Ethnic Wear, and Beauty Products.</p><p><strong>Customer Support:</strong> +91 7665913393<br><strong>Location:</strong> Rajasthan, India</p>`;
+            }
+
+            modal.classList.add('open');
+        };
+
+        window.closePolicyModal = () => {
+            document.getElementById('policyModal').classList.remove('open');
+        };
+
+        window.checkSharedLink = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (productId && liveProducts.length > 0) {
+                window.showProductDetail(productId);
+            }
+        };
+
+        // Initialize App Listener
         listenToProducts();
     </script>
-</body>
+</body>    
 </html>
