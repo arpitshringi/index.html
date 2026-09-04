@@ -517,46 +517,47 @@
             </div>
         </div>
     </div>
-   <script>
-async function submitOrder() {
-  const TELEGRAM_BOT_TOKEN = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
-  const TELEGRAM_CHAT_ID = "7900935815";
+<script>
+    const TELEGRAM_BOT_TOKEN = '8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY';
+    const TELEGRAM_CHAT_ID = '7900935815';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec';
 
-  const name = document.getElementById("name")?.value || "N/A";
-  const phone = document.getElementById("phone")?.value || "N/A";
-  const address = document.getElementById("address")?.value || "N/A";
+    document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-  const orderMessage = `📦 *new order!*
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const item = document.getElementById('item').value;
+        const time = new Date().toLocaleString();
 
-👤 *नाम:* ${name}
-📞 *फोन:* ${phone}
-📍 *पता:* ${address}`;
+        const orderData = { name, phone, item, time };
 
-  const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        // 1. Telegram Par Message Bhejna
+        const message = `📦 *Naya Order Aaya!*\n\n👤 *Naam:* ${name}\n📞 *Phone:* ${phone}\n🛒 *Item:* ${item}\n⏰ *Time:* ${time}`;
+        
+        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+        });
 
-  try {
-    const response = await fetch(telegramUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: orderMessage,
-        parse_mode: "Markdown"
-      })
+        // 2. Online Sheet (Apps Script) Par Data Bhejna
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            alert('Order successfully submit ho gaya!');
+            document.getElementById('orderForm').reset();
+        } catch (err) {
+            console.error('Sheet Error:', err);
+            alert('Data save karne mein dikkat aayi.');
+        }
     });
-
-    if (response.ok) {
-      alert("ऑर्डर सफलतापूर्वक टेलीग्राम पर भेज दिया गया है!");
-    } else {
-      alert("ऑर्डर भेजने में समस्या आई।");
-    }
-  } catch (error) {
-    console.error("Telegram API Error:", error);
-  }
-}
 </script>
+
 
     <!-- Success Modal -->
     <div class="modal" id="successModal">
