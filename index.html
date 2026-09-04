@@ -517,119 +517,7 @@
             </div>
         </div>
     </div>
-<script>
-    const TELEGRAM_BOT_TOKEN = '8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY';
-    const TELEGRAM_CHAT_ID = '7900935815';
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec';
-   document.getElementById('orderForm').addEventListener('submit', async function(e) {
-    
-    window.submitOrder = async function() {
-    const name = document.getElementById('name').value;
-    const phone = document.getElementById('phone').value;
-    const item = document.getElementById('item').value;
-    const time = new Date().toLocaleString();
-    
-    // Unique Order ID
-    const orderId = "ORD" + Math.floor(10000 + Math.random() * 90000);
-
-    // 1. Telegram Par Buttons ke sath Message Bhejna
-    const message = `📦 *Naya Order Aaya Bhai!* 🚀\n\n🆔 *Order ID:* #${orderId}\n👤 *Naam:* ${name}\n📞 *Phone:* ${phone}\n🛒 *Items:* ${item}\n⏰ *Time:* ${time}`;
-
-    const telegramPayload = {
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown',
-        reply_markup: {
-            inline_keyboard: [
-                [
-                    { text: "✅ Accept Order", callback_data: `status_Accept_${orderId}` },
-                    { text: "🚚 Dispatch", callback_data: `status_Dispatch_${orderId}` }
-                ],
-                [
-                    { text: "🎉 Delivered", callback_data: `status_Delivered_${orderId}` },
-                    { text: "❌ Cancel", callback_data: `status_Cancel_${orderId}` }
-                ]
-            ]
-        }
-    };
-
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(telegramPayload)
-    }).catch(err => console.log('Telegram Error:', err));
-
-    // 2. Google Sheets Par Data Bhejna
-    try {
-        const formData = new URLSearchParams();
-        formData.append("orderId", orderId);
-        formData.append("name", name);
-        formData.append("phone", phone);
-        formData.append("item", item);
-        formData.append("time", time);
-        formData.append("status", "Pending");
-
-        await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData.toString()
-        });
-    } catch (err) {
-        console.error('Sheet Error:', err);
-    }
-
-    // 3. Success Modal dikhane ka code
-    const successModal = document.getElementById('successModal');
-    if (successModal) {
-        successModal.style.display = 'block';
-    }
-    
-    const orderForm = document.getElementById('orderForm');
-    if (orderForm) {
-        orderForm.reset();
-    }
-};
-
-
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(telegramPayload)
-    });
-
-    // 2. Online Sheet (Apps Script) Par Data Bhejna (CORS & Form Data fix)
-    try {
-        const formData = new URLSearchParams();
-        formData.append("orderId", orderId);
-        formData.append("name", name);
-        formData.append("phone", phone);
-        formData.append("item", item);
-        formData.append("time", time);
-        formData.append("status", "Pending");
-
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(telegramPayload)
-})
-.then(response => response.json())
-.then(data => {
-    console.log("Telegram Response:", data);
-    if (!data.ok) {
-        alert("Telegram Error: " + data.description);
-    } else {
-        console.log("Message chala gaya!");
-    }
-})
-.catch(err => {
-    console.log("Network Error:", err);
-});
-
-
-    
-</script>
-
-
+ 
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
@@ -660,6 +548,68 @@
         const auth = getAuth(app);
         let secureRecaptchaVerifier = null;
         let secureConfirmationResult = null;
+       window.submitOrder = async () => {
+    const TELEGRAM_BOT_TOKEN = '8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY';
+    const TELEGRAM_CHAT_ID = '7900935815';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec';
+
+    const name = document.getElementById('custName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    const address = document.getElementById('custAddress').value.trim();
+    const paymentMode = document.getElementById('paymentMode').value;
+    const utr = document.getElementById('utrNumber').value.trim();
+
+    if (!name || !phone || !address) {
+        window.showToast("Naam, Phone aur Address bharna zaroori hai!", "error");
+        return;
+    }
+
+    if (cart.length === 0) {
+        window.showToast("Cart khaali hai!", "error");
+        return;
+    }
+
+    if (paymentMode === 'Online' && !utr) {
+        window.showToast("Online payment ke liye 12-digit UTR number daalein!", "error");
+        return;
+    }
+
+    const itemsList = cart.map(i => `• ${i.name} (Qty: ${i.qty || 1}, Price: ₹${i.price})`).join('\n');
+    const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+    const time = new Date().toLocaleString();
+
+    const telegramMsg = `📦 *Naya Order Aaya! (#${orderId})*\n\n👤 *Naam:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${address}\n💳 *Payment Mode:* ${paymentMode}${utr ? `\n🔢 *UTR:* ${utr}` : ''}\n⏰ *Time:* ${time}\n\n🛒 *Items:*\n${itemsList}\n\n💰 *Total Amount:* ₹${cartTotalAmount}`;
+
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: telegramMsg, parse_mode: 'Markdown' })
+    }).catch(err => console.error('Telegram Error:', err));
+
+    try {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, name, phone, address, paymentMode, utr, items: itemsList, total: cartTotalAmount, date: time })
+        });
+    } catch (err) {
+        console.error('Sheet Error:', err);
+    }
+
+    const newOrder = { orderId, date: time, items: [...cart], total: cartTotalAmount, status: "Your order is ready" };
+    let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+    savedOrders.unshift(newOrder);
+    localStorage.setItem(getUserOrdersKey(), JSON.stringify(savedOrders));
+
+    cart = [];
+    localStorage.removeItem(getUserCartKey());
+    document.getElementById('cartCount').innerText = '0';
+    window.toggleCart();
+
+    document.getElementById('successModal').style.display = 'flex';
+    setTimeout(() => { document.getElementById('successModal').style.display = 'none'; }, 3000);
+};
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -2108,8 +2058,27 @@
             }
         };
 
-        // Initialize App Listener
-        listenToProducts();
+        function fetchLiveStatusForAllOrders() {
+            if (typeof currentUser === 'undefined' || !currentUser) return;
+            
+            let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+            if (savedOrders.length === 0) return;
+
+            savedOrders.forEach(async (order) => {
+                try {
+                    console.log("Checking live status for Order ID:", order.id);
+                } catch (err) {
+                    console.error("Status fetch error for " + order.id + ":", err);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof listenToProducts === 'function') {
+                listenToProducts();
+            }
+            fetchLiveStatusForAllOrders();
+        });
     </script>
-</body>    
+</body>
 </html>
