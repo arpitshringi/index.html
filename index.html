@@ -569,19 +569,24 @@
         formData.append("time", time);
         formData.append("status", "Pending");
 
-        await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData.toString()
-        });
-
-        alert('Order successfully submit ho gaya!');
-        document.getElementById('orderForm').reset();
-    } catch (err) {
-        console.error('Sheet Error:', err);
-        alert('Data save karne mein dikkat aayi.');
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(telegramPayload)
+})
+.then(response => response.json())
+.then(data => {
+    console.log("Telegram Response:", data);
+    if (!data.ok) {
+        alert("Telegram Error: " + data.description);
+    } else {
+        console.log("Message chala gaya!");
     }
+})
+.catch(err => {
+    console.log("Network Error:", err);
 });
+
 
     
 </script>
