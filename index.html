@@ -521,41 +521,69 @@
     const TELEGRAM_BOT_TOKEN = '8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY';
     const TELEGRAM_CHAT_ID = '7900935815';
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec';
+   document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const item = document.getElementById('item').value;
+    const time = new Date().toLocaleString();
+    
+    // Unique Order ID generate kar li taaki buttons me kaam aaye
+    const orderId = "ORD" + Math.floor(10000 + Math.random() * 90000);
 
-    document.getElementById('orderForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // 1. Telegram Par Message Bhejta (Buttons ke sath)
+    const message = `📦 *Naya Order Aaya Bhai!* 🚀\n\n🆔 *Order ID:* #${orderId}\n👤 *Naam:* ${name}\n📞 *Phone:* ${phone}\n🛒 *Items:* ${item}\n⏰ *Time:* ${time}`;
 
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const item = document.getElementById('item').value;
-        const time = new Date().toLocaleString();
+    const telegramPayload = {
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'Markdown',
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    { text: "✅ Accept Order", callback_data: `status_Accept_${orderId}` },
+                    { text: "🚚 Dispatch", callback_data: `status_Dispatch_${orderId}` }
+                ],
+                [
+                    { text: "🎉 Delivered", callback_data: `status_Delivered_${orderId}` },
+                    { text: "❌ Cancel", callback_data: `status_Cancel_${orderId}` }
+                ]
+            ]
+        }
+    };
 
-        const orderData = { name, phone, item, time };
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(telegramPayload)
+    });
 
-        // 1. Telegram Par Message Bhejna
-        const message = `📦 *Naya Order Aaya!*\n\n👤 *Naam:* ${name}\n📞 *Phone:* ${phone}\n🛒 *Item:* ${item}\n⏰ *Time:* ${time}`;
-        
-        fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    // 2. Online Sheet (Apps Script) Par Data Bhejna (CORS & Form Data fix)
+    try {
+        const formData = new URLSearchParams();
+        formData.append("orderId", orderId);
+        formData.append("name", name);
+        formData.append("phone", phone);
+        formData.append("item", item);
+        formData.append("time", time);
+        formData.append("status", "Pending");
+
+        await fetch(APPS_SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
         });
 
-        // 2. Online Sheet (Apps Script) Par Data Bhejna
-        try {
-            await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            });
-            alert('Order successfully submit ho gaya!');
-            document.getElementById('orderForm').reset();
-        } catch (err) {
-            console.error('Sheet Error:', err);
-            alert('Data save karne mein dikkat aayi.');
-        }
-    });
+        alert('Order successfully submit ho gaya!');
+        document.getElementById('orderForm').reset();
+    } catch (err) {
+        console.error('Sheet Error:', err);
+        alert('Data save karne mein dikkat aayi.');
+    }
+});
+
+    
 </script>
 
 
