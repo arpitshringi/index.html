@@ -497,9 +497,7 @@
                     <option value="COD">Cash on Delivery</option>
                     <option value="Online">Online Payment (UPI / QR)</option>
                 </select>
-                const TELEGRAM_BOT_TOKEN = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
-               const TELEGRAM_CHAT_ID = "7900935815";
-
+                
                 <div id="onlinePaymentSection">
                     <h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
                     
@@ -519,6 +517,46 @@
             </div>
         </div>
     </div>
+   <script>
+async function submitOrder() {
+  const TELEGRAM_BOT_TOKEN = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
+  const TELEGRAM_CHAT_ID = "7900935815";
+
+  const name = document.getElementById("name")?.value || "N/A";
+  const phone = document.getElementById("phone")?.value || "N/A";
+  const address = document.getElementById("address")?.value || "N/A";
+
+  const orderMessage = `📦 *new order!*
+
+👤 *नाम:* ${name}
+📞 *फोन:* ${phone}
+📍 *पता:* ${address}`;
+
+  const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+  try {
+    const response = await fetch(telegramUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: orderMessage,
+        parse_mode: "Markdown"
+      })
+    });
+
+    if (response.ok) {
+      alert("ऑर्डर सफलतापूर्वक टेलीग्राम पर भेज दिया गया है!");
+    } else {
+      alert("ऑर्डर भेजने में समस्या आई।");
+    }
+  } catch (error) {
+    console.error("Telegram API Error:", error);
+  }
+}
+</script>
 
     <!-- Success Modal -->
     <div class="modal" id="successModal">
