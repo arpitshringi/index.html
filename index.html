@@ -173,7 +173,6 @@
         .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; }
         .detail-slider::-webkit-scrollbar { display: none; }
         .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
-        .detail-slider.zoomed { transform: scale(1.4); z-index: 10; }
         
         .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
         .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
@@ -532,7 +531,6 @@
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-        // FIREBASE CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
             authDomain: "arpit-store.firebaseapp.com",
@@ -546,8 +544,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        let secureRecaptchaVerifier = null;
-        let secureConfirmationResult = null;
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -634,6 +630,9 @@
         document.addEventListener('gesturechange', (e) => e.preventDefault());
         document.addEventListener('gestureend', (e) => e.preventDefault());
 
+        let secureRecaptchaVerifier = null;
+        let secureConfirmationResult = null;
+
         // --- FIREBASE AUTHENTICATION HANDLERS ---
         window.showPhoneOtpLogin = () => {
             const section = document.querySelector('.secure-auth-section');
@@ -713,13 +712,7 @@
                 secureRecaptchaVerifier = new RecaptchaVerifier(auth, 'secureRecaptchaContainer', { 
                     'size': 'invisible',
                     'callback': (response) => {
-                        console.log("reCAPTCHA solved");
-                    },
-                    'expired-callback': () => {
-                        if (secureRecaptchaVerifier) {
-                            try { secureRecaptchaVerifier.clear(); } catch(e){}
-                            secureRecaptchaVerifier = null;
-                        }
+                        console.log("reCAPTCHA resolved");
                     }
                 });
             }
@@ -731,31 +724,21 @@
             if (rawPhone.length < 10) { window.showToast('Valid 10-digit mobile number bharein.', 'error'); return; }
             const phoneNumber = '+91' + rawPhone.slice(-10);
             
-            try {
-                const appVerifier = window.setupSecureRecaptcha();
-                signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-                    .then(result => {
-                        secureConfirmationResult = result;
-                        document.getElementById('secureOtpStepOne').style.display = 'none';
-                        document.getElementById('secureOtpStepTwo').style.display = 'block';
-                        window.showToast('OTP SMS se bhej diya gaya hai.');
-                    })
-                    .catch(error => {
-                        console.error("OTP Send Error:", error);
-                        if (secureRecaptchaVerifier) { 
-                            try { secureRecaptchaVerifier.clear(); } catch(e){}
-                            secureRecaptchaVerifier = null; 
-                        }
-                        window.showToast('OTP send error: ' + error.message, 'error');
-                    });
-            } catch(err) {
-                console.error("Recaptcha init error:", err);
-                if (secureRecaptchaVerifier) { 
-                    try { secureRecaptchaVerifier.clear(); } catch(e){}
-                    secureRecaptchaVerifier = null; 
-                }
-                window.showToast('reCAPTCHA reset kiya. Dobara Get OTP dabein.', 'error');
-            }
+            const appVerifier = window.setupSecureRecaptcha();
+            signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+                .then(result => {
+                    secureConfirmationResult = result;
+                    document.getElementById('secureOtpStepOne').style.display = 'none';
+                    document.getElementById('secureOtpStepTwo').style.display = 'block';
+                    window.showToast('OTP SMS se bhej diya gaya hai.');
+                })
+                .catch(error => {
+                    if (secureRecaptchaVerifier) { 
+                        secureRecaptchaVerifier.clear(); 
+                        secureRecaptchaVerifier = null; 
+                    }
+                    window.showToast('OTP send error: ' + error.message, 'error');
+                });
         };
 
         window.verifySecureOTP = () => {
@@ -1443,3 +1426,507 @@
                 grid.innerHTML += `
                     <div class="card" onclick="window.showProductDetail('${p.id}')">
                         <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</div>
+                        ${mediaHtml}
+                        <div>
+                            <small>${categoryTag}</small>
+                            <h3>${p.name}</h3>
+                            ${priceHtml}
+                        </div>
+                        <button class="add-btn" onclick="event.stopPropagation(); window.showProductDetail('${p.id}')">Select Options</button>
+                    </div>
+                `;
+            });
+        }
+
+        function renderOrdersUI() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            if (!currentUser) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login 🚀</button></div>';
+                return;
+            }
+
+            let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+            if(savedOrders.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
+                return;
+            }
+
+            savedOrders.forEach(ord => {
+                let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
+                ord.items.forEach(it => {
+                    let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
+                    if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
+                    
+                    let variantTxt = '';
+                    if (it.selectedColor || it.selectedSize) {
+                        variantTxt = `<div style="color:#cbd5e1; font-size:11px; display:flex; gap:6px; align-items:center; margin-top:2px;">`;
+                        if (it.selectedColor) variantTxt += `<span style="background:rgba(56,189,248,0.2); padding:1px 5px; border-radius:4px;">🎨 ${it.selectedColor}</span>`;
+                        if (it.selectedSize) variantTxt += `<span style="background:rgba(244,63,94,0.2); padding:1px 5px; border-radius:4px;">📏 ${it.selectedSize}</span>`;
+                        variantTxt += `</div>`;
+                    }
+                    
+                    itemsListHtml += `
+                        <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
+                                <div>
+                                    <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
+                                    ${variantTxt}
+                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold; margin-top:2px;">₹${it.price}</div>
+                                </div>
+                            </div>
+                            <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Buy Again 🔄</button>
+                        </li>
+                    `;
+                });
+                itemsListHtml += '</ul>';
+
+                let subText = "Hi, your order is ready";
+                let badgeBg = '#0284c7';
+                if (ord.status === "Your order on the way") { badgeBg = '#eab308'; subText = "Order on the way! 🚚"; }
+                else if (ord.status === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
+                else if (ord.status === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
+
+                grid.innerHTML += `
+                    <div class="order-card" style="grid-column: 1/-1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span class="order-status-badge" style="background: ${badgeBg}; margin: 0;">${ord.status}</span>
+                            <span style="color:#38bdf8; font-size:13px; font-weight:bold;">${subText}</span>
+                        </div>
+                        <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
+                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date & Time: ${ord.date}</p>
+                        ${itemsListHtml}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
+                            <span style="color:#94a3b8; font-size:14px;">Total Paid:</span>
+                            <span style="color:#38bdf8; font-weight:bold; font-size:18px;">₹${ord.total}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function fetchLiveStatusForAllOrders() {
+            if (!navigator.onLine || !currentUser) return;
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            if (savedOrders.length === 0) return;
+            
+            let statusChanged = false;
+            let fetchPromises = savedOrders.map((ord, index) => {
+                let cleanId = ord.orderId.toString().replace('#', '').trim();
+                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.status && data.status !== ord.status) {
+                            savedOrders[index].status = data.status;
+                            statusChanged = true;
+                        }
+                    }).catch(err => console.log("Status error:", err));
+            });
+            
+            Promise.all(fetchPromises).then(() => {
+                if(statusChanged) {
+                    localStorage.setItem(key, JSON.stringify(savedOrders));
+                    if(currentCategory === 'MyOrders') renderOrdersUI();
+                }
+            });
+        }
+
+        window.updateGalleryImages = function(colorName) {
+            if (!currentProduct) return;
+
+            let currentImages = [];
+            const selectedColorData = (currentProduct.colors && Array.isArray(currentProduct.colors)) 
+                ? currentProduct.colors.find(c => (typeof c === 'object' ? c.name : c) === colorName) 
+                : null;
+
+            if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
+                let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
+                currentImages = imgs.map(url => formatMediaUrl(url));
+            } else if (currentProduct.variants && Array.isArray(currentProduct.variants)) {
+                const variantData = currentProduct.variants.find(v => v.color === colorName);
+                if (variantData && variantData.image) {
+                    currentImages = [formatMediaUrl(variantData.image)];
+                }
+            }
+
+            if (currentImages.length === 0 && currentProduct.media) {
+                currentImages = currentProduct.media.map(url => formatMediaUrl(url));
+            }
+
+            const slider = document.getElementById('detailSlider');
+            if (slider && currentImages.length > 0) {
+                slider.innerHTML = '';
+                currentImages.forEach(imgUrl => {
+                    slider.innerHTML += `<img src="${imgUrl}" class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
+                });
+            }
+        };
+
+        window.showProductDetail = (productId) => {
+            const product = liveProducts.find(p => p.id === productId);
+            if (!product) return;
+            currentProduct = product;
+            
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('detailView').style.display = 'block';
+            window.scrollTo(0, 0);
+
+            selectedColor = product.colors && product.colors.length > 0 
+                ? (typeof product.colors[0] === 'object' ? product.colors[0].name : product.colors[0]) 
+                : (product.variants && product.variants.length > 0 ? product.variants[0].color : "");
+
+            selectedSize = product.sizes && product.sizes.length > 0 ? product.sizes[0] : "";
+
+            let colorHtml = '';
+            if (product.colors && product.colors.length > 0) {
+                colorHtml += `<div class="variant-section"><div class="variant-title">🎨 Select Color: <span id="selectedColorLabel">${selectedColor}</span></div><div class="color-options">`;
+                product.colors.forEach(c => {
+                    let cName = typeof c === 'object' ? c.name : c;
+                    let cHex = typeof c === 'object' ? (c.hex || c.code || '#38bdf8') : '#38bdf8';
+                    let cImg = typeof c === 'object' && c.image ? formatMediaUrl(Array.isArray(c.image) ? c.image[0] : c.image) : '';
+                    let activeClass = selectedColor === cName ? 'active' : '';
+
+                    if (cImg) {
+                        colorHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectProductColor('${cName}')" title="${cName}">`;
+                    } else {
+                        colorHtml += `<button class="size-btn ${activeClass}" style="background:${cHex}; width:40px; height:40px; border-radius:50%; padding:0;" onclick="window.selectProductColor('${cName}')" title="${cName}"></button>`;
+                    }
+                });
+                colorHtml += `</div></div>`;
+            }
+
+            let sizeHtml = '';
+            if (product.sizes && product.sizes.length > 0) {
+                sizeHtml += `<div class="variant-section"><div class="variant-title">📏 Select Size: <span id="selectedSizeLabel">${selectedSize}</span></div><div class="size-options">`;
+                product.sizes.forEach(s => {
+                    let activeClass = selectedSize === s ? 'active' : '';
+                    sizeHtml += `<button class="size-btn ${activeClass}" onclick="window.selectProductSize('${s}')">${s}</button>`;
+                });
+                sizeHtml += `</div></div>`;
+            }
+
+            let mediaHtml = '<div class="detail-slider" id="detailSlider">';
+            if (product.media && product.media.length > 0) {
+                product.media.forEach(rawLink => {
+                    let link = formatMediaUrl(rawLink);
+                    mediaHtml += `<img src="${link}" class="detail-slide-item" onclick="window.openZoomModal('${link}')" onerror="this.src='https://via.placeholder.com/400x350?text=Image+Error'">`;
+                });
+            } else {
+                mediaHtml += `<img src="https://via.placeholder.com/400x350?text=No+Image" class="detail-slide-item">`;
+            }
+            mediaHtml += '</div>';
+
+            let sellingPrice = Number(product.price) || 0;
+            let mrpPrice = Number(product.mrp) || 0;
+            let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 22px; margin-bottom: 12px;">₹${sellingPrice}</p>`;
+            if (mrpPrice > sellingPrice) {
+                let offAmount = mrpPrice - sellingPrice;
+                let offPercent = Math.round((offAmount / mrpPrice) * 100);
+                priceHtml = `
+                    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span style="font-weight: 800; color: #38bdf8; font-size: 22px;">₹${sellingPrice}</span>
+                        <span style="color: #94a3b8; font-size: 14px; text-decoration: line-through;">₹${mrpPrice}</span>
+                        <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">
+                            ${offPercent}% OFF (Save ₹${offAmount})
+                        </span>
+                    </div>
+                `;
+            }
+
+            let isLiked = watchlist.includes(product.id);
+            let heartIcon = isLiked ? '❤️' : '🤍';
+
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <h2 style="color: white; font-size: 20px; margin-bottom: 8px;">${product.name}</h2>
+                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${product.id}', event)">${heartIcon}</button>
+                </div>
+                <small style="color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 10px;">${product.category || 'General'}</small>
+                ${mediaHtml}
+                ${priceHtml}
+                ${colorHtml}
+                ${sizeHtml}
+                <div style="margin: 15px 0;">
+                    <h4 style="color: #f8fafc; font-size: 14px; margin-bottom: 5px;">Product Description:</h4>
+                    <p style="color: #cbd5e1; font-size: 13px; line-height: 1.6;">${product.description || 'No description available.'}</p>
+                </div>
+                <button class="pay-btn" onclick="window.addToCartFromDetail('${product.id}')" style="margin-top: 15px;">Add to Cart 🛒</button>
+            `;
+            pushNavState('detail');
+        };
+
+        window.selectProductColor = (colorName) => {
+            selectedColor = colorName;
+            document.getElementById('selectedColorLabel').innerText = colorName;
+            document.querySelectorAll('.color-options .color-thumb, .color-options .size-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            updateGalleryImages(colorName);
+        };
+
+        window.selectProductSize = (sizeName) => {
+            selectedSize = sizeName;
+            document.getElementById('selectedSizeLabel').innerText = sizeName;
+            document.querySelectorAll('.size-options .size-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        };
+
+        window.addToCartFromDetail = (productId) => {
+            const product = liveProducts.find(p => p.id === productId);
+            if(!product) return;
+            
+            const cartItem = {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                media: product.media,
+                selectedColor: selectedColor || '',
+                selectedSize: selectedSize || '',
+                qty: 1
+            };
+
+            let existingIndex = cart.findIndex(item => item.id === product.id && item.selectedColor === cartItem.selectedColor && item.selectedSize === cartItem.selectedSize);
+            if(existingIndex >= 0) {
+                cart[existingIndex].qty += 1;
+            } else {
+                cart.push(cartItem);
+            }
+
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            window.showToast("Product added to Cart! 🛒");
+        };
+
+        window.toggleCart = () => {
+            const modal = document.getElementById('cartModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                renderCartUI();
+                pushNavState('cart');
+            } else if (history.state && history.state.appNav === 'cart') {
+                history.back();
+            }
+        };
+
+        function renderCartUI() {
+            const listDiv = document.getElementById('cartList');
+            listDiv.innerHTML = '';
+            if(cart.length === 0) {
+                listDiv.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
+                document.getElementById('qrTotal').innerText = '0';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                let itemTotal = Number(item.price) * item.qty;
+                total += itemTotal;
+                let imgUrl = item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/55?text=Img';
+                
+                let variantStr = '';
+                if (item.selectedColor) variantStr += `Color: ${item.selectedColor} `;
+                if (item.selectedSize) variantStr += `Size: ${item.selectedSize}`;
+
+                listDiv.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${imgUrl}" class="cart-item-img">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>₹${item.price} x ${item.qty} = ₹${itemTotal}</p>
+                            ${variantStr ? `<small style="color:#94a3b8; font-size:11px;">${variantStr}</small>` : ''}
+                            <div class="qty-controls">
+                                <button onclick="window.changeCartQty(${index}, -1)">-</button>
+                                <span>${item.qty}</span>
+                                <button onclick="window.changeCartQty(${index}, 1)">+</button>
+                            </div>
+                        </div>
+                        <button class="remove-btn" onclick="window.removeFromCart(${index})">Remove</button>
+                    </div>
+                `;
+            });
+
+            cartTotalAmount = total;
+            document.getElementById('qrTotal').innerText = total;
+
+            if (currentUser) {
+                document.getElementById('custName').value = currentUser.name;
+                document.getElementById('custPhone').value = currentUser.phone;
+                
+                const addrSelect = document.getElementById('checkoutAddressSelect');
+                if (currentUser.addresses && currentUser.addresses.length > 0) {
+                    document.getElementById('checkoutAddressSection').style.display = 'block';
+                    addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                    currentUser.addresses.forEach(addr => {
+                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
+                    });
+                } else {
+                    document.getElementById('checkoutAddressSection').style.display = 'none';
+                }
+            } else {
+                document.getElementById('custName').value = 'Guest Customer';
+                document.getElementById('custPhone').value = '9999999999';
+                document.getElementById('checkoutAddressSection').style.display = 'none';
+            }
+        }
+
+        window.changeCartQty = (index, delta) => {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            renderCartUI();
+        };
+
+        window.removeFromCart = (index) => {
+            cart.splice(index, 1);
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+            renderCartUI();
+            window.showToast("Item removed from cart.");
+        };
+
+        window.handleCheckoutAddressSelect = () => {
+            const select = document.getElementById('checkoutAddressSelect');
+            const addrTextArea = document.getElementById('custAddress');
+            if (select.value) {
+                addrTextArea.value = select.value;
+            }
+        };
+
+        window.handlePaymentMode = () => {
+            const mode = document.getElementById('paymentMode').value;
+            const onlineSection = document.getElementById('onlinePaymentSection');
+            if (mode === 'Online') {
+                onlineSection.style.display = 'block';
+                let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiLink;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
+            } else {
+                onlineSection.style.display = 'none';
+            }
+        };
+
+        window.submitOrder = () => {
+            if (cart.length === 0) {
+                window.showToast("Aapka cart khaali hai!", "error");
+                return;
+            }
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const paymentMode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber').value.trim();
+
+            if (!address) {
+                window.showToast("Delivery address bharna zaroori hai!", "error");
+                return;
+            }
+
+            if (paymentMode === 'Online' && !utr) {
+                window.showToast("Online payment ke baad 12-digit UTR number daalna zaroori hai!", "error");
+                return;
+            }
+
+            const orderId = 'AS' + Math.floor(100000 + Math.random() * 900000);
+            const orderData = {
+                orderId: orderId,
+                customerName: name,
+                phone: phone,
+                address: address,
+                paymentMode: paymentMode,
+                utr: utr || 'COD',
+                total: cartTotalAmount,
+                items: [...cart],
+                status: 'Order Placed',
+                date: new Date().toLocaleString()
+            };
+
+            let ordersKey = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(ordersKey)) || [];
+            savedOrders.unshift(orderData);
+            localStorage.setItem(ordersKey, JSON.stringify(savedOrders));
+
+            // Submit to Google Sheets if configured
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            }).catch(err => console.log('Sheet sync error:', err));
+
+            cart = [];
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = '0';
+            document.getElementById('cartModal').style.display = 'none';
+            
+            const successModal = document.getElementById('successModal');
+            successModal.style.display = 'flex';
+            setTimeout(() => {
+                successModal.style.display = 'none';
+                window.showMyOrders();
+            }, 2000);
+        };
+
+        window.openPolicy = (type) => {
+            const modal = document.getElementById('policyModal');
+            const titleEl = document.getElementById('policyModalTitle');
+            const bodyEl = document.getElementById('policyModalBody');
+            modal.classList.add('open');
+
+            if (type === 'privacy') {
+                titleEl.innerText = 'Privacy Policy';
+                bodyEl.innerHTML = `
+                    <h4>Privacy Policy</h4>
+                    <p>Arpit Store respects your privacy. We collect minimal information such as your name, phone number, and delivery address solely for order fulfillment and customer support purposes.</p>
+                    <p>We do not sell, rent, or share your personal data with third parties except for payment verification and logistics delivery.</p>
+                `;
+            } else if (type === 'terms') {
+                titleEl.innerText = 'Terms & Conditions';
+                bodyEl.innerText = 'Welcome to Arpit Store. By accessing our platform and placing orders, you agree to comply with our shipping, return, and payment terms.';
+            } else if (type === 'refund') {
+                titleEl.innerText = 'Refund & Return Policy';
+                bodyEl.innerHTML = `
+                    <h4>Easy Return & Refund Policy</h4>
+                    <p>We offer hassle-free returns on eligible products (such as sarees and beauty products) within 7 days of delivery. For Saree combo offers, you can keep your favorite piece and return the rest absolutely free.</p>
+                `;
+            } else if (type === 'shipping') {
+                titleEl.innerText = 'Shipping Policy';
+                bodyEl.innerText = 'We provide fast and free shipping across India. Orders are typically processed and dispatched within 24-48 hours.';
+            } else if (type === 'contact') {
+                titleEl.innerText = 'About Arpit Store';
+                bodyEl.innerHTML = `
+                    <h4>About Us</h4>
+                    <p>Arpit Store brings you premium quality sarees, ethnic wear, and beauty products. Customer satisfaction is our top priority.</p>
+                    <p><strong>Contact Support:</strong> +91 7665913393<br><strong>Location:</strong> Rajasthan, India</p>
+                `;
+            }
+        };
+
+        window.closePolicyModal = () => {
+            document.getElementById('policyModal').classList.remove('open');
+        };
+
+        window.checkSharedLink = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (productId) {
+                const checkExist = setInterval(() => {
+                    if (liveProducts.length > 0) {
+                        clearInterval(checkExist);
+                        window.showProductDetail(productId);
+                    }
+                }, 100);
+            }
+        };
+
+        listenToProducts();
+        window.checkNetworkStatus();
+    </script>
+</body>
+</html>
