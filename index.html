@@ -1927,47 +1927,7 @@
 
         listenToProducts();
         window.checkNetworkStatus();
-                else if (sortVal === 'name') {
-            filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-        }
-        
-        const grid = document.getElementById('productGrid');
-        if (!grid) return;
-        grid.innerHTML = '';
-        
-        if (filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">Koi products nahi mile! 😕</div>`;
-            return;
-        }
-
-        filtered.forEach(p => {
-            let mediaHtml = '';
-            let images = p.images || (p.image ? [p.image] : []);
-            if (images.length === 0) images = ['https://via.placeholder.com/300'];
-            
-            images.forEach(img => {
-                mediaHtml += `<img src="${formatMediaUrl(img)}" class="slide-item" alt="${p.name}" loading="lazy">`;
-            });
-
-            let isLiked = watchlist.includes(p.id);
-
-            grid.innerHTML += `
-                <div class="card" onclick="window.openProductDetail('${p.id}')">
-                    <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${isLiked ? '❤️' : '🤍'}</div>
-                    <div class="media-slider">${mediaHtml}</div>
-                    <small>${p.category || 'General'}</small>
-                    <h3>${p.name}</h3>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="color: #38bdf8; font-weight: 800; font-size: 16px;">₹${p.price}</span>
-                        <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${p.oldPrice || Number(p.price) + 500}</span>
-                    </div>
-                    <button class="add-btn" onclick="window.quickAddToCart('${p.id}', event)">Add to Cart 🛒</button>
-                </div>
-            `;
-        });
-    };
-
-    // --- QUICK ADD TO CART ---
+        // --- QUICK ADD TO CART ---
     window.quickAddToCart = (id, event) => {
         if(event) event.stopPropagation();
         const p = liveProducts.find(item => item.id === id);
@@ -1979,7 +1939,10 @@
             cart.push({ ...p, qty: 1 });
         }
         localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-        document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+        const cartCountEl = document.getElementById('cartCount');
+        if(cartCountEl) {
+            cartCountEl.innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+        }
         window.showToast("Added to Cart! 🛒");
     };
 
@@ -1993,7 +1956,7 @@
         const phone = document.getElementById('custPhone').value.trim();
         const address = document.getElementById('custAddress').value.trim();
         const paymentMode = document.getElementById('paymentMode').value;
-        const utr = document.getElementById('utrNumber').value.trim();
+        const utr = document.getElementById('utrNumber') ? document.getElementById('utrNumber').value.trim() : '';
 
         if (!name || !phone || !address) {
             window.showToast("Kripya naam, phone aur address bharein!", "error");
@@ -2023,21 +1986,26 @@
         };
 
         // 1. Save in App (LocalStorage & Orders View)
-        let myOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+        let myOrders = [];
+        try {
+            myOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+        } catch(e) {}
         myOrders.unshift(orderData);
         localStorage.setItem(getUserOrdersKey(), JSON.stringify(myOrders));
 
-        // 2. Send to Google Sheets (Excel) via Apps Script
+        // 2. Send to Google Sheets (Excel)
         try {
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            }).catch(err => console.log('Google sheet sync error:', err));
+            if (typeof GOOGLE_SCRIPT_URL !== 'undefined') {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                }).catch(err => console.log('Sheet error:', err));
+            }
         } catch (e) {}
 
-        // 3. Send Notification to Telegram (using your Bot Token & Chat ID)
+        // 3. Send Notification to Telegram
         const botToken = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
         const chatId = "7900935815";
         
@@ -2070,14 +2038,23 @@
         // Reset Cart & Show Success
         cart = [];
         localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-        document.getElementById('cartCount').innerText = '0';
-        document.getElementById('cartModal').style.display = 'none';
-        document.getElementById('successModal').style.display = 'flex';
-        setTimeout(() => {
-            document.getElementById('successModal').style.display = 'none';
-            window.showMyOrders();
-        }, 2000);
+        
+        const cartCountEl = document.getElementById('cartCount');
+        if(cartCountEl) cartCountEl.innerText = '0';
+        
+        const cartModal = document.getElementById('cartModal');
+        if(cartModal) cartModal.style.display = 'none';
+        
+        const successModal = document.getElementById('successModal');
+        if(successModal) {
+            successModal.style.display = 'flex';
+            setTimeout(() => {
+                successModal.style.display = 'none';
+                if(typeof window.showMyOrders === 'function') window.showMyOrders();
+            }, 2000);
+        }
     };
+
     </script>
 </body>
 </html>
