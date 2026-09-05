@@ -1927,6 +1927,157 @@
 
         listenToProducts();
         window.checkNetworkStatus();
+                else if (sortVal === 'name') {
+            filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+        }
+        
+        const grid = document.getElementById('productGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">Koi products nahi mile! 😕</div>`;
+            return;
+        }
+
+        filtered.forEach(p => {
+            let mediaHtml = '';
+            let images = p.images || (p.image ? [p.image] : []);
+            if (images.length === 0) images = ['https://via.placeholder.com/300'];
+            
+            images.forEach(img => {
+                mediaHtml += `<img src="${formatMediaUrl(img)}" class="slide-item" alt="${p.name}" loading="lazy">`;
+            });
+
+            let isLiked = watchlist.includes(p.id);
+
+            grid.innerHTML += `
+                <div class="card" onclick="window.openProductDetail('${p.id}')">
+                    <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${isLiked ? '❤️' : '🤍'}</div>
+                    <div class="media-slider">${mediaHtml}</div>
+                    <small>${p.category || 'General'}</small>
+                    <h3>${p.name}</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="color: #38bdf8; font-weight: 800; font-size: 16px;">₹${p.price}</span>
+                        <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${p.oldPrice || Number(p.price) + 500}</span>
+                    </div>
+                    <button class="add-btn" onclick="window.quickAddToCart('${p.id}', event)">Add to Cart 🛒</button>
+                </div>
+            `;
+        });
+    };
+
+    // --- QUICK ADD TO CART ---
+    window.quickAddToCart = (id, event) => {
+        if(event) event.stopPropagation();
+        const p = liveProducts.find(item => item.id === id);
+        if(!p) return;
+        const existing = cart.find(item => item.id === id);
+        if(existing) {
+            existing.qty = (Number(existing.qty) || 1) + 1;
+        } else {
+            cart.push({ ...p, qty: 1 });
+        }
+        localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+        document.getElementById('cartCount').innerText = cart.reduce((sum, item) => sum + (Number(item.qty) || 1), 0);
+        window.showToast("Added to Cart! 🛒");
+    };
+
+    // --- ORDER SUBMISSION WITH TELEGRAM, EXCEL & APP SYNC ---
+    window.submitOrder = async () => {
+        if (cart.length === 0) {
+            window.showToast("Aapka cart khali hai!", "error");
+            return;
+        }
+        const name = document.getElementById('custName').value.trim();
+        const phone = document.getElementById('custPhone').value.trim();
+        const address = document.getElementById('custAddress').value.trim();
+        const paymentMode = document.getElementById('paymentMode').value;
+        const utr = document.getElementById('utrNumber').value.trim();
+
+        if (!name || !phone || !address) {
+            window.showToast("Kripya naam, phone aur address bharein!", "error");
+            return;
+        }
+
+        if (paymentMode === 'Online' && !utr) {
+            window.showToast("Kripya 12-digit UTR / Transaction number dalein!", "error");
+            return;
+        }
+
+        const orderId = 'ARPIT_' + Math.floor(100000 + Math.random() * 900000);
+        const orderDate = new Date().toLocaleString();
+        const totalAmount = cart.reduce((sum, item) => sum + (Number(item.price) * (Number(item.qty) || 1)), 0);
+
+        const orderData = {
+            orderId,
+            date: orderDate,
+            name,
+            phone,
+            address,
+            paymentMode,
+            utr: utr || 'COD',
+            items: cart,
+            total: totalAmount,
+            status: 'Order Placed'
+        };
+
+        // 1. Save in App (LocalStorage & Orders View)
+        let myOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+        myOrders.unshift(orderData);
+        localStorage.setItem(getUserOrdersKey(), JSON.stringify(myOrders));
+
+        // 2. Send to Google Sheets (Excel) via Apps Script
+        try {
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            }).catch(err => console.log('Google sheet sync error:', err));
+        } catch (e) {}
+
+        // 3. Send Notification to Telegram (using your Bot Token & Chat ID)
+        const botToken = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
+        const chatId = "7900935815";
+        
+        let itemsListText = cart.map(item => `• ${item.name} (Qty: ${item.qty || 1}) - ₹${item.price}`).join('\n');
+        
+        let telegramMessage = `🚨 *New Order Received!* 🛍️\n\n` +
+            `🆔 *Order ID:* ${orderId}\n` +
+            `👤 *Name:* ${name}\n` +
+            `📞 *Phone:* ${phone}\n` +
+            `📍 *Address:* ${address}\n` +
+            `💰 *Total:* ₹${totalAmount}\n` +
+            `💳 *Payment:* ${paymentMode} ${paymentMode === 'Online' ? '(UTR: ' + utr + ')' : ''}\n\n` +
+            `📦 *Items:*\n${itemsListText}\n\n` +
+            `⚡ Status: Order Placed`;
+
+        try {
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: telegramMessage,
+                    parse_mode: 'Markdown'
+                })
+            });
+        } catch (err) {
+            console.log('Telegram send error:', err);
+        }
+
+        // Reset Cart & Show Success
+        cart = [];
+        localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+        document.getElementById('cartCount').innerText = '0';
+        document.getElementById('cartModal').style.display = 'none';
+        document.getElementById('successModal').style.display = 'flex';
+        setTimeout(() => {
+            document.getElementById('successModal').style.display = 'none';
+            window.showMyOrders();
+        }, 2000);
+    };
     </script>
 </body>
 </html>
