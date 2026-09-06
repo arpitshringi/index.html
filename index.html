@@ -470,7 +470,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -610,6 +610,15 @@
         document.getElementById('cartCount').innerText = cart.length;
         updateAuthUI();
 
+        // HANDLE GOOGLE REDIRECT LOGIN RESULT (For Mobile App / WebView Compatibility)
+        getRedirectResult(auth).then((result) => {
+            if (result && result.user) {
+                handleSuccessfulAuthUser(result.user);
+            }
+        }).catch((error) => {
+            console.error("Google Redirect Error:", error);
+        });
+
         // CHECK EMAIL LINK LOGIN ON LOAD
         if (isSignInWithEmailLink(auth, window.location.href)) {
             let email = window.localStorage.getItem('emailForSignIn');
@@ -620,32 +629,7 @@
                 .then((result) => {
                     window.localStorage.removeItem('emailForSignIn');
                     window.history.replaceState({}, document.title, window.location.pathname);
-                    
-                    let phone = prompt("Enter your 10-digit Mobile Number for order notifications:", "9876543210");
-                    if (!phone || phone.length !== 10) phone = "9999999999";
-
-                    currentUser = {
-                        name: result.user.displayName || email.split('@')[0],
-                        phone: phone,
-                        email: email,
-                        addresses: []
-                    };
-
-                    let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-                    let existing = registeredUsers.find(u => u.phone === phone);
-                    if (!existing) {
-                        registeredUsers.push(currentUser);
-                        localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-                    } else {
-                        currentUser = existing;
-                    }
-
-                    localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                    syncUserToExcel({ action: 'signup', name: currentUser.name, phone: currentUser.phone, password: 'gmail_link_auth' });
-                    
-                    updateAuthUI();
-                    reloadUserSpecificState();
-                    window.showToast("Gmail Link Login Successful!");
+                    handleSuccessfulAuthUser(result.user);
                 })
                 .catch((error) => {
                     window.showToast("Email link login failed: " + error.message, "error");
@@ -707,7 +691,40 @@
             fetchLiveStatusForAllOrders();
         }
 
-        // Mobile + Password Authentication (Syncs with Excel/Apps Script)
+        // Helper function for user auth completion
+        function handleSuccessfulAuthUser(user) {
+            let phone = prompt("Enter your 10-digit Mobile Number for order notifications:", "9876543210");
+            if (!phone || phone.length !== 10) phone = "9999999999";
+
+            currentUser = {
+                name: user.displayName || (user.email ? user.email.split('@')[0] : "Google User"),
+                phone: phone,
+                email: user.email || "",
+                password: 'google_auth_user',
+                addresses: []
+            };
+
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            let existing = registeredUsers.find(u => u.phone === phone);
+            if (!existing) {
+                registeredUsers.push(currentUser);
+                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+            } else {
+                currentUser = existing;
+            }
+
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+            syncUserToExcel({ action: 'signup', name: currentUser.name, phone: currentUser.phone, password: 'google_auth_user' });
+            
+            if(document.getElementById('authModal').style.display === 'flex') {
+                window.toggleAuthModal();
+            }
+            updateAuthUI();
+            reloadUserSpecificState();
+            window.showToast("Login Successful! 🎉");
+        }
+
+        // Mobile + Password Authentication
         window.submitAuth = () => {
             const phone = document.getElementById('authPhone').value.trim();
             const password = document.getElementById('authPassword').value.trim();
@@ -760,42 +777,26 @@
             }
         };
 
-        // Firebase Google Direct Login
+        // Firebase Google Direct Login (Popup + Redirect Fallback for WebView/App)
         window.handleGoogleLogin = async () => {
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
             try {
-                const provider = new GoogleAuthProvider();
                 const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                let phone = prompt("Enter your 10-digit Mobile Number for order delivery:", "9876543210");
-                if (!phone || phone.length !== 10) {
-                    window.showToast("Valid mobile number is required!", "error");
-                    return;
+                if (result && result.user) {
+                    handleSuccessfulAuthUser(result.user);
                 }
-
-                let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-                let existingUser = registeredUsers.find(u => u.phone === phone);
-
-                if (!existingUser) {
-                    existingUser = { 
-                        name: user.displayName || "Google User", 
-                        phone: phone, 
-                        password: 'google_auth_user', 
-                        addresses: [] 
-                    };
-                    registeredUsers.push(existingUser);
-                    localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-                    syncUserToExcel({ action: 'signup', name: existingUser.name, phone: phone, password: 'google_auth_user' });
-                }
-
-                currentUser = existingUser;
-                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-                window.toggleAuthModal();
-                updateAuthUI();
-                reloadUserSpecificState();
-                window.showToast("Google Login Successful! 🎉");
             } catch (error) {
-                window.showToast("Google Login failed: " + error.message, "error");
+                console.warn("Popup blocked or failed in app/webview, switching to redirect mode:", error);
+                if (error.code === 'auth/popup-blocked' || error.code === 'auth/disallowed-useragent' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/operation-not-supported-in-this-environment') {
+                    try {
+                        await signInWithRedirect(auth, provider);
+                    } catch (redirectError) {
+                        window.showToast("Google Login Error: " + redirectError.message, "error");
+                    }
+                } else {
+                    window.showToast("Google Login failed: " + error.message, "error");
+                }
             }
         };
 
@@ -1244,6 +1245,8 @@
             saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const watchTab = document.getElementById('tab-Watchlist');
             if(watchTab) watchTab.classList.add('active');
@@ -1257,6 +1260,8 @@
             saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const orderTab = document.getElementById('tab-Orders');
             if(orderTab) orderTab.classList.add('active');
@@ -1267,12 +1272,18 @@
             renderOrdersUI();
         };
 
+        // Category selection fix from 3-line menu / tabs
         window.filterCategory = (cat) => {
             saveActiveTab(cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
             if(cat === 'MyOrders') { window.showMyOrders(); return; }
             currentCategory = cat;
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            
+            // Switch back to homeView if inside detailView
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const activeTab = document.getElementById('tab-' + cat);
             if(activeTab) activeTab.classList.add('active');
@@ -1600,15 +1611,18 @@
                     if (typeof c === 'object' && c.image) {
                         let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
                         cImg = formatMediaUrl(imgUrl);
+                    } else if (p.media && p.media.length > 0) {
+                        cImg = formatMediaUrl(p.media[0]);
                     }
-                    let active = idx === 0 ? 'active' : '';
 
+                    let activeClass = (idx === 0) ? 'active' : '';
                     if (cImg) {
-                        variantHtml += `<img src="${cImg}" class="color-thumb ${active}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="color icon">`;
+                        variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="${cName}">`;
                     } else {
-                        variantHtml += `<div class="size-btn ${active}" onclick="window.selectColor('${cName}', this)">🎨 ${cName}</div>`;
+                        variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${cName}', this)">${cName}</button>`;
                     }
                 });
+
                 variantHtml += `</div></div>`;
             }
 
@@ -1618,27 +1632,31 @@
                     <div class="variant-title">📏 Size: <span id="sizeLabel" style="color:#38bdf8">${selectedSize}</span></div>
                     <div class="size-options">`;
                 p.sizes.forEach((s, idx) => {
-                    let active = idx === 0 ? 'active' : '';
-                    variantHtml += `<div class="size-btn ${active}" onclick="window.selectSize('${s}', this)">📏 ${s}</div>`;
+                    let activeClass = (idx === 0) ? 'active' : '';
+                    variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectSize('${s}', this)">${s}</button>`;
                 });
                 variantHtml += `</div></div>`;
             }
 
-            document.getElementById('detailContent').innerHTML = `
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = `
                 <div id="detailSliderContainer"></div>
-                <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                     <div>
-                        <small style="color: #94a3b8; font-size: 12px; text-transform: uppercase;">${categoryTag}</small>
-                        <h2 style="color: white; margin: 0;">${p.name}</h2>
+                        <small style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">${categoryTag}</small>
+                        <h1 style="color: white; font-size: 22px; margin-top: 4px;">${p.name}</h1>
                     </div>
-                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}')">${heartIcon}</button>
+                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
                 </div>
                 ${detailPriceHtml}
                 ${variantHtml}
-                <p style="color: #94a3b8; font-size: 15px; margin: 15px 0; line-height: 1.6;">${p.description || 'Premium quality product.'}</p>
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <button class="add-btn" style="flex:1;" onclick="window.addToCartWithVariants('${p.id}')">Add to Cart 🛒</button>
-                    <button class="pay-btn" style="flex:1; margin-top:0;" onclick="window.buyNowProduct('${p.id}')">Buy Now ⚡</button>
+                <div style="margin: 20px 0; background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
+                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available.'}</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1);" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
+                    <button class="pay-btn" style="flex: 1;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
                 </div>
             `;
 
@@ -1646,227 +1664,271 @@
             window.scrollTo(0, 0);
         };
 
-        window.addToCart = (id) => {
-            window.showProductDetail(id);
-        };
+        window.addToCartDirect = (id) => {
+            const p = liveProducts.find(item => item.id === id);
+            if (!p) return;
 
-        window.addToCartWithVariants = (id) => {
-            if (!currentUser) {
-                window.showToast("Pehle Sign Up / Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
-            const item = liveProducts.find(p => p.id === id);
-            if(!item) return;
-            
-            if (item.sizes && item.sizes.length > 0 && !selectedSize) {
-                window.showToast("Please select a size first!", "error"); return;
-            }
-            if (item.colors && item.colors.length > 0 && !selectedColor) {
-                window.showToast("Please select a color first!", "error"); return;
-            }
+            let cartItem = {
+                id: p.id,
+                name: p.name,
+                price: Number(p.price) || 0,
+                selectedColor: selectedColor || '',
+                selectedSize: selectedSize || '',
+                selectedImage: selectedImage || (p.media && p.media[0] ? p.media[0] : ''),
+                quantity: 1,
+                media: p.media || []
+            };
 
-            let cartItem = { ...item };
-            if (selectedSize) cartItem.selectedSize = selectedSize;
-            if (selectedColor) cartItem.selectedColor = selectedColor;
-            
-            if (selectedImage) {
-                cartItem.media = [selectedImage, ...(item.media || [])];
+            let existingIdx = cart.findIndex(ci => ci.id === p.id && ci.selectedColor === cartItem.selectedColor && ci.selectedSize === cartItem.selectedSize);
+            if (existingIdx > -1) {
+                cart[existingIdx].quantity += 1;
+            } else {
+                cart.push(cartItem);
             }
 
-            cart.push(cartItem);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
-            window.showToast(`${item.name} added to cart!`);
+            window.showToast("Product Cart me add ho gaya hai! 🛒");
         };
 
-        window.buyNowProduct = (id) => {
-            if (!currentUser) {
-                window.showToast("Kripya pehle Sign Up karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
-            window.addToCartWithVariants(id);
+        window.buyNowDirect = (id) => {
+            window.addToCartDirect(id);
             window.toggleCart();
+        };
+
+        window.toggleCart = () => {
+            const modal = document.getElementById('cartModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                renderCartUI();
+                pushNavState('cart');
+            } else if (history.state && history.state.appNav === 'cart') {
+                history.back();
+            }
+        };
+
+        function renderCartUI() {
+            const cartList = document.getElementById('cartList');
+            cartList.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
+                cartTotalAmount = 0;
+            } else {
+                cartTotalAmount = 0;
+                cart.forEach((item, index) => {
+                    let itemTotal = item.price * (item.quantity || 1);
+                    cartTotalAmount += itemTotal;
+                    
+                    let imgUrl = item.selectedImage ? formatMediaUrl(item.selectedImage) : (item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/50');
+                    
+                    let variantTxt = '';
+                    if (item.selectedColor || item.selectedSize) {
+                        variantTxt = `<div style="font-size: 11px; color: #cbd5e1;">${item.selectedColor ? 'Color: ' + item.selectedColor : ''} ${item.selectedSize ? ' | Size: ' + item.selectedSize : ''}</div>`;
+                    }
+
+                    cartList.innerHTML += `
+                        <div class="cart-item">
+                            <img src="${imgUrl}" class="cart-item-img" alt="Cart Product">
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                ${variantTxt}
+                                <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">-</button>
+                                <span style="font-weight: bold; font-size: 13px;">${item.quantity || 1}</span>
+                                <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">+</button>
+                                <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px; padding: 4px 8px;">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('qrTotal').innerText = cartTotalAmount;
+
+            // Fill user details if logged in
+            const nameInput = document.getElementById('custName');
+            const phoneInput = document.getElementById('custPhone');
+            const addressSelectSection = document.getElementById('checkoutAddressSection');
+            const addressSelect = document.getElementById('checkoutAddressSelect');
+
+            if (currentUser) {
+                nameInput.value = currentUser.name || '';
+                phoneInput.value = currentUser.phone || '';
+                
+                if (currentUser.addresses && currentUser.addresses.length > 0) {
+                    addressSelectSection.style.display = 'block';
+                    addressSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
+                    currentUser.addresses.forEach((addr, idx) => {
+                        addressSelect.innerHTML += `<option value="${idx}">📍 ${addr}</option>`;
+                    });
+                } else {
+                    addressSelectSection.style.display = 'none';
+                }
+            } else {
+                nameInput.value = '';
+                phoneInput.value = '';
+                nameInput.readOnly = false;
+                phoneInput.readOnly = false;
+                addressSelectSection.style.display = 'none';
+            }
+
+            window.handlePaymentMode();
+        }
+
+        window.updateCartQuantity = (index, change) => {
+            if (!cart[index]) return;
+            cart[index].quantity = (cart[index].quantity || 1) + change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            renderCartUI();
         };
 
         window.removeFromCart = (index) => {
             cart.splice(index, 1);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
-            window.updateCartUI();
-        };
-
-        window.toggleCart = () => {
-            if (!currentUser) {
-                window.showToast("Cart dekhne ya order karne ke liye Login karein!", "error");
-                window.toggleAuthModal();
-                return;
-            }
-            const modal = document.getElementById('cartModal');
-            const isOpening = modal.style.display !== 'flex';
-            modal.style.display = isOpening ? 'flex' : 'none';
-            if (isOpening) {
-                pushNavState('cart');
-                window.updateCartUI();
-                window.handlePaymentMode();
-            } else if (history.state && history.state.appNav === 'cart') {
-                history.back();
-            }
-        };
-
-        window.updateCartUI = () => {
-            const cartList = document.getElementById('cartList');
-            cartTotalAmount = 0;
-            cartList.innerHTML = '';
-            
-            if(cart.length === 0) {
-                cartList.innerHTML = '<p style="color:#94a3b8; font-size:14px; text-align:center; padding: 20px 0;">Your cart is empty!</p>';
-                document.getElementById('qrTotal').innerText = "0";
-                return;
-            }
-
-            cart.forEach((item, index) => {
-                cartTotalAmount += Number(item.price);
-                
-                let imgUrl = 'https://via.placeholder.com/60?text=No+Img';
-                if (item.media && item.media.length > 0) imgUrl = formatMediaUrl(item.media[0]);
-
-                let variantText = '';
-                if (item.selectedColor || item.selectedSize) {
-                    variantText = `<div style="font-size:12px; color:#cbd5e1; margin-bottom:4px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">`;
-                    if (item.selectedColor) variantText += `<span style="background:rgba(56,189,248,0.2); padding:1px 6px; border-radius:4px; border:1px solid rgba(56,189,248,0.3);">🎨 ${item.selectedColor}</span>`;
-                    if (item.selectedSize) variantText += `<span style="background:rgba(244,63,94,0.2); padding:1px 6px; border-radius:4px; border:1px solid rgba(244,63,94,0.3);">📏 ${item.selectedSize}</span>`;
-                    variantText += `</div>`;
-                }
-
-                cartList.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${imgUrl}" class="cart-item-img" loading="lazy">
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            ${variantText}
-                            <p>₹${item.price}</p>
-                        </div>
-                        <button class="remove-btn" onclick="window.removeFromCart(${index})">🗑 Remove</button>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('qrTotal').innerText = cartTotalAmount;
-
-            if (currentUser) {
-                document.getElementById('custName').value = currentUser.name;
-                document.getElementById('custPhone').value = currentUser.phone;
-                
-                let addrSelect = document.getElementById('checkoutAddressSelect');
-                addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
-                if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    currentUser.addresses.forEach(addr => {
-                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
-                    });
-                    document.getElementById('custAddress').value = currentUser.addresses[0];
-                } else {
-                    document.getElementById('custAddress').value = '';
-                }
-            }
-
-            let upiLink = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
-            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-            document.getElementById('directPayLink').href = upiLink;
+            renderCartUI();
+            window.showToast("Product Cart se hata diya gaya hai.");
         };
 
         window.handleCheckoutAddressSelect = () => {
-            let selectedAddr = document.getElementById('checkoutAddressSelect').value;
-            if (selectedAddr) {
-                document.getElementById('custAddress').value = selectedAddr;
+            const select = document.getElementById('checkoutAddressSelect');
+            const addressTextarea = document.getElementById('custAddress');
+            if (select && currentUser && currentUser.addresses) {
+                const val = select.value;
+                if (val !== '' && currentUser.addresses[val]) {
+                    addressTextarea.value = currentUser.addresses[val];
+                }
             }
         };
 
         window.handlePaymentMode = () => {
-            let mode = document.getElementById('paymentMode').value;
-            let onlineSection = document.getElementById('onlinePaymentSection');
-            onlineSection.style.display = (mode === 'Online') ? 'block' : 'none';
+            const mode = document.getElementById('paymentMode').value;
+            const onlineSec = document.getElementById('onlinePaymentSection');
+            if (mode === 'Online') {
+                onlineSec.style.display = 'block';
+                const upiUrl = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiUrl;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+            } else {
+                onlineSec.style.display = 'none';
+            }
         };
 
         window.submitOrder = () => {
-            const address = document.getElementById('custAddress').value.trim();
-            const paymentMode = document.getElementById('paymentMode').value;
-            const utrNumber = document.getElementById('utrNumber').value.trim();
-
-            if(!address) { window.showToast("Kripya delivery address select ya enter karein!", "error"); return; }
-            if(cart.length === 0) { window.showToast("Cart khaali hai!", "error"); return; }
-            if(paymentMode === 'Online' && utrNumber === "") {
-                window.showToast("Online payment ke liye UTR number daalna zaroori hai.", "error");
+            if (cart.length === 0) {
+                window.showToast("Aapka Cart khaali hai!", "error");
                 return;
             }
 
-            if (currentUser && !currentUser.addresses.includes(address)) {
-                currentUser.addresses.push(address);
-                updateUserDataInStorage();
+            const name = currentUser ? currentUser.name : document.getElementById('custName').value.trim();
+            const phone = currentUser ? currentUser.phone : document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const paymentMode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber').value.trim();
+
+            if (!name || !phone || phone.length !== 10 || !address) {
+                window.showToast("Kripya Naam, 10-digit Phone aur Delivery Address bharein!", "error");
+                return;
             }
 
-            let submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "Processing Order...";
+            if (paymentMode === 'Online' && (!utr || utr.length < 6)) {
+                window.showToast("Online Payment ke liye sahi UTR / Transaction Number daalein!", "error");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
+            submitBtn.innerText = "Order Place ho rha hai...";
 
-            let orderId = Math.floor(100000 + Math.random() * 900000).toString();
-            let now = new Date();
-            let fullDateTime = `${now.toLocaleDateString('en-IN')}, ${now.toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit', hour12: true})}`;
-            
-            let productNames = cart.map(item => {
-                let variantInfo = [];
-                if(item.selectedColor) variantInfo.push(`Color: ${item.selectedColor}`);
-                if(item.selectedSize) variantInfo.push(`Size: ${item.selectedSize}`);
-                let variantStr = variantInfo.length > 0 ? ` (${variantInfo.join(', ')})` : '';
-                return item.name + variantStr;
-            }).join(", ");
+            const orderId = Math.floor(100000 + Math.random() * 900000);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            let payload = {
-                action: "new_order", 
-                orderId: orderId, 
-                name: currentUser.name, 
-                phone: currentUser.phone,
-                address: address + (paymentMode === 'Online' ? ` (UTR: ${utrNumber})` : ''),
-                productName: productNames, 
-                total: cartTotalAmount, 
-                date: fullDateTime
+            const orderPayload = {
+                action: 'order',
+                orderId: orderId,
+                date: dateStr,
+                customerName: name,
+                customerPhone: phone,
+                address: address,
+                paymentMode: paymentMode,
+                utrNumber: paymentMode === 'Online' ? utr : 'COD',
+                totalAmount: cartTotalAmount,
+                items: cart.map(i => ({
+                    id: i.id,
+                    name: i.name,
+                    price: i.price,
+                    quantity: i.quantity || 1,
+                    selectedColor: i.selectedColor || '',
+                    selectedSize: i.selectedSize || '',
+                    media: i.media || []
+                }))
             };
 
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
+                method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(orderPayload)
             }).then(() => {
                 let userOrdersKey = getUserOrdersKey();
                 let savedOrders = JSON.parse(localStorage.getItem(userOrdersKey)) || [];
                 savedOrders.unshift({
-                    orderId: orderId, items: [...cart], total: cartTotalAmount,
-                    date: fullDateTime, status: "Order Confirmed"
+                    orderId: orderId,
+                    date: dateStr,
+                    total: cartTotalAmount,
+                    status: "Order Received",
+                    items: cart
                 });
                 localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
 
-                document.getElementById('cartModal').style.display = 'none';
-                const successModal = document.getElementById('successModal');
-                successModal.style.display = 'flex';
+                // Save new address if unique
+                if (currentUser) {
+                    if (!currentUser.addresses) currentUser.addresses = [];
+                    if (!currentUser.addresses.includes(address)) {
+                        currentUser.addresses.push(address);
+                        updateUserDataInStorage();
+                    }
+                }
 
+                // Clear cart
                 cart = [];
-                localStorage.removeItem(getUserCartKey());
+                localStorage.setItem(getUserCartKey(), JSON.stringify([]));
                 document.getElementById('cartCount').innerText = '0';
 
-                setTimeout(() => { successModal.style.display = 'none'; window.showMyOrders(); }, 2500);
-            }).catch(error => { 
-                window.showToast("Order failed due to network error.", "error"); 
-            }).finally(() => { submitBtn.innerText = "Confirm & Place Order"; submitBtn.disabled = false; });
+                document.getElementById('cartModal').style.display = 'none';
+                document.getElementById('successModal').style.display = 'flex';
+
+                setTimeout(() => {
+                    document.getElementById('successModal').style.display = 'none';
+                    window.showMyOrders();
+                }, 2000);
+            }).catch(err => {
+                window.showToast("Order submit karne me dikkat aayi. Net connect karein!", "error");
+            }).finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm & Place Order";
+            });
         };
 
-        const APP_VERSION = "3.2";
-        if (localStorage.getItem('installed_app_version') !== APP_VERSION) {
-            localStorage.setItem('installed_app_version', APP_VERSION);
-            if ('caches' in window) caches.keys().then(names => { for (let name of names) caches.delete(name); });
-        }
+        window.checkSharedLink = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (productId && liveProducts.length > 0) {
+                window.showProductDetail(productId);
+            }
+        };
 
-        window.onload = listenToProducts;
+        // START APP LISTENERS
+        listenToProducts();
     </script>
 </body>
 </html>
