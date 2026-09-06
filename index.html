@@ -66,7 +66,7 @@
         /* Header Elements */
         header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-icon { font-size: 24px; cursor: pointer; color: #38bdf8; background: none; border: none; }
+        .menu-icon { font-size: 26px; cursor: pointer; color: #38bdf8; background: none; border: none; padding: 5px; display: inline-block; z-index: 101; touch-action: manipulation; }
         .logo { font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
         
         .header-right { display: flex; align-items: center; gap: 10px; }
@@ -79,7 +79,7 @@
 
         /* Drawer & Overlay */
         .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; overflow-y: auto; }
-        .drawer.open { left: 0; }
+        .drawer.open { left: 0 !important; }
         .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .close-drawer { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: 0.2s; }
         .close-drawer:hover { color: #f8fafc; }
@@ -261,12 +261,12 @@
                 <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
             </div>
 
-            <!-- Firebase Google Direct Login -->
+            <!-- Google Login Option -->
             <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
                 <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
                 Continue with Google
             </button>
-            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR with Mobile Number & Password</div>
+            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR Mobile Number & Password से Login करें</div>
 
             <div id="authFormContainer">
                 <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
@@ -277,7 +277,7 @@
 
             <!-- Firebase Gmail Link / OTP Login Section -->
             <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📧 Or Login with Gmail Link / OTP</div>
+                <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📧 Or Login with Gmail Link</div>
                 <input type="email" id="authEmail" class="input-box" placeholder="Enter Gmail Address">
                 <button class="pay-btn" style="background: linear-gradient(135deg, #0284c7, #6366f1); margin-top:0;" onclick="window.handleEmailLinkLogin()">Send Login Link to Gmail ✉️</button>
             </div>
@@ -316,8 +316,10 @@
         ⚡ Cash on Delivery Available • Fast Shipping - FREE
     </div>
 
-    <!-- Drawer Menu -->
+    <!-- Drawer Menu Overlay -->
     <div class="overlay" id="overlay" onclick="window.toggleDrawer()"></div>
+    
+    <!-- Side Drawer Menu -->
     <div class="drawer" id="drawer">
         <div class="drawer-header">
             <span>Menu</span>
@@ -337,7 +339,7 @@
     <!-- Header -->
     <header>
         <div class="header-left">
-            <button class="menu-icon" onclick="window.toggleDrawer()">☰</button>
+            <button class="menu-icon" onclick="window.toggleDrawer()" aria-label="Open Menu">☰</button>
             <div class="logo" onclick="window.goHome()">Arpit Store</div>
         </div>
         <div class="header-right">
@@ -422,8 +424,8 @@
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
-                <input type="text" id="custName" class="input-box" placeholder="Full Name" readonly>
-                <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number" readonly>
+                <input type="text" id="custName" class="input-box" placeholder="Full Name">
+                <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number">
                 
                 <div id="checkoutAddressSection">
                     <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
@@ -466,7 +468,7 @@
         </div>
     </div>
 
-    <!-- Firebase Integration Module -->
+    <!-- Firebase & Core Engine Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -515,34 +517,13 @@
             let distance = ptrCurrent - ptrStart;
             
             const ptr = document.getElementById('ptrContainer');
-            ptr.style.transform = `translateY(-100%)`;
+            if (ptr) ptr.style.transform = `translateY(-100%)`;
             
             if (distance > 120 && window.scrollY === 0) {
                 window.refreshAppData();
             }
             document.getElementById('ptrText').innerText = "Pull down to refresh ↓";
         });
-
-        // PREVENT PAGE ZOOM GLOBALLY
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1 && !e.target.closest('#imageZoomModal')) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-
-        let lastPageTap = 0;
-        document.addEventListener('touchend', (e) => {
-            if (e.target.closest('#imageZoomModal')) return;
-            const now = new Date().getTime();
-            if (now - lastPageTap <= 300) {
-                e.preventDefault();
-            }
-            lastPageTap = now;
-        }, false);
-
-        document.addEventListener('gesturestart', (e) => e.preventDefault());
-        document.addEventListener('gesturechange', (e) => e.preventDefault());
-        document.addEventListener('gestureend', (e) => e.preventDefault());
 
         // FIREBASE CONFIG & INITIALIZATION
         const firebaseConfig = {
@@ -591,9 +572,9 @@
         let selectedColor = "";
         let selectedColorImg = "";
         let selectedSize = "";
-        let selectedImage = ""; // Main image state variable
+        let selectedImage = "";
 
-        // PINCH ZOOM, DRAG & LIGHTBOX VARIABLES
+        // LIGHTBOX & ZOOM VARIABLES
         let zoomScale = 1;
         let zoomLastScale = 1;
         let zoomStartDistance = 0;
@@ -607,10 +588,11 @@
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
+        // INITIAL UI UPDATE
         document.getElementById('cartCount').innerText = cart.length;
         updateAuthUI();
 
-        // HANDLE GOOGLE REDIRECT LOGIN RESULT (For Mobile App / WebView Compatibility)
+        // HANDLE GOOGLE REDIRECT LOGIN RESULT
         getRedirectResult(auth).then((result) => {
             if (result && result.user) {
                 handleSuccessfulAuthUser(result.user);
@@ -691,7 +673,6 @@
             fetchLiveStatusForAllOrders();
         }
 
-        // Helper function for user auth completion
         function handleSuccessfulAuthUser(user) {
             let phone = prompt("Enter your 10-digit Mobile Number for order notifications:", "9876543210");
             if (!phone || phone.length !== 10) phone = "9999999999";
@@ -777,8 +758,16 @@
             }
         };
 
-        // Firebase Google Direct Login (Popup + Redirect Fallback for WebView/App)
+        // Firebase Google Login WITH WEBVIEW AUTO-FALLBACK FIX
         window.handleGoogleLogin = async () => {
+            const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
+            
+            if (isWebView) {
+                window.showToast("App WebView me Google login Google dwara restricted hai. Kripya Mobile & Password se Sign Up/Login karein!", "error");
+                window.switchAuthTab('signup');
+                return;
+            }
+
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             try {
@@ -787,8 +776,11 @@
                     handleSuccessfulAuthUser(result.user);
                 }
             } catch (error) {
-                console.warn("Popup blocked or failed in app/webview, switching to redirect mode:", error);
-                if (error.code === 'auth/popup-blocked' || error.code === 'auth/disallowed-useragent' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/operation-not-supported-in-this-environment') {
+                console.warn("Popup blocked or failed, switching to redirect mode:", error);
+                if (error.code === 'auth/disallowed-useragent' || isWebView) {
+                    window.showToast("App me Google Login restricted hai. Mobile Number se Sign Up karein!", "error");
+                    window.switchAuthTab('signup');
+                } else if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
                     try {
                         await signInWithRedirect(auth, provider);
                     } catch (redirectError) {
@@ -934,7 +926,7 @@
             document.getElementById('profileModal').style.display = 'none';
             updateAuthUI();
             window.goHome();
-            window.showToast("Logged out successfully! All local data cleared.", "success");
+            window.showToast("Logged out successfully!", "success");
         };
 
         window.checkNetworkStatus = () => {
@@ -1192,14 +1184,21 @@
             if (btn) btn.style.background = isHidden ? 'rgba(56, 189, 248, 0.25)' : 'rgba(30, 41, 59, 0.8)';
         };
 
+        // 3-LINE HAMBURGER MENU DRAWER FIX FOR MOBILE & APP
         window.toggleDrawer = () => {
             const drawer = document.getElementById('drawer');
             const overlay = document.getElementById('overlay');
-            drawer.classList.toggle('open');
+            if (!drawer || !overlay) return;
+            
             const isOpen = drawer.classList.contains('open');
-            overlay.style.display = isOpen ? 'block' : 'none';
-            if(isOpen) pushNavState('drawer');
-            else if (history.state && history.state.appNav === 'drawer') history.back();
+            if (isOpen) {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+                pushNavState('drawer');
+            }
         };
 
         window.goHome = () => {
@@ -1272,7 +1271,6 @@
             renderOrdersUI();
         };
 
-        // Category selection fix from 3-line menu / tabs
         window.filterCategory = (cat) => {
             saveActiveTab(cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
@@ -1280,7 +1278,6 @@
             currentCategory = cat;
             if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
             
-            // Switch back to homeView if inside detailView
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
 
@@ -1504,7 +1501,6 @@
             });
         }
 
-        // --- STRICT COLOR IMAGE FILTERING ENGINE ---
         function updateGalleryImages(colorName) {
             if (!currentProduct) return;
 
@@ -1749,7 +1745,6 @@
 
             document.getElementById('qrTotal').innerText = cartTotalAmount;
 
-            // Fill user details if logged in
             const nameInput = document.getElementById('custName');
             const phoneInput = document.getElementById('custPhone');
             const addressSelectSection = document.getElementById('checkoutAddressSection');
@@ -1771,8 +1766,6 @@
             } else {
                 nameInput.value = '';
                 phoneInput.value = '';
-                nameInput.readOnly = false;
-                phoneInput.readOnly = false;
                 addressSelectSection.style.display = 'none';
             }
 
@@ -1791,144 +1784,125 @@
         };
 
         window.removeFromCart = (index) => {
+            if (!cart[index]) return;
             cart.splice(index, 1);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             renderCartUI();
-            window.showToast("Product Cart se hata diya gaya hai.");
+            window.showToast("Item cart se hata diya gaya hai.");
         };
 
         window.handleCheckoutAddressSelect = () => {
             const select = document.getElementById('checkoutAddressSelect');
-            const addressTextarea = document.getElementById('custAddress');
-            if (select && currentUser && currentUser.addresses) {
-                const val = select.value;
-                if (val !== '' && currentUser.addresses[val]) {
-                    addressTextarea.value = currentUser.addresses[val];
-                }
+            const idx = select.value;
+            if (idx !== "" && currentUser && currentUser.addresses && currentUser.addresses[idx]) {
+                document.getElementById('custAddress').value = currentUser.addresses[idx];
             }
         };
 
         window.handlePaymentMode = () => {
             const mode = document.getElementById('paymentMode').value;
-            const onlineSec = document.getElementById('onlinePaymentSection');
+            const sec = document.getElementById('onlinePaymentSection');
             if (mode === 'Online') {
-                onlineSec.style.display = 'block';
-                const upiUrl = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
-                document.getElementById('directPayLink').href = upiUrl;
-                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+                sec.style.display = 'block';
+                document.getElementById('qrTotal').innerText = cartTotalAmount;
+                const upiLink = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiLink;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
             } else {
-                onlineSec.style.display = 'none';
+                sec.style.display = 'none';
             }
         };
 
         window.submitOrder = () => {
             if (cart.length === 0) {
-                window.showToast("Aapka Cart khaali hai!", "error");
+                window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
 
-            const name = currentUser ? currentUser.name : document.getElementById('custName').value.trim();
-            const phone = currentUser ? currentUser.phone : document.getElementById('custPhone').value.trim();
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            const paymentMode = document.getElementById('paymentMode').value;
+            const mode = document.getElementById('paymentMode').value;
             const utr = document.getElementById('utrNumber').value.trim();
 
             if (!name || !phone || phone.length !== 10 || !address) {
-                window.showToast("Kripya Naam, 10-digit Phone aur Delivery Address bharein!", "error");
+                window.showToast("Kripya Naam, 10-Digit Mobile No. aur Address bharein!", "error");
                 return;
             }
 
-            if (paymentMode === 'Online' && (!utr || utr.length < 6)) {
-                window.showToast("Online Payment ke liye sahi UTR / Transaction Number daalein!", "error");
+            if (mode === 'Online' && (!utr || utr.length < 6)) {
+                window.showToast("Online Payment ke liye sahi UTR Number daalna zaroori hai!", "error");
                 return;
             }
 
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Order Place ho rha hai...";
-
-            const orderId = Math.floor(100000 + Math.random() * 900000);
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-
-            const orderPayload = {
-                action: 'order',
+            const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            const orderObj = {
                 orderId: orderId,
-                date: dateStr,
+                date: new Date().toLocaleString('en-IN'),
+                items: [...cart],
+                total: cartTotalAmount,
+                status: 'Your order is ready',
+                paymentMode: mode,
+                utr: utr || 'N/A',
                 customerName: name,
                 customerPhone: phone,
-                address: address,
-                paymentMode: paymentMode,
-                utrNumber: paymentMode === 'Online' ? utr : 'COD',
-                totalAmount: cartTotalAmount,
-                items: cart.map(i => ({
-                    id: i.id,
-                    name: i.name,
-                    price: i.price,
-                    quantity: i.quantity || 1,
-                    selectedColor: i.selectedColor || '',
-                    selectedSize: i.selectedSize || '',
-                    media: i.media || []
-                }))
+                customerAddress: address
             };
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderPayload)
-            }).then(() => {
-                let userOrdersKey = getUserOrdersKey();
-                let savedOrders = JSON.parse(localStorage.getItem(userOrdersKey)) || [];
-                savedOrders.unshift({
-                    orderId: orderId,
-                    date: dateStr,
-                    total: cartTotalAmount,
-                    status: "Order Received",
-                    items: cart
-                });
-                localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            savedOrders.unshift(orderObj);
+            localStorage.setItem(key, JSON.stringify(savedOrders));
 
-                // Save new address if unique
-                if (currentUser) {
-                    if (!currentUser.addresses) currentUser.addresses = [];
-                    if (!currentUser.addresses.includes(address)) {
-                        currentUser.addresses.push(address);
-                        updateUserDataInStorage();
-                    }
-                }
+            if (navigator.onLine) {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'createOrder',
+                        orderId: orderObj.orderId,
+                        date: orderObj.date,
+                        customerName: name,
+                        customerPhone: phone,
+                        address: address,
+                        totalAmount: cartTotalAmount,
+                        paymentMode: mode,
+                        utrNumber: utr,
+                        items: cart.map(i => `${i.name} (Color: ${i.selectedColor || '-'}, Size: ${i.selectedSize || '-'}, Qty: ${i.quantity || 1})`).join(' | ')
+                    })
+                }).catch(e => console.log("Excel order sync error:", e));
+            }
 
-                // Clear cart
-                cart = [];
-                localStorage.setItem(getUserCartKey(), JSON.stringify([]));
-                document.getElementById('cartCount').innerText = '0';
+            cart = [];
+            localStorage.removeItem(getUserCartKey());
+            document.getElementById('cartCount').innerText = '0';
+            
+            document.getElementById('cartModal').style.display = 'none';
+            const successModal = document.getElementById('successModal');
+            successModal.style.display = 'flex';
 
-                document.getElementById('cartModal').style.display = 'none';
-                document.getElementById('successModal').style.display = 'flex';
-
-                setTimeout(() => {
-                    document.getElementById('successModal').style.display = 'none';
-                    window.showMyOrders();
-                }, 2000);
-            }).catch(err => {
-                window.showToast("Order submit karne me dikkat aayi. Net connect karein!", "error");
-            }).finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Confirm & Place Order";
-            });
+            setTimeout(() => {
+                successModal.style.display = 'none';
+                window.showMyOrders();
+            }, 2000);
         };
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
             if (productId && liveProducts.length > 0) {
-                window.showProductDetail(productId);
+                const p = liveProducts.find(item => item.id === productId);
+                if (p) {
+                    window.showProductDetail(p.id);
+                }
             }
         };
 
-        // START APP LISTENERS
-        listenToProducts();
+        window.addEventListener('DOMContentLoaded', () => {
+            listenToProducts();
+        });
     </script>
 </body>
 </html>
