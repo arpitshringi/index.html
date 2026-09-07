@@ -540,9 +540,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        // Updated Google Apps Script URL
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
-        const TELEGRAM_BOT_TOKEN = "8933617989:AAHcifPIc9E8XX1Jp4njCDrhE9sU4PFiVFY";
-        const TELEGRAM_CHAT_ID = "7900935815";
         const UPI_ID = "7665913393@ptsbi";
 
         let liveProducts = [];
@@ -1406,7 +1405,7 @@
             });
         }
 
-        // RENDER ORDERS UI: Customer app view should only show order status and Cancel button if allowed, no delivery/on-the-way control buttons here!
+        // RENDER ORDERS UI: Customer app view with Cancel button restriction when on the way or delivered
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -1460,9 +1459,9 @@
                 else if (currentStatus === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
                 else if (currentStatus === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
 
-                // Only Cancel button allowed for customer in app if not already delivered or cancelled
+                // Customer cannot cancel if product is on the way, delivered, or already cancelled
                 let cancelBtnHtml = '';
-                if (currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
+                if (currentStatus !== "Your order on the way" && currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
                     cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
                 }
 
@@ -1500,9 +1499,7 @@
                     body: JSON.stringify({
                         action: 'update_status',
                         orderId: ord.orderId,
-                        status: 'Cancel your order',
-                        token: TELEGRAM_BOT_TOKEN,
-                        chatId: TELEGRAM_CHAT_ID
+                        status: 'Cancel your order'
                     })
                 }).catch(e => console.log(e));
 
@@ -1849,7 +1846,7 @@
             }
         };
 
-        // SUBMIT ORDER WITH EXCEL SYNC & TELEGRAM BUTTON CONFIGURATION
+        // Submit Order Function connected to Excel & Telegram via GAS
         window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
@@ -1858,7 +1855,11 @@
             const utr = document.getElementById('utrNumber').value.trim();
 
             if (!name || !phone || !address) {
-                window.showToast("Kripya naam, mobile number aur delivery address saari details bharein!", "error");
+                window.showToast("Kripya apna naam, mobile number aur address bharein!", "error");
+                return;
+            }
+            if (phone.length !== 10) {
+                window.showToast("Kripya sahi 10-digit mobile number daalein!", "error");
                 return;
             }
             if (cart.length === 0) {
@@ -1866,61 +1867,47 @@
                 return;
             }
             if (paymentMode === 'Online' && !utr) {
-                window.showToast("Online payment ke liye 12-digit UTR / Transaction number daalna anivarya hai!", "error");
+                window.showToast("Online payment ke liye UTR / Transaction number daalna zaroori hai!", "error");
                 return;
             }
 
-            let orderId = Math.floor(100000 + Math.random() * 900000);
-            let orderDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-
-            let orderPayload = {
-                action: 'new_order',
+            let orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
+            let orderData = {
                 orderId: orderId,
+                date: new Date().toLocaleString(),
                 name: name,
                 phone: phone,
                 address: address,
-                paymentMode: paymentMode,
-                utr: utr || 'COD',
+                items: [...cart],
                 total: cartTotalAmount,
-                date: orderDate,
-                items: cart,
-                token: TELEGRAM_BOT_TOKEN,
-                chatId: TELEGRAM_CHAT_ID
+                paymentMode: paymentMode,
+                utr: utr || 'N/A',
+                status: 'Hi, your order is ready'
             };
 
-            // Send to Google Apps Script (which handles Excel logging and Telegram message sending with inline status change buttons)
+            // Save to local storage for user orders
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            savedOrders.unshift(orderData);
+            localStorage.setItem(key, JSON.stringify(savedOrders));
+
+            // Send to Google Apps Script (Saves to Excel and forwards to Telegram)
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderPayload)
-            }).then(() => {
-                console.log("Order successfully synced to Excel and Telegram!");
-            }).catch(err => {
-                console.error("Order sync error:", err);
-            });
-
-            // Save order in local history
-            let newOrderObj = {
-                orderId: orderId,
-                date: orderDate,
-                items: [...cart],
-                total: cartTotalAmount,
-                status: "Hi, your order is ready",
-                paymentMode: paymentMode
-            };
-
-            let key = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(newOrderObj);
-            localStorage.setItem(key, JSON.stringify(savedOrders));
+                body: JSON.stringify({
+                    action: 'new_order',
+                    ...orderData
+                })
+            }).catch(err => console.log("Order sync error:", err));
 
             // Clear cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
+            document.getElementById('cartModal').style.display = 'none';
 
-            window.toggleCart();
             const successModal = document.getElementById('successModal');
             successModal.style.display = 'flex';
             setTimeout(() => {
@@ -1929,7 +1916,7 @@
             }, 2000);
         };
 
-        // Initialize application products listener on load
+        // Initialize Firebase Products Listener on Load
         listenToProducts();
     </script>
 </body>
