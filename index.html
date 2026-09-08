@@ -472,7 +472,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithredirect, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -763,19 +763,10 @@
         window.handleGoogleLogin = async () => {
             const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
             
-            if (isWebView) {
-                window.showToast("App WebView me Google login Google dwara restricted hai. Kripya Mobile & Password se Sign Up/Login karein!", "error");
-                window.switchAuthTab('signup');
-                return;
-            }
-
-            const provider = new GoogleAuthProvider();
+           const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             try {
-                const result = await signInWithPopup(auth, provider);
-                if (result && result.user) {
-                    handleSuccessfulAuthUser(result.user);
-                }
+                await signInWithRedirect(auth, provider);
             } catch (error) {
                 console.warn("Popup blocked or failed, switching to redirect mode:", error);
                 if (error.code === 'auth/disallowed-useragent' || isWebView) {
