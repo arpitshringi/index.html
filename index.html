@@ -474,29 +474,6 @@
                import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
                import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ 
-    prompt: 'select_account' 
-});
-
-// 3. Login function
-window.loginWithGoogle = function() {
-    signInWithRedirect(auth, provider).catch((error) => {
-        console.error("Login Error: ", error);
-    });
-};
-
-// 4. Redirect result check (Yeh hamesha auth ke baad aayega)                                                                   
-        getRedirectResult(auth)
-          .then((result) => {
-            if (result && result.user) {
-              console.log("Logged in as: ", result.user.displayName);
-            }
-          }).catch((error) => {
-            console.error("Redirect Error: ", error);
-          });
- 
-
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
         let ptrCurrent = 0;
