@@ -473,14 +473,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        
         import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ 
-    prompt: 'select_account' 
+       const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ 
+       prompt: 'select_account' 
 });
-
-        
 // Window par attach karna zaroori hai taaki HTML onclick se chal sake
 window.loginWithGoogle = function() {
     signInWithRedirect(auth, provider).catch((error) => {
