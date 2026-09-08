@@ -470,32 +470,37 @@
 
     <!-- Firebase & Core Engine Module -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-       
-        const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ 
-       prompt: 'select_account' 
+               import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+               import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+               import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+// 2. Firebase Init (Yeh pehle hona zaroori hai)
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app); 
+
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ 
+    prompt: 'select_account' 
 });
-// Window par attach karna zaroori hai taaki HTML onclick se chal sake
+
+// 3. Login function
 window.loginWithGoogle = function() {
     signInWithRedirect(auth, provider).catch((error) => {
         console.error("Login Error: ", error);
     });
 };
 
-// Redirect hone ke baad result handle karne ke liye
-getRedirectResult(auth)
-  .then((result) => {
-    if (result && result.user) {
-      const user = result.user;
-      console.log("Logged in as: ", user.displayName);
-      // Yahan apna success action ya page redirection laga sakte ho
-    }
-  }).catch((error) => {
-    console.error("Redirect Error: ", error);
-  });
+// 4. Redirect result check (Yeh hamesha auth ke baad aayega)                                                                   
+        getRedirectResult(auth)
+          .then((result) => {
+            if (result && result.user) {
+              console.log("Logged in as: ", result.user.displayName);
+            }
+          }).catch((error) => {
+            console.error("Redirect Error: ", error);
+          });
+ 
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
