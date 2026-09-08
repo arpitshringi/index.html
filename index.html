@@ -473,6 +473,32 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        
+        import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ 
+    prompt: 'select_account' 
+});
+
+        
+// Window par attach karna zaroori hai taaki HTML onclick se chal sake
+window.loginWithGoogle = function() {
+    signInWithRedirect(auth, provider).catch((error) => {
+        console.error("Login Error: ", error);
+    });
+};
+
+// Redirect hone ke baad result handle karne ke liye
+getRedirectResult(auth)
+  .then((result) => {
+    if (result && result.user) {
+      const user = result.user;
+      console.log("Logged in as: ", user.displayName);
+      // Yahan apna success action ya page redirection laga sakte ho
+    }
+  }).catch((error) => {
+    console.error("Redirect Error: ", error);
+  });
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
