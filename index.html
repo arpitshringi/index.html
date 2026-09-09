@@ -1791,25 +1791,21 @@
                 
                 const addrSelect = document.getElementById('checkoutAddressSelect');
                 if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    addrSelect.parentElement.style.display = 'block';
-                    addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
-                    currentUser.addresses.forEach(addr => {
-                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
+                    document.getElementById('checkoutAddressSection').style.display = 'block';
+                    addrSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
+                    currentUser.addresses.forEach(a => {
+                        addrSelect.innerHTML += `<option value="${a}">${a}</option>`;
                     });
                 } else {
-                    addrSelect.parentElement.style.display = 'none';
+                    document.getElementById('checkoutAddressSection').style.display = 'none';
                 }
             } else {
-                const addrSelect = document.getElementById('checkoutAddressSelect');
-                if (addrSelect && addrSelect.parentElement) {
-                    addrSelect.parentElement.style.display = 'none';
-                }
+                document.getElementById('checkoutAddressSection').style.display = 'none';
             }
 
             if (cart.length === 0) {
-                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
+                cartList.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">Aapka cart khaali hai!</p>';
                 cartTotalAmount = 0;
-                handlePaymentMode();
                 return;
             }
 
@@ -1820,120 +1816,131 @@
 
                 let variantText = '';
                 if (item.selectedColor || item.selectedSize) {
-                    variantText = `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">`;
+                    variantText = `<div style="font-size:11px; color:#94a3b8; margin-top:2px;">`;
                     if (item.selectedColor) variantText += `Color: ${item.selectedColor} `;
                     if (item.selectedSize) variantText += `Size: ${item.selectedSize}`;
                     variantText += `</div>`;
                 }
 
-                let imgUrl = item.selectedImage || 'https://via.placeholder.com/55?text=No+Img';
-
                 cartList.innerHTML += `
                     <div class="cart-item">
-                        <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
+                        <img src="${item.selectedImage || 'https://via.placeholder.com/55'}" class="cart-item-img">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
                             ${variantText}
                             <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-weight: bold;">-</button>
-                            <span style="color: white; font-weight: bold; font-size: 14px;">${item.quantity || 1}</span>
-                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-weight: bold;">+</button>
-                            <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px;">✕</button>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background:rgba(255,255,255,0.1); color:white; border:none; width:26px; height:26px; border-radius:6px; cursor:pointer;">-</button>
+                            <span style="color:white; font-weight:bold; font-size:14px;">${item.quantity || 1}</span>
+                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background:rgba(255,255,255,0.1); color:white; border:none; width:26px; height:26px; border-radius:6px; cursor:pointer;">+</button>
+                            <button onclick="window.removeFromCart(${index})" class="remove-btn" style="margin-left:5px;">✕</button>
                         </div>
                     </div>
                 `;
             });
 
-            handlePaymentMode();
+            window.handlePaymentMode();
         }
 
-        // ORDER SUBMIT FUNCTION (SELECTION & SEND TO EXCEL + BOT)
+        // SUBMIT CUSTOMER ORDER FUNCTION (POST TO APPS SCRIPT)
         window.submitOrder = () => {
-            if (cart.length === 0) {
-                window.showToast("Aapka cart khaali hai! Pehle product add karein.", "error");
-                return;
-            }
-
-            const custName = document.getElementById('custName').value.trim();
-            const custPhone = document.getElementById('custPhone').value.trim();
-            const custAddress = document.getElementById('custAddress').value.trim();
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
             const paymentMode = document.getElementById('paymentMode').value;
-            const utrNumber = document.getElementById('utrNumber') ? document.getElementById('utrNumber').value.trim() : '';
+            const utr = document.getElementById('utrNumber').value.trim();
 
-            if (!custName || !custPhone || custPhone.length !== 10 || !custAddress) {
-                window.showToast("Kripya Naam, 10-digit Phone Number aur Address sahi se bharein!", "error");
+            if (cart.length === 0) {
+                window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
 
-            if (paymentMode === 'Online' && (!utrNumber || utrNumber.length < 6)) {
-                window.showToast("Online Payment ke liye sahi UTR / Transaction Number daalein!", "error");
+            if (!name || !phone || phone.length !== 10 || !address) {
+                window.showToast("Kripya Naam, 10-digit Mobile Number aur Address sahi se bharein!", "error");
+                return;
+            }
+
+            if (paymentMode === 'Online' && !utr) {
+                window.showToast("Online Payment ke liye 12-digit UTR Number daalna zaroori hai!", "error");
                 return;
             }
 
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerText = "Order Processing... ⏳";
+            submitBtn.innerText = "Processing Order...";
 
-            const orderId = "AS" + Math.floor(100000 + Math.random() * 900000);
+            const orderId = "ORD" + Math.floor(100000 + Math.random() * 900000);
             const now = new Date();
             const orderDate = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            const orderData = {
-                action: 'place_order',
+            const newOrder = {
                 orderId: orderId,
-                custName: custName,
-                custPhone: custPhone,
-                custAddress: custAddress,
-                paymentMode: paymentMode,
-                utrNumber: utrNumber,
+                items: [...cart],
                 total: cartTotalAmount,
-                items: cart,
-                status: "Hi, your order is ready",
-                date: orderDate
+                custName: name,
+                custPhone: phone,
+                custAddress: address,
+                paymentMode: paymentMode,
+                utr: utr || 'N/A',
+                date: orderDate,
+                status: "Hi, your order is ready"
             };
 
-            // 1. Save Locally
-            let key = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(orderData);
-            localStorage.setItem(key, JSON.stringify(savedOrders));
+            // Save to LocalStorage for user
+            const userOrdersKey = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(userOrdersKey)) || [];
+            savedOrders.unshift(newOrder);
+            localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
 
-            // 2. Send payload to Google Apps Script (Excel Backend) -> Bot
+            // Clear Cart
+            cart = [];
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = '0';
+
+            // Send Order Data to Google Apps Script / Excel / Telegram Bot
+            const payload = {
+                action: 'create_order',
+                orderId: orderId,
+                cleanId: orderId,
+                custName: name,
+                custPhone: phone,
+                custAddress: address,
+                paymentMode: paymentMode,
+                utr: utr || 'N/A',
+                total: cartTotalAmount,
+                date: orderDate,
+                status: "Hi, your order is ready",
+                items: newOrder.items.map(i => `${i.name} (Qty: ${i.quantity || 1}${i.selectedColor ? ', Color: ' + i.selectedColor : ''}${i.selectedSize ? ', Size: ' + i.selectedSize : ''})`).join(' | ')
+            };
+
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
+                body: JSON.stringify(payload)
             }).then(() => {
-                finalizeOrderSuccess();
+                window.toggleCart();
+                document.getElementById('successModal').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('successModal').style.display = 'none';
+                    window.showMyOrders();
+                }, 2000);
             }).catch(err => {
-                console.error("Order sync error:", err);
-                finalizeOrderSuccess();
+                console.error("Order submission error:", err);
+                window.toggleCart();
+                document.getElementById('successModal').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('successModal').style.display = 'none';
+                    window.showMyOrders();
+                }, 2000);
+            }).finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm & Place Order";
             });
         };
 
-        function finalizeOrderSuccess() {
-            cart = [];
-            localStorage.removeItem(getUserCartKey());
-            document.getElementById('cartCount').innerText = '0';
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Confirm & Place Order";
-
-            document.getElementById('cartModal').style.display = 'none';
-
-            const successModal = document.getElementById('successModal');
-            successModal.style.display = 'flex';
-            setTimeout(() => {
-                successModal.style.display = 'none';
-                window.showMyOrders();
-            }, 2500);
-        }
-
-        // START LISTENING
+        // START LISTENING TO PRODUCTS
         listenToProducts();
     </script>
 </body>
