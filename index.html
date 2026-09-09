@@ -1830,115 +1830,119 @@
 
                 cartList.innerHTML += `
                     <div class="cart-item">
-                        <img src="${imgUrl}" class="cart-item-img" alt="Cart Item">
+                        <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
                             ${variantText}
                             <p>₹${item.price} x ${item.quantity || 1}</p>
                         </div>
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <button onclick="window.updateCartQuantity(${index}, -1)" style="padding:4px 8px; background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:5px; cursor:pointer;">-</button>
-                            <span style="color:white; font-weight:bold; font-size:14px;">${item.quantity || 1}</span>
-                            <button onclick="window.updateCartQuantity(${index}, 1)" style="padding:4px 8px; background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); border-radius:5px; cursor:pointer;">+</button>
-                            <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left:5px;">✕</button>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 6px; font-weight: bold; cursor: pointer;">-</button>
+                            <span style="color: white; font-weight: bold; font-size: 14px; min-width: 18px; text-align: center;">${item.quantity || 1}</span>
+                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 6px; font-weight: bold; cursor: pointer;">+</button>
+                            <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px; padding: 4px 8px;">✕</button>
                         </div>
                     </div>
                 `;
             });
+
+            cartList.innerHTML += `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; font-weight: bold;">
+                    <span style="color: #cbd5e1; font-size: 15px;">Total Amount:</span>
+                    <span style="color: #38bdf8; font-size: 20px;">₹${cartTotalAmount}</span>
+                </div>
+            `;
+
             handlePaymentMode();
         }
+
+        window.checkSharedLink = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const prodId = urlParams.get('id');
+            if (prodId && liveProducts.length > 0) {
+                window.showProductDetail(prodId);
+            }
+        };
 
         window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            const paymentMode = document.getElementById('paymentMode').value;
-            const utrNumber = document.getElementById('utrNumber').value.trim();
+            const payMode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber').value.trim();
 
             if (cart.length === 0) {
                 window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
+
             if (!name || !phone || phone.length !== 10 || !address) {
                 window.showToast("Kripya Naam, 10-digit Mobile Number aur Address sahi se bharein!", "error");
                 return;
             }
-            if (paymentMode === 'Online' && !utrNumber) {
-                window.showToast("Online Payment ke liye UTR / Transaction Number daalna zaroori hai!", "error");
+
+            if (payMode === 'Online' && (!utr || utr.length < 6)) {
+                window.showToast("Online payment ke liye valid UTR / Transaction number daalein!", "error");
                 return;
             }
 
-            const orderId = 'ORD' + Date.now().toString().slice(-6);
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing Order...";
+
+            const newOrderId = Math.floor(100000 + Math.random() * 900000);
             const orderDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-            const newOrder = {
-                orderId: orderId,
+            const orderPayload = {
+                orderId: newOrderId,
                 date: orderDate,
-                items: [...cart],
-                total: cartTotalAmount,
-                status: "Hi, your order is ready",
-                paymentMode: paymentMode,
-                utr: utrNumber || "N/A",
                 custName: name,
                 custPhone: phone,
-                custAddress: address
+                address: address,
+                items: [...cart],
+                total: cartTotalAmount,
+                paymentMode: payMode,
+                utrNumber: payMode === 'Online' ? utr : 'COD',
+                status: "Hi, your order is ready"
             };
 
+            // Save locally
             let key = getUserOrdersKey();
             let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(newOrder);
+            savedOrders.unshift(orderPayload);
             localStorage.setItem(key, JSON.stringify(savedOrders));
 
-            if (navigator.onLine) {
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'place_order',
-                        orderId: orderId,
-                        date: orderDate,
-                        items: JSON.stringify(cart),
-                        total: cartTotalAmount,
-                        paymentMode: paymentMode,
-                        utr: utrNumber || "N/A",
-                        custName: name,
-                        custPhone: phone,
-                        custAddress: address,
-                        status: "Hi, your order is ready"
-                    })
-                }).catch(err => console.log("Order sync error:", err));
-            }
+            // Sync to Google Sheet / Script
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'place_order',
+                    ...orderPayload
+                })
+            }).catch(e => console.log("Order sync error:", e));
 
+            // Reset Cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
 
-            document.getElementById('cartModal').style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Confirm & Place Order";
 
+            // Close Cart Modal & Show Success Modal
+            document.getElementById('cartModal').style.display = 'none';
             const successModal = document.getElementById('successModal');
             successModal.style.display = 'flex';
+
             setTimeout(() => {
                 successModal.style.display = 'none';
                 window.showMyOrders();
             }, 2500);
         };
 
-        window.checkSharedLink = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const prodId = urlParams.get('id');
-            if (prodId && liveProducts.length > 0) {
-                const p = liveProducts.find(item => item.id === prodId);
-                if (p) {
-                    window.showProductDetail(prodId);
-                } else {
-                    window.applyFiltersAndRender();
-                }
-            } else {
-                window.applyFiltersAndRender();
-            }
-        };
-
-        // Initialize Firestore listener
+        // Start App
         listenToProducts();
     </script>
 </body>
