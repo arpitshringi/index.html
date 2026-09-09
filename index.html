@@ -554,8 +554,7 @@ header {
   <div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
     <div style="font-size: 60px; color: #22c55e; margin-bottom: 10px;">✓</div>
     <h2 style="color: white; font-size: 24px; margin-bottom: 5px;">Order Done!</h2>
-    <p style="color: #94a3b8; font-size: 15px; margin-bottom: 15px;">Aapka order successfully place ho gaya hai!</p>
-    <a id="waOrderBtn" href="#" target="_blank" style="display: none; background: #25D366; color: white; padding: 12px 18px; border-radius: 10px; font-weight: bold; text-decoration: none; font-size: 14px;">📲 Send Order Details on WhatsApp</a>
+    <p style="color: #94a3b8; font-size: 15px;">Aapka order successfully place ho gaya hai!</p>
   </div>
 </div>
 
@@ -625,7 +624,6 @@ const auth = getAuth(app);
 
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiRq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
 const UPI_ID = "7665913393@ptsbi";
-const OWNER_WA_PHONE = "917665913393";
 
 let liveProducts = [];
 let productsUnsubscribe = null;
@@ -669,6 +667,9 @@ const MAX_ZOOM = 4;
 
 document.getElementById('cartCount').innerText = cart.length;
 updateAuthUI();
+
+// Start app by listening to products automatically
+listenToProducts();
 
 getRedirectResult(auth).then((result) => {
   if (result && result.user) {
@@ -860,7 +861,7 @@ function syncUserToExcel(payloadData) {
   fetch(GOOGLE_SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payloadData)
   }).catch(err => console.log("Excel user sync error:", err));
 }
@@ -1173,51 +1174,34 @@ function formatMediaUrl(url) {
 
 function listenToProducts() {
   window.checkNetworkStatus();
-  fetchLiveStatusForAllOrders();
+  if (currentUser) {
+    fetchLiveStatusForAllOrders();
+  }
   if (productsUnsubscribe) productsUnsubscribe();
-
-  const loader = document.getElementById('loader');
-  let fallbackTriggered = false;
-
-  const timeoutId = setTimeout(() => {
-    if (loader && loader.style.display !== 'none') {
-      loader.style.display = 'none';
-      if (liveProducts.length === 0) {
-        window.applyFiltersAndRender();
-      }
-    }
-  }, 6000);
-
   const productsRef = collection(db, "products");
   productsUnsubscribe = onSnapshot(productsRef, (snapshot) => {
-    clearTimeout(timeoutId);
     if (!snapshot.empty) {
       liveProducts = [];
       snapshot.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
+      const loader = document.getElementById('loader');
       if (loader) loader.style.display = 'none';
       restoreSavedTab();
-    } else if (!fallbackTriggered) {
-      fallbackTriggered = true;
+    } else {
       onSnapshot(collection(db, "product"), (snap2) => {
         liveProducts = [];
         snap2.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
+        const loader = document.getElementById('loader');
         if (loader) loader.style.display = 'none';
         restoreSavedTab();
-      }, (err2) => {
-        console.error("Fallback product query error:", err2);
+      }, (err) => {
+        const loader = document.getElementById('loader');
         if (loader) loader.style.display = 'none';
-        restoreSavedTab();
       });
-    } else {
-      if (loader) loader.style.display = 'none';
-      restoreSavedTab();
     }
   }, (error) => {
-    console.error("Products query error:", error);
-    clearTimeout(timeoutId);
-    if (loader) loader.style.display = 'none';
     window.checkNetworkStatus();
-    restoreSavedTab();
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'none';
   });
 }
 
@@ -1530,7 +1514,7 @@ window.cancelCustomerOrder = (index) => {
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'cancel_order',
           orderId: ord.orderId,
@@ -1875,64 +1859,66 @@ window.submitOrder = () => {
     return;
   }
 
-  let orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
-  let orderData = {
-    action: 'order',
+  const orderId = Math.floor(100000 + Math.random() * 900000);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + " " + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+  const newOrder = {
     orderId: orderId,
+    date: dateStr,
     name: name,
     phone: phone,
     address: address,
-    paymentMode: paymentMode,
-    utr: utr,
+    items: [...cart],
     total: cartTotalAmount,
-    items: cart,
-    date: new Date().toLocaleString('en-IN')
+    paymentMode: paymentMode,
+    utr: paymentMode === 'Online' ? utr : '',
+    status: "Hi, your order is ready"
   };
 
-  let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
-  savedOrders.unshift({
-    orderId: orderId,
-    name: name,
-    phone: phone,
-    items: cart,
-    total: cartTotalAmount,
-    status: 'Hi, your order is ready',
-    date: new Date().toLocaleString('en-IN')
-  });
-  localStorage.setItem(getUserOrdersKey(), JSON.stringify(savedOrders));
+  let userOrdersKey = getUserOrdersKey();
+  let savedOrders = JSON.parse(localStorage.getItem(userOrdersKey)) || [];
+  savedOrders.unshift(newOrder);
+  localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
 
   if (navigator.onLine) {
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(orderData)
-    }).catch(err => console.log("Order sync error:", err));
-  }
-
-  let waMsg = `*New Order - Arpit Store* 🛍️\n\n*Order ID:* #${orderId}\n*Name:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n*Payment Mode:* ${paymentMode}\n${paymentMode === 'Online' ? '*UTR:* ' + utr + '\n' : ''}*Total Amount:* ₹${cartTotalAmount}\n\n*Items Ordered:* \n`;
-  cart.forEach((it, idx) => {
-    waMsg += `${idx+1}. ${it.name} (Qty: ${it.quantity || 1}${it.selectedColor ? ', Color: ' + it.selectedColor : ''}${it.selectedSize ? ', Size: ' + it.selectedSize : ''}) - ₹${it.price * (it.quantity || 1)}\n`;
-  });
-  
-  let waBtn = document.getElementById('waOrderBtn');
-  if (waBtn) {
-    waBtn.href = `https://wa.me/${OWNER_WA_PHONE}?text=${encodeURIComponent(waMsg)}`;
-    waBtn.style.display = 'inline-block';
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'create_order',
+        orderId: orderId,
+        date: dateStr,
+        name: name,
+        phone: phone,
+        address: address,
+        items: cart,
+        total: cartTotalAmount,
+        paymentMode: paymentMode,
+        utr: paymentMode === 'Online' ? utr : '',
+        status: "Hi, your order is ready"
+      })
+    }).catch(err => console.log("Excel order sync error:", err));
   }
 
   cart = [];
-  localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+  localStorage.setItem(getUserCartKey(), JSON.stringify([]));
   document.getElementById('cartCount').innerText = '0';
-  document.getElementById('cartModal').style.display = 'none';
-  document.getElementById('successModal').style.display = 'flex';
-  setTimeout(() => {
-    document.getElementById('successModal').style.display = 'none';
-    window.showMyOrders();
-  }, 4000);
-};
 
-listenToProducts();
+  window.toggleCart();
+
+  const successModal = document.getElementById('successModal');
+  if (successModal) {
+    successModal.style.display = 'flex';
+    setTimeout(() => {
+      successModal.style.display = 'none';
+      window.showMyOrders();
+    }, 2000);
+  } else {
+    window.showMyOrders();
+  }
+};
 </script>
 </body>
 </html>
