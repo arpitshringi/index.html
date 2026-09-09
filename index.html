@@ -763,10 +763,19 @@
         window.handleGoogleLogin = async () => {
             const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
             
-           const provider = new GoogleAuthProvider();
+            if (isWebView) {
+                window.showToast("App WebView me Google login Google dwara restricted hai. Kripya Mobile & Password se Sign Up/Login karein!", "error");
+                window.switchAuthTab('signup');
+                return;
+            }
+
+            const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             try {
-                await signInWithRedirect(auth, provider);
+                const result = await signInWithPopup(auth, provider);
+                if (result && result.user) {
+                    handleSuccessfulAuthUser(result.user);
+                }
             } catch (error) {
                 console.warn("Popup blocked or failed, switching to redirect mode:", error);
                 if (error.code === 'auth/disallowed-useragent' || isWebView) {
@@ -1450,6 +1459,7 @@
                 else if (currentStatus === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
                 else if (currentStatus === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
 
+                // Customer cannot cancel if product is on the way, delivered, or already cancelled
                 let cancelBtnHtml = '';
                 if (currentStatus !== "Your order on the way" && currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
                     cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
@@ -1481,6 +1491,7 @@
                 savedOrders[index].status = "Cancel your order";
                 localStorage.setItem(key, JSON.stringify(savedOrders));
                 
+                // Send cancellation update to Google script / Telegram
                 let ord = savedOrders[index];
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
@@ -1772,138 +1783,183 @@
             const phoneInput = document.getElementById('custPhone');
             const addressSelectSection = document.getElementById('checkoutAddressSection');
             const addressSelect = document.getElementById('checkoutAddressSelect');
+            const addressInput = document.getElementById('custAddress');
 
             if (currentUser) {
-                nameInput.value = currentUser.name || '';
-                phoneInput.value = currentUser.phone || '';
+                if (nameInput) nameInput.value = currentUser.name || '';
+                if (phoneInput) phoneInput.value = currentUser.phone || '';
                 
                 if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    addressSelectSection.style.display = 'block';
-                    addressSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
-                    currentUser.addresses.forEach((addr, idx) => {
-                        addressSelect.innerHTML += `<option value="${idx}">📍 ${addr}</option>`;
-                    });
+                    if (addressSelectSection) addressSelectSection.style.display = 'block';
+                    if (addressSelect) {
+                        addressSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                        currentUser.addresses.forEach((addr, idx) => {
+                            addressSelect.innerHTML += `<option value="${idx}">📍 ${addr}</option>`;
+                        });
+                    }
                 } else {
-                    addressSelectSection.style.display = 'none';
+                    if (addressSelectSection) addressSelectSection.style.display = 'none';
                 }
             } else {
-                nameInput.value = '';
-                phoneInput.value = '';
-                addressSelectSection.style.display = 'none';
+                if (addressSelectSection) addressSelectSection.style.display = 'none';
             }
 
             window.handlePaymentMode();
         }
 
-        window.updateCartQuantity = (index, change) => {
-            if (!cart[index]) return;
-            cart[index].quantity = (cart[index].quantity || 1) + change;
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
+        window.updateCartQuantity = (index, delta) => {
+            if (cart[index]) {
+                cart[index].quantity = (cart[index].quantity || 1) + delta;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+                document.getElementById('cartCount').innerText = cart.length;
+                renderCartUI();
             }
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
-            renderCartUI();
         };
 
         window.removeFromCart = (index) => {
-            if (!cart[index]) return;
             cart.splice(index, 1);
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             renderCartUI();
+            window.showToast("Product removed from cart!");
         };
 
         window.handleCheckoutAddressSelect = () => {
             const select = document.getElementById('checkoutAddressSelect');
-            const idx = select.value;
-            if (idx !== "" && currentUser && currentUser.addresses && currentUser.addresses[idx]) {
-                document.getElementById('custAddress').value = currentUser.addresses[idx];
+            const addressInput = document.getElementById('custAddress');
+            if (select && addressInput && currentUser && currentUser.addresses) {
+                const val = select.value;
+                if (val !== '' && currentUser.addresses[val]) {
+                    addressInput.value = currentUser.addresses[val];
+                }
             }
         };
 
         window.handlePaymentMode = () => {
             const mode = document.getElementById('paymentMode').value;
             const onlineSec = document.getElementById('onlinePaymentSection');
+            const qrTotalSpan = document.getElementById('qrTotal');
+            const directPayLink = document.getElementById('directPayLink');
+            const qrCodeImg = document.getElementById('qrCodeImg');
+
+            if (qrTotalSpan) qrTotalSpan.innerText = cartTotalAmount;
+
             if (mode === 'Online') {
-                onlineSec.style.display = 'block';
-                let total = cartTotalAmount;
-                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${total}&cu=INR`)}`;
-                document.getElementById('directPayLink').href = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${total}&cu=INR`;
+                if (onlineSec) onlineSec.style.display = 'block';
+                const upiString = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
+                if (directPayLink) directPayLink.href = upiString;
+                if (qrCodeImg) qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
             } else {
-                onlineSec.style.display = 'none';
+                if (onlineSec) onlineSec.style.display = 'none';
             }
         };
 
-        // Submit Order Function connected to Excel & Telegram via GAS
         window.submitOrder = () => {
+            if (cart.length === 0) {
+                window.showToast("Cart is empty!", "error");
+                return;
+            }
+
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            const paymentMode = document.getElementById('paymentMode').value;
-            const utr = document.getElementById('utrNumber').value.trim();
+            const mode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber') ? document.getElementById('utrNumber').value.trim() : '';
 
-            if (!name || !phone || !address) {
-                window.showToast("Kripya apna naam, mobile number aur address bharein!", "error");
-                return;
-            }
-            if (phone.length !== 10) {
-                window.showToast("Kripya sahi 10-digit mobile number daalein!", "error");
-                return;
-            }
-            if (cart.length === 0) {
-                window.showToast("Aapka cart khaali hai!", "error");
-                return;
-            }
-            if (paymentMode === 'Online' && !utr) {
-                window.showToast("Online payment ke liye UTR / Transaction number daalna zaroori hai!", "error");
+            if (!name || !phone || phone.length !== 10 || !address) {
+                window.showToast("Kripya Naam, 10-digit Phone, aur Delivery Address sahi bharein!", "error");
                 return;
             }
 
-            let orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
-            let orderData = {
-                action: 'order',
+            if (mode === 'Online' && !utr) {
+                window.showToast("Online payment ke liye 12-Digit UTR Number zaroori hai!", "error");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Placing Order...";
+            }
+
+            const orderId = "ORD" + Math.floor(100000 + Math.random() * 900000);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN');
+
+            const newOrder = {
                 orderId: orderId,
-                name: name,
-                phone: phone,
-                address: address,
-                paymentMode: paymentMode,
-                utr: utr,
+                date: dateStr,
+                items: [...cart],
                 total: cartTotalAmount,
-                items: cart,
-                date: new Date().toLocaleString()
+                paymentMode: mode,
+                utr: utr,
+                customerName: name,
+                customerPhone: phone,
+                customerAddress: address,
+                status: "Hi, your order is ready"
             };
 
-            let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
-            savedOrders.unshift({
-                orderId: orderId,
-                items: cart,
-                total: cartTotalAmount,
-                status: 'Hi, your order is ready',
-                date: new Date().toLocaleString()
-            });
-            localStorage.setItem(getUserOrdersKey(), JSON.stringify(savedOrders));
+            // Save locally
+            let orderKey = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(orderKey)) || [];
+            savedOrders.unshift(newOrder);
+            localStorage.setItem(orderKey, JSON.stringify(savedOrders));
 
+            // Sync to Excel / Telegram
             if (navigator.onLine) {
                 fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
+                    method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orderData)
+                    body: JSON.stringify({
+                        action: 'create_order',
+                        ...newOrder
+                    })
                 }).catch(err => console.log("Order sync error:", err));
             }
 
+            // Clear Cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
-            document.getElementById('cartModal').style.display = 'none';
-            document.getElementById('successModal').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('successModal').style.display = 'none';
-                window.showMyOrders();
-            }, 2500);
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Confirm & Place Order";
+            }
+
+            window.toggleCart();
+
+            // Show Success Modal
+            const successModal = document.getElementById('successModal');
+            if (successModal) {
+                successModal.style.display = 'flex';
+                setTimeout(() => {
+                    successModal.style.display = 'none';
+                    window.showMyOrders();
+                }, 2000);
+            }
         };
 
-        // Initialize App on Load
+        window.checkSharedLink = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedId = urlParams.get('id');
+            if (sharedId) {
+                const found = liveProducts.find(p => p.id === sharedId);
+                if (found) {
+                    window.showProductDetail(sharedId);
+                } else {
+                    window.applyFiltersAndRender();
+                }
+            } else {
+                window.applyFiltersAndRender();
+            }
+        };
+
+        // Initialize listener
         listenToProducts();
     </script>
 </body>
