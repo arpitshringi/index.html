@@ -763,7 +763,7 @@
         window.handleGoogleLogin = async () => {
             const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
             
-           const provider = new GoogleAuthProvider();
+            const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             try {
                 await signInWithRedirect(auth, provider);
@@ -1791,160 +1791,149 @@
                 
                 const addrSelect = document.getElementById('checkoutAddressSelect');
                 if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    document.getElementById('checkoutAddressSection').style.display = 'block';
-                    addrSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
-                    currentUser.addresses.forEach(a => {
-                        addrSelect.innerHTML += `<option value="${a}">${a}</option>`;
+                    addrSelect.parentElement.style.display = 'block';
+                    addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                    currentUser.addresses.forEach(addr => {
+                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
                     });
                 } else {
-                    document.getElementById('checkoutAddressSection').style.display = 'none';
+                    addrSelect.parentElement.style.display = 'none';
+                }
+            } else {
+                const addrSelect = document.getElementById('checkoutAddressSelect');
+                if (addrSelect && addrSelect.parentElement) {
+                    addrSelect.parentElement.style.display = 'none';
                 }
             }
 
             if (cart.length === 0) {
                 cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
                 cartTotalAmount = 0;
-                document.getElementById('submitBtn').disabled = true;
-                document.getElementById('submitBtn').style.opacity = '0.5';
-                window.handlePaymentMode();
+                handlePaymentMode();
                 return;
             }
 
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('submitBtn').style.opacity = '1';
-
             cartTotalAmount = 0;
             cart.forEach((item, index) => {
-                let itemTotal = (Number(item.price) || 0) * (item.quantity || 1);
+                let itemTotal = item.price * (item.quantity || 1);
                 cartTotalAmount += itemTotal;
-                let imgUrl = item.selectedImage || (item.media && item.media[0] ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/55');
 
-                let variantTxt = '';
+                let variantText = '';
                 if (item.selectedColor || item.selectedSize) {
-                    variantTxt = `<div style="font-size: 11px; color: #cbd5e1; margin-top:2px;">`;
-                    if (item.selectedColor) variantTxt += `🎨 ${item.selectedColor} `;
-                    if (item.selectedSize) variantTxt += `📏 ${item.selectedSize}`;
-                    variantTxt += `</div>`;
+                    variantText = `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">`;
+                    if (item.selectedColor) variantText += `Color: ${item.selectedColor} `;
+                    if (item.selectedSize) variantText += `Size: ${item.selectedSize}`;
+                    variantText += `</div>`;
                 }
+
+                let imgUrl = item.selectedImage || 'https://via.placeholder.com/55?text=No+Img';
 
                 cartList.innerHTML += `
                     <div class="cart-item">
                         <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
                         <div class="cart-item-info">
                             <h4>${item.name}</h4>
-                            ${variantTxt}
+                            ${variantText}
                             <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer;">-</button>
-                            <span style="font-weight: bold; font-size: 14px;">${item.quantity || 1}</span>
-                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer;">+</button>
+                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-weight: bold;">-</button>
+                            <span style="color: white; font-weight: bold; font-size: 14px;">${item.quantity || 1}</span>
+                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; font-weight: bold;">+</button>
                             <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px;">✕</button>
                         </div>
                     </div>
                 `;
             });
 
-            window.handlePaymentMode();
+            handlePaymentMode();
         }
 
-        // SUBMIT ORDER TO EXCEL SHEET & TELEGRAM BOT
+        // ORDER SUBMIT FUNCTION (SELECTION & SEND TO EXCEL + BOT)
         window.submitOrder = () => {
             if (cart.length === 0) {
-                window.showToast("Aapka cart khaali hai!", "error");
+                window.showToast("Aapka cart khaali hai! Pehle product add karein.", "error");
                 return;
             }
 
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
-            const address = document.getElementById('custAddress').value.trim();
+            const custName = document.getElementById('custName').value.trim();
+            const custPhone = document.getElementById('custPhone').value.trim();
+            const custAddress = document.getElementById('custAddress').value.trim();
             const paymentMode = document.getElementById('paymentMode').value;
-            const utr = document.getElementById('utrNumber').value.trim();
+            const utrNumber = document.getElementById('utrNumber') ? document.getElementById('utrNumber').value.trim() : '';
 
-            if (!name || !phone || phone.length !== 10 || !address) {
-                window.showToast("Kripya Naam, 10-Digit Mobile Number aur Address sahi se bharein!", "error");
+            if (!custName || !custPhone || custPhone.length !== 10 || !custAddress) {
+                window.showToast("Kripya Naam, 10-digit Phone Number aur Address sahi se bharein!", "error");
                 return;
             }
 
-            if (paymentMode === 'Online' && !utr) {
-                window.showToast("Online Payment ke liye 12-Digit UTR Number daalna zaroori hai!", "error");
+            if (paymentMode === 'Online' && (!utrNumber || utrNumber.length < 6)) {
+                window.showToast("Online Payment ke liye sahi UTR / Transaction Number daalein!", "error");
                 return;
             }
 
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "Order Place Ho Raha Hai...";
             submitBtn.disabled = true;
+            submitBtn.innerText = "Order Processing... ⏳";
 
-            const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            const orderId = "AS" + Math.floor(100000 + Math.random() * 900000);
             const now = new Date();
-            const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            const orderDate = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-            const newOrder = {
-                orderId: orderId,
-                date: dateStr,
-                items: [...cart],
-                total: cartTotalAmount,
-                custName: name,
-                custPhone: phone,
-                custAddress: address,
-                paymentMode: paymentMode,
-                utrNumber: utr || 'N/A',
-                status: "Hi, your order is ready"
-            };
-
-            // 1. Send Order to Google Apps Script (Excel Sheet & Telegram Bot Sync)
-            const payload = {
+            const orderData = {
                 action: 'place_order',
                 orderId: orderId,
-                cleanId: orderId,
-                custName: name,
-                custPhone: phone,
-                custAddress: address,
+                custName: custName,
+                custPhone: custPhone,
+                custAddress: custAddress,
                 paymentMode: paymentMode,
-                utrNumber: utr || 'N/A',
+                utrNumber: utrNumber,
                 total: cartTotalAmount,
-                items: cart.map(i => `${i.name} (${i.selectedColor ? 'Color: ' + i.selectedColor : ''} ${i.selectedSize ? 'Size: ' + i.selectedSize : ''}) x ${i.quantity || 1} = ₹${(i.price || 0) * (i.quantity || 1)}`).join('\n'),
+                items: cart,
                 status: "Hi, your order is ready",
-                date: dateStr
+                date: orderDate
             };
 
+            // 1. Save Locally
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            savedOrders.unshift(orderData);
+            localStorage.setItem(key, JSON.stringify(savedOrders));
+
+            // 2. Send payload to Google Apps Script (Excel Backend) -> Bot
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(orderData)
             }).then(() => {
-                console.log("Order synced to Excel & Bot");
+                finalizeOrderSuccess();
             }).catch(err => {
                 console.error("Order sync error:", err);
+                finalizeOrderSuccess();
             });
+        };
 
-            // 2. Save order locally for user history
-            let ordersKey = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(ordersKey)) || [];
-            savedOrders.unshift(newOrder);
-            localStorage.setItem(ordersKey, JSON.stringify(savedOrders));
-
-            // 3. Clear cart
+        function finalizeOrderSuccess() {
             cart = [];
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            localStorage.removeItem(getUserCartKey());
             document.getElementById('cartCount').innerText = '0';
 
-            // 4. Update UI & Show Success Modal
-            submitBtn.innerText = "Confirm & Place Order";
+            const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = false;
-            
+            submitBtn.innerText = "Confirm & Place Order";
+
             document.getElementById('cartModal').style.display = 'none';
+
             const successModal = document.getElementById('successModal');
             successModal.style.display = 'flex';
-
             setTimeout(() => {
                 successModal.style.display = 'none';
                 window.showMyOrders();
-            }, 2000);
-        };
+            }, 2500);
+        }
 
-        // START APP LISTENERS
+        // START LISTENING
         listenToProducts();
     </script>
 </body>
