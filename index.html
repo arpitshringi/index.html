@@ -1,1897 +1,1915 @@
 <!DOCTYPE html>
 <html lang="hi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Arpit Store - Live Premium v3.0</title>
-<link href="https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}
-html, body {
-  overscroll-behavior-y: none !important;
-  overscroll-behavior-x: none !important;
-  touch-action: manipulation;
-  user-select: none;
-  -webkit-user-select: none;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-  color: #f8fafc;
-  min-height: 100vh;
-  padding-bottom: 60px;
-}
-input, textarea, select {
-  user-select: text;
-  -webkit-user-select: text;
-}
-.ptr-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: translateY(-100%);
-  z-index: 150;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, transparent 100%);
-  pointer-events: none;
-}
-.ptr-text {
-  color: #38bdf8;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 8px 16px;
-  background: rgba(15, 23, 42, 0.8);
-  border-radius: 20px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  backdrop-filter: blur(5px);
-}
-.announcement-bar {
-  background: linear-gradient(135deg, #0284c7, #6366f1);
-  color: white;
-  text-align: center;
-  padding: 8px 15px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-header {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-.header-left { display: flex; align-items: center; gap: 15px; }
-.menu-icon {
-  font-size: 26px;
-  cursor: pointer;
-  color: #38bdf8;
-  background: none;
-  border: none;
-  padding: 5px;
-  display: inline-block;
-  z-index: 101;
-  touch-action: manipulation;
-}
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  cursor: pointer;
-}
-.header-right { display: flex; align-items: center; gap: 10px; }
-.cart-btn {
-  background: linear-gradient(135deg, #38bdf8, #6366f1);
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
-}
-.cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
-.auth-highlight-btn {
-  background: linear-gradient(135deg, #f43f5e, #fb7185);
-  color: white;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 25px;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  animation: pulseGlow 2s infinite;
-}
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
-}
-.drawer {
-  position: fixed;
-  top: 0;
-  left: -280px;
-  width: 280px;
-  height: 100%;
-  background: #1e293b;
-  z-index: 300;
-  transition: 0.3s ease;
-  box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-  padding: 20px;
-  overflow-y: auto;
-}
-.drawer.open { left: 0 !important; }
-.drawer-header {
-  font-size: 20px;
-  font-weight: 700;
-  color: #38bdf8;
-  margin-bottom: 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.close-drawer {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  font-size: 24px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.close-drawer:hover { color: #f8fafc; }
-.user-profile-brief {
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  padding: 12px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-}
-.user-avatar-small {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #38bdf8;
-  color: #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 18px;
-}
-.drawer-item {
-  padding: 12px 15px;
-  color: #f1f5f9;
-  font-weight: 600;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.drawer-item:hover { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding-left: 20px; }
-.overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(3px);
-  z-index: 250;
-}
-.container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
-.search-container { position: relative; margin-bottom: 18px; }
-.search-input {
-  width: 100%;
-  padding: 12px 16px 12px 45px;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  color: white;
-  font-size: 15px;
-  backdrop-filter: blur(8px);
-  transition: 0.3s;
-}
-.search-input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.25); background: rgba(30, 41, 59, 0.95); }
-.search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
-.clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; }
-.active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-.filter-badge {
-  background: rgba(56, 189, 248, 0.15);
-  border: 1px solid #38bdf8;
-  color: #38bdf8;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.filter-badge span { cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; }
-.filter-badge span:hover { color: #f8fafc; }
-.filter-sort-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.category-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; width: 100%; }
-.category-tabs::-webkit-scrollbar { display: none; }
-.tab-btn {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94a3b8;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: 0.3s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.tab-btn:hover { background: rgba(56, 189, 248, 0.1); color: #f8fafc; }
-.tab-btn.active { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; border-color: transparent; }
-.sort-select {
-  padding: 10px 14px;
-  background: rgba(30, 41, 59, 0.9);
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  border-radius: 12px;
-  color: #f8fafc;
-  font-size: 13px;
-  font-weight: 600;
-  outline: none;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: 0.2s;
-}
-.sort-select option { background: #1e293b; color: white; }
-.section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-.saree-offer-banner {
-  display: none;
-  background: linear-gradient(135deg, #4c1d95 0%, #831843 50%, #9f1239 100%);
-  border: 2px dashed #f43f5e;
-  border-radius: 20px;
-  padding: 22px;
-  margin-bottom: 25px;
-  box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25);
-  position: relative;
-  overflow: hidden;
-}
-.saree-offer-banner::before { content: ""; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; }
-.offer-badge { background: #f43f5e; color: white; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-.offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
-.offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
-.offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
-.variant-section { margin: 15px 0; background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-.variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; align-items: center; }
-.color-options::-webkit-scrollbar { display: none; }
-.color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
-.color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
-.size-options { display: flex; gap: 8px; flex-wrap: wrap; }
-.size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
-.order-item-clickable { cursor: pointer; transition: 0.2s; }
-.order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
-.loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
-.spinner { width: 40px; height: 40px; border: 4px solid rgba(56, 189, 248, 0.2); border-top: 4px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-.card { position: relative; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.3s ease; }
-.card:hover { transform: translateY(-5px); border-color: #38bdf8; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-.like-badge { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 50%; font-size: 16px; cursor: pointer; z-index: 5; transition: 0.2s; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;}
-.like-badge:hover { transform: scale(1.15); }
-.media-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 10px; border-radius: 12px; scrollbar-width: none; }
-.media-slider::-webkit-scrollbar { display: none; }
-.slide-item { flex: 0 0 100%; width: 100%; height: 200px; object-fit: cover; border-radius: 12px; scroll-snap-align: start; }
-.card small { color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; font-weight: 600; }
-.card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 6px; }
-.add-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 9px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
-.add-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
-#detailView { display: none; }
-.detail-container { background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
-.back-link { color: #38bdf8; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; padding: 8px 16px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; transition: 0.3s; }
-.back-link:hover { background: rgba(56, 189, 248, 0.2); }
-.detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; }
-.detail-slider::-webkit-scrollbar { display: none; }
-.detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
-.detail-slider.zoomed { transform: scale(1.4); z-index: 10; }
-.detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
-.detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 350; }
-.modal-content { background: #1e293b; padding: 22px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-.close-btn { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; float: right; transition: 0.2s; }
-.close-btn:hover { color: #f8fafc; }
-.input-box { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white; font-size: 15px; transition: 0.3s;}
-.input-box:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 8px rgba(56,189,248,0.2); }
-.pay-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 14px; width: 100%; font-size: 16px; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
-.pay-btn:hover { background: linear-gradient(135deg, #16a34a, #15803d); transform: translateY(-2px); }
-.remove-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;}
-.remove-btn:hover { background: #ef4444; color: white; }
-#onlinePaymentSection { display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
-.cart-item { background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); gap: 10px; }
-.cart-item-img { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-.cart-item-info { flex: 1; }
-.cart-item-info h4 { font-size: 14px; color: white; margin-bottom: 3px; }
-.cart-item-info p { font-size: 14px; color: #38bdf8; font-weight: bold; }
-.order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; }
-.order-status-badge { background: #0284c7; color: white; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; transition: 0.3s; }
-.toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-.toast { background: rgba(15, 23, 42, 0.95); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease-out forwards, fadeOut 0.3s ease-in forwards 2.7s; }
-.toast.error { border-left: 4px solid #ef4444; }
-.toast.success { border-left: 4px solid #22c55e; }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
-.zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
-.zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
-.zoom-img:active { cursor: grabbing; }
-.zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
-.auth-tab-header { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-.auth-tab { background: none; border: none; color: #94a3b8; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 5px; }
-.auth-tab.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
-.google-auth-btn { width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
-.google-auth-btn:hover { background: #f1f5f9; }
-.address-chip { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-</style>
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Arpit Store - Live Premium v3.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        html, body {
+            overscroll-behavior-y: none !important;
+            overscroll-behavior-x: none !important; 
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); 
+            color: #f8fafc; 
+            min-height: 100vh; 
+            padding-bottom: 60px; 
+        }
+
+        input, textarea, select {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        
+        /* Pull To Refresh CSS */
+        .ptr-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateY(-100%);
+            z-index: 150;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .ptr-text {
+            color: #38bdf8;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Top Announcement Bar */
+        .announcement-bar { background: linear-gradient(135deg, #0284c7, #6366f1); color: white; text-align: center; padding: 8px 15px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* Header Elements */
+        header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .menu-icon { font-size: 26px; cursor: pointer; color: #38bdf8; background: none; border: none; padding: 5px; display: inline-block; z-index: 101; touch-action: manipulation; }
+        .logo { font-size: 20px; font-weight: 700; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+        
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
+        .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
+
+        /* Highlighted Guest Sign-Up Button */
+        .auth-highlight-btn { background: linear-gradient(135deg, #f43f5e, #fb7185); color: white; padding: 8px 14px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
+
+        /* Drawer & Overlay */
+        .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; overflow-y: auto; }
+        .drawer.open { left: 0 !important; }
+        .drawer-header { font-size: 20px; font-weight: 700; color: #38bdf8; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .close-drawer { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; transition: 0.2s; }
+        .close-drawer:hover { color: #f8fafc; }
+        
+        .user-profile-brief { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .user-avatar-small { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; background: #38bdf8; color: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
+
+        .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+        .drawer-item:hover { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding-left: 20px; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 250; }
+
+        .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
+        
+        /* Search Bar */
+        .search-container { position: relative; margin-bottom: 18px; }
+        .search-input { width: 100%; padding: 12px 16px 12px 45px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; color: white; font-size: 15px; backdrop-filter: blur(8px); transition: 0.3s; }
+        .search-input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.25); background: rgba(30, 41, 59, 0.95); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
+        .clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; }
+
+        /* Filters & Sort */
+        .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .filter-badge { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .filter-badge span { cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; }
+        .filter-badge span:hover { color: #f8fafc; }
+
+        .filter-sort-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .category-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; width: 100%; }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+        .tab-btn:hover { background: rgba(56, 189, 248, 0.1); color: #f8fafc; }
+        .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; border-color: transparent; }
+
+        .sort-select { padding: 10px 14px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; color: #f8fafc; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(8px); transition: 0.2s; }
+        .sort-select option { background: #1e293b; color: white; }
+
+        .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Banner */
+        .saree-offer-banner { display: none; background: linear-gradient(135deg, #4c1d95 0%, #831843 50%, #9f1239 100%); border: 2px dashed #f43f5e; border-radius: 20px; padding: 22px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25); position: relative; overflow: hidden; }
+        .saree-offer-banner::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; }
+        .offer-badge { background: #f43f5e; color: white; font-size: 12px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
+        .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
+        .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
+
+        /* Color & Size Variant Styling */
+        .variant-section { margin: 15px 0; background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .color-options { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; align-items: center; }
+        .color-options::-webkit-scrollbar { display: none; }
+        .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
+        .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
+
+        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
+
+        /* Order Re-buy Items */
+        .order-item-clickable { cursor: pointer; transition: 0.2s; }
+        .order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
+
+        /* Loader */
+        .loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(56, 189, 248, 0.2); border-top: 4px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Product Grid */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { position: relative; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-5px); border-color: #38bdf8; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        
+        .like-badge { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 50%; font-size: 16px; cursor: pointer; z-index: 5; transition: 0.2s; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;}
+        .like-badge:hover { transform: scale(1.15); }
+        
+        .media-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 10px; border-radius: 12px; scrollbar-width: none; }
+        .media-slider::-webkit-scrollbar { display: none; }
+        .slide-item { flex: 0 0 100%; width: 100%; height: 200px; object-fit: cover; border-radius: 12px; scroll-snap-align: start; }
+        
+        .card small { color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 3px; font-weight: 600; }
+        .card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 6px; }
+        .add-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 9px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
+        .add-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+
+        /* Detail View */
+        #detailView { display: none; }
+        .detail-container { background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .back-link { color: #38bdf8; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 15px; padding: 8px 16px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; transition: 0.3s; }
+        .back-link:hover { background: rgba(56, 189, 248, 0.2); }
+        
+        .detail-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 20px; border-radius: 15px; scrollbar-width: none; transition: transform 0.2s ease; }
+        .detail-slider::-webkit-scrollbar { display: none; }
+        .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
+        .detail-slider.zoomed { transform: scale(1.4); z-index: 10; }
+        
+        .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
+        .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+
+        /* Modal & Cart */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 350; }
+        .modal-content { background: #1e293b; padding: 22px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .close-btn { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; float: right; transition: 0.2s; }
+        .close-btn:hover { color: #f8fafc; }
+        
+        .input-box { width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 15px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white; font-size: 15px; transition: 0.3s;}
+        .input-box:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 8px rgba(56,189,248,0.2); }
+        
+        .pay-btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 14px; width: 100%; font-size: 16px; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
+        .pay-btn:hover { background: linear-gradient(135deg, #16a34a, #15803d); transform: translateY(-2px); }
+        .remove-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;}
+        .remove-btn:hover { background: #ef4444; color: white; }
+
+        #onlinePaymentSection { display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        
+        .cart-item { background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); gap: 10px; }
+        .cart-item-img { width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .cart-item-info { flex: 1; }
+        .cart-item-info h4 { font-size: 14px; color: white; margin-bottom: 3px; }
+        .cart-item-info p { font-size: 14px; color: #38bdf8; font-weight: bold; }
+
+        .order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; }
+        .order-status-badge { background: #0284c7; color: white; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; transition: 0.3s; }
+
+        /* Toast Notifications */
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: rgba(15, 23, 42, 0.95); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease-out forwards, fadeOut 0.3s ease-in forwards 2.7s; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.success { border-left: 4px solid #22c55e; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
+
+        /* Image Lightbox Modal Zoom & Drag Fix */
+        .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
+        .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
+        .zoom-img:active { cursor: grabbing; }
+        .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
+
+        /* Auth & Profile Modal Specifics */
+        .auth-tab-header { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .auth-tab { background: none; border: none; color: #94a3b8; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 5px; }
+        .auth-tab.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+        .google-auth-btn { width: 100%; background: white; color: #1e293b; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
+        .google-auth-btn:hover { background: #f1f5f9; }
+        .address-chip { background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    </style>
 </head>
 <body>
 
-<div class="ptr-container" id="ptrContainer">
-  <span class="ptr-text" id="ptrText">Pull down to refresh</span>
-</div>
-
-<div id="toastContainer" class="toast-container"></div>
-
-<div class="modal" id="offlineModal" style="display: none; z-index: 10000;">
-  <div class="modal-content" style="text-align: center; border: 2px solid #ef4444; background: #1e293b;">
-    <div style="font-size: 50px; margin-bottom: 10px;">⚠️</div>
-    <h2 style="color: #ef4444; margin-bottom: 10px; font-size: 22px;">Network Issue!</h2>
-    <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Aapka Internet connection chalu nahi hai. Kripya apna Net connect karein!</p>
-    <button onclick="window.checkNetworkStatus()" style="background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px;">Retry Connection</button>
-  </div>
-</div>
-
-<div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal(false)">
-  <span class="zoom-close" onclick="window.closeZoomModal(true)">&times;</span>
-  <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
-</div>
-
-<div class="modal" id="authModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
-    <div class="auth-tab-header">
-      <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
-      <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
-    </div>
-    <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3.88.88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
-      Continue with Google
-    </button>
-    <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR Mobile Number & Password se Login karein</div>
-    <div id="authFormContainer">
-      <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
-      <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
-      <input type="password" id="authPassword" class="input-box" placeholder="Password">
-      <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
-    </div>
-    <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-      <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">Or Login with Gmail Link</div>
-      <input type="email" id="authEmail" class="input-box" placeholder="Enter Gmail Address">
-      <button class="pay-btn" style="background: linear-gradient(135deg, #0284c7, #6366f1); margin-top:0;" onclick="window.handleEmailLinkLogin()">Send Login Link to Gmail</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="profileModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="window.toggleProfileModal()">&times;</button>
-    <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">My Profile</h2>
-    <div style="text-align: center; margin-bottom: 15px;">
-      <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
-      <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
-      <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">-</p>
-    </div>
-    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-      <h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses:</h4>
-      <div id="savedAddressesList"></div>
-      <div style="margin-top: 15px; background: rgba(15,23,42,0.5); padding: 12px; border-radius: 10px;">
-        <h5 style="color: #38bdf8; margin-bottom: 8px;">Add New Address</h5>
-        <textarea id="newAddressInput" class="input-box" placeholder="Enter full address here..." rows="2" style="margin-bottom: 10px;"></textarea>
-        <button class="add-btn" onclick="window.saveNewAddress()">Save Address</button>
-      </div>
-    </div>
-    <button onclick="window.logoutUser()" class="remove-btn" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 14px;">Logout</button>
-  </div>
-</div>
-
-<div class="announcement-bar">Cash on Delivery Available | Fast Shipping - FREE</div>
-
-<div class="overlay" id="overlay" onclick="window.toggleDrawer()"></div>
-
-<div class="drawer" id="drawer">
-  <div class="drawer-header">
-    <span>Menu</span>
-    <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
-  </div>
-  <div id="drawerUserSection"></div>
-  <div class="drawer-item" onclick="window.filterCategory('All')">Home</div>
-  <div class="drawer-item" onclick="window.showMyOrders()">My Orders</div>
-  <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">My Watchlist</div>
-  <div class="drawer-item" onclick="window.filterCategory('Saree')">Sarees</div>
-  <div class="drawer-item" onclick="window.filterCategory('Beauty')">Beauty Products</div>
-  <div class="drawer-item" onclick="window.refreshAppData()" style="color: #38bdf8;">Refresh App</div>
-</div>
-
-<header>
-  <div class="header-left">
-    <button class="menu-icon" onclick="window.toggleDrawer()" aria-label="Open Menu">☰</button>
-    <div class="logo" onclick="window.goHome()">Arpit Store</div>
-  </div>
-  <div class="header-right">
-    <div id="headerAuthArea"></div>
-    <button class="cart-btn" onclick="window.toggleCart()">Cart (<span id="cartCount">0</span>)</button>
-  </div>
-</header>
-
-<div class="container">
-  <div id="homeView">
-    <div class="search-container">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords..." oninput="window.handleSearch(this.value)">
-      <button id="clearSearchBtn" class="clear-search" onclick="window.clearSearchBox()">×</button>
-    </div>
-    <div id="activeFilters" class="active-filters"></div>
-    
-    <div class="filter-sort-bar">
-      <div class="category-tabs">
-        <button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">All</button>
-        <button class="tab-btn" id="tab-Orders" onclick="window.showMyOrders()">My Orders</button>
-        <button class="tab-btn" id="tab-Watchlist" onclick="window.showWatchlist()">Watchlist</button>
-        <button class="tab-btn" id="tab-Saree" onclick="window.filterCategory('Saree')">Sarees</button>
-        <button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">Beauty</button>
-        <button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">Filter</button>
-      </div>
-      <div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
-        <select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
-          <option value="featured">Featured</option>
-          <option value="low">Price: Low to High</option>
-          <option value="high">Price: High to Low</option>
-          <option value="name">Name: A to Z</option>
-        </select>
-      </div>
+    <!-- Pull to Refresh Indicator -->
+    <div class="ptr-container" id="ptrContainer">
+        <span class="ptr-text" id="ptrText">Pull down to refresh ↓</span>
     </div>
 
-    <div id="sareeOfferBanner" class="saree-offer-banner">
-      <span class="offer-badge">Mega Saree Special Offer</span>
-      <div class="offer-title">5 Saree Combo Trial Offer (COD Available)</div>
-      <div class="offer-desc">
-        Cart mein 5 Sarees add karke <b>Cash on Delivery (COD)</b> order karein!<br>
-        Pasand aane par sirf <b>1 Saree rakhein</b> (Delivery Charge Bilkul Free), aur baaki <b>4 Sarees bilkul free return</b> kardein bina kisi extra charge ke!<br><br>
-        <span style="color: #38bdf8; font-weight: 600;">Order 5 Sarees via COD, keep your favorite 1 & return the remaining 4 absolutely FREE with zero charges!</span>
-      </div>
-      <div class="offer-footer">
-        <span>100% Risk-Free Shopping</span>
-        <span>No Question Asked Return</span>
-      </div>
-    </div>
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
-    <div class="section-title">
-      <span id="pageTitle">All Products</span>
-    </div>
-
-    <div id="loader" class="loader-container">
-      <div class="spinner"></div>
-      <p style="color: #38bdf8; font-weight: 600;">Products load ho rahe hain...</p>
-    </div>
-    <div class="product-grid" id="productGrid"></div>
-  </div>
-
-  <div id="detailView">
-    <div class="back-link" onclick="window.goHome()"> Back to Store</div>
-    <div class="detail-container" id="detailContent"></div>
-  </div>
-</div>
-
-<div class="modal" id="cartModal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="window.toggleCart()">&times;</button>
-    <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Your Cart</h2>
-    <div id="cartList" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
-    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-      <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
-      <input type="text" id="custName" class="input-box" placeholder="Full Name">
-      <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number">
-      <div id="checkoutAddressSection">
-        <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
-        <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
-      </div>
-      <textarea id="custAddress" class="input-box" placeholder="Delivery Address..." rows="2"></textarea>
-      
-      <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
-      <select id="paymentMode" class="input-box" onchange="window.handlePaymentMode()">
-        <option value="COD">Cash on Delivery</option>
-        <option value="Online">Online Payment (UPI/QR)</option>
-      </select>
-      
-      <div id="onlinePaymentSection">
-        <h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
-        <a id="directPayLink" href="#" style="display: block; width: 100%; background: #22c55e; color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 14px; border-radius: 8px; margin-bottom: 15px; text-decoration: none;">Pay via PhonePe / GPay / Paytm</a>
-        <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 10px;">Ya fir niche diya QR Code scan karein:</p>
-        <img id="qrCodeImg" src="" alt="UPI QR Code" width="180" height="180" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment hone ke baad apna UTR / Transaction Number niche zaroor daalein</p>
-        <input type="text" id="utrNumber" class="input-box" placeholder="Daalein 12-Digit UTR Number *" style="border-color: #ef4444;">
-      </div>
-      <button class="pay-btn" id="submitBtn" onclick="window.submitOrder()">Confirm & Place Order</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="successModal">
-  <div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
-    <div style="font-size: 60px; color: #22c55e; margin-bottom: 10px;">✓</div>
-    <h2 style="color: white; font-size: 24px; margin-bottom: 5px;">Order Done!</h2>
-    <p style="color: #94a3b8; font-size: 15px;">Aapka order successfully place ho gaya hai!</p>
-  </div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
-let ptrStart = 0;
-let ptrCurrent = 0;
-let isPtrPulling = false;
-
-document.addEventListener('touchstart', e => {
-  if (window.scrollY === 0) {
-    ptrStart = e.touches[0].clientY;
-    isPtrPulling = true;
-  }
-}, { passive: true });
-
-document.addEventListener('touchmove', e => {
-  if (!isPtrPulling) return;
-  ptrCurrent = e.touches[0].clientY;
-  let distance = ptrCurrent - ptrStart;
-  if (distance > 0 && window.scrollY === 0) {
-    if (e.cancelable) e.preventDefault();
-    const ptr = document.getElementById('ptrContainer');
-    const txt = document.getElementById('ptrText');
-    let offset = Math.min(distance / 2, 80) - 60;
-    ptr.style.transform = `translateY(${offset}px)`;
-    if (distance > 120) {
-      txt.innerText = "Release to refresh";
-      txt.style.borderColor = "#22c55e";
-      txt.style.color = "#22c55e";
-    } else {
-      txt.innerText = "Pull down to refresh";
-      txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
-      txt.style.color = "#38bdf8";
-    }
-  }
-}, { passive: false });
-
-document.addEventListener('touchend', e => {
-  if (!isPtrPulling) return;
-  isPtrPulling = false;
-  let distance = ptrCurrent - ptrStart;
-  const ptr = document.getElementById('ptrContainer');
-  if (ptr) ptr.style.transform = 'translateY(-100%)';
-  if (distance > 120 && window.scrollY === 0) {
-    window.refreshAppData();
-  }
-  document.getElementById('ptrText').innerText = "Pull down to refresh";
-});
-
-const firebaseConfig = {
-  apiKey: "AlzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
-  authDomain: "arpit-store.firebaseapp.com",
-  projectId: "arpit-store",
-  storageBucket: "arpit-store.firebasestorage.app",
-  messagingSenderId: "607228237560",
-  appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
-  measurementId: "G-9T9Q26ZC9M"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiRq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
-const UPI_ID = "7665913393@ptsbi";
-
-let liveProducts = [];
-let productsUnsubscribe = null;
-let currentProduct = null;
-
-let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-let authMode = 'login';
-
-function getUserOrdersKey() {
-  return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
-}
-function getUserCartKey() {
-  return currentUser ? 'arpit_cart_' + currentUser.phone : 'arpit_cart_guest';
-}
-function getUserWatchlistKey() {
-  return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
-}
-
-let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
-let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
-let currentCategory = 'All';
-let searchQuery = '';
-let cartTotalAmount = 0;
-let selectedColor = "";
-let selectedColorImg = "";
-let selectedSize = "";
-let selectedImage = "";
-
-let zoomScale = 1;
-let zoomLastScale = 1;
-let zoomStartDistance = 0;
-let zoomLastTap = 0;
-let zoomPosX = 0, zoomPosY = 0;
-let startPosX = 0, startPosY = 0;
-let isDragging = false;
-let isPinching = false;
-let preventClick = false;
-let justPinched = false;
-const MIN_ZOOM = 1;
-const MAX_ZOOM = 4;
-
-document.getElementById('cartCount').innerText = cart.length;
-updateAuthUI();
-
-getRedirectResult(auth).then((result) => {
-  if (result && result.user) {
-    handleSuccessfulAuthUser(result.user);
-  }
-}).catch((error) => {
-  console.error("Google Redirect Error:", error);
-});
-
-if (isSignInWithEmailLink(auth, window.location.href)) {
-  let email = window.localStorage.getItem('emailForSignIn');
-  if (!email) {
-    email = window.prompt('Please provide your Gmail address for confirmation:');
-  }
-  signInWithEmailLink(auth, email, window.location.href)
-    .then((result) => {
-      window.localStorage.removeItem('emailForSignIn');
-      window.history.replaceState({}, document.title, window.location.pathname);
-      handleSuccessfulAuthUser(result.user);
-    })
-    .catch((error) => {
-      window.showToast("Email link login failed: " + error.message, "error");
-    });
-}
-
-window.refreshAppData = () => {
-  window.showToast("App data refresh ho raha hai...");
-  listenToProducts();
-  if (currentUser) {
-    fetchLiveStatusForAllOrders();
-  }
-  window.applyFiltersAndRender();
-};
-
-setInterval(() => {
-  if (currentUser && currentCategory === 'MyOrders') {
-    fetchLiveStatusForAllOrders();
-  }
-}, 6000);
-
-window.toggleAuthModal = () => {
-  const modal = document.getElementById('authModal');
-  const isOpen = modal.style.display === 'flex';
-  modal.style.display = isOpen ? 'none' : 'flex';
-  if (!isOpen) {
-    pushNavState('auth');
-  } else if (history.state && history.state.appNav === 'auth') {
-    history.back();
-  }
-};
-
-window.switchAuthTab = (mode) => {
-  authMode = mode;
-  const loginBtn = document.getElementById('tabLoginBtn');
-  const signupBtn = document.getElementById('tabSignupBtn');
-  const nameInput = document.getElementById('authName');
-  const submitBtn = document.getElementById('authSubmitBtn');
-  if (mode === 'login') {
-    loginBtn.classList.add('active');
-    signupBtn.classList.remove('active');
-    nameInput.style.display = 'none';
-    submitBtn.innerText = 'Login';
-  } else {
-    signupBtn.classList.add('active');
-    loginBtn.classList.remove('active');
-    nameInput.style.display = 'block';
-    submitBtn.innerText = 'Sign Up';
-  }
-};
-
-function reloadUserSpecificState() {
-  cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
-  watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
-  document.getElementById('cartCount').innerText = cart.length;
-  fetchLiveStatusForAllOrders();
-}
-
-function handleSuccessfulAuthUser(user) {
-  let phone = prompt("Enter your 10-digit Mobile Number for order notifications:", "9876543210");
-  if (!phone || phone.length !== 10) phone = "9999999999";
-  currentUser = {
-    name: user.displayName || (user.email ? user.email.split('@')[0] : "Google User"),
-    phone: phone,
-    email: user.email || "",
-    password: 'google_auth_user',
-    addresses: []
-  };
-  let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-  let existing = registeredUsers.find(u => u.phone === phone);
-  if (!existing) {
-    registeredUsers.push(currentUser);
-    localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-  } else {
-    currentUser = existing;
-  }
-  localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-  syncUserToExcel({ action: 'signup', name: currentUser.name, phone: currentUser.phone, password: 'google_auth_user', email: currentUser.email });
-  if (document.getElementById('authModal').style.display === 'flex') {
-    window.toggleAuthModal();
-  }
-  updateAuthUI();
-  reloadUserSpecificState();
-  window.showToast("Login Successful!");
-}
-
-window.submitAuth = () => {
-  const phone = document.getElementById('authPhone').value.trim();
-  const password = document.getElementById('authPassword').value.trim();
-  const name = document.getElementById('authName').value.trim();
-  if (!phone || phone.length !== 10 || !password) {
-    window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
-    return;
-  }
-  let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-  if (authMode === 'signup') {
-    if (!name) {
-      window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
-      return;
-    }
-    let existing = registeredUsers.find(u => u.phone === phone);
-    if (existing) {
-      window.showToast("Yeh mobile number pehle se registered hai! Login karein.", "error");
-      window.switchAuthTab('login');
-      return;
-    }
-    let newUser = { name, phone, password, addresses: [] };
-    registeredUsers.push(newUser);
-    localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-    syncUserToExcel({ action: 'signup', name, phone, password, email: '' });
-    currentUser = newUser;
-    localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-    window.toggleAuthModal();
-    updateAuthUI();
-    reloadUserSpecificState();
-    window.showToast("Sign up successful! Welcome.");
-  } else {
-    let user = registeredUsers.find(u => u.phone === phone && u.password === password);
-    if (!user) {
-      window.showToast("Galat mobile number ya password! Pehle Sign Up karein.", "error");
-      return;
-    }
-    currentUser = user;
-    localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-    window.toggleAuthModal();
-    updateAuthUI();
-    reloadUserSpecificState();
-    window.showToast("Login successful!");
-  }
-};
-
-window.handleGoogleLogin = async () => {
-  const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
-  const provider = new GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  try {
-    await signInWithRedirect(auth, provider);
-  } catch (error) {
-    console.warn("Popup blocked or failed, switching to redirect mode:", error);
-    if (error.code === 'auth/disallowed-useragent' || isWebView) {
-      window.showToast("App me Google Login restricted hai. Mobile Number se Sign Up karein!", "error");
-      window.switchAuthTab('signup');
-    } else {
-      window.showToast("Google Login failed: " + error.message, "error");
-    }
-  }
-};
-
-window.handleEmailLinkLogin = async () => {
-  const email = document.getElementById('authEmail').value.trim();
-  if (!email || !email.includes('@')) {
-    window.showToast("Kripya sahi Gmail address bharein!", "error");
-    return;
-  }
-  const actionCodeSettings = {
-    url: window.location.href.split('?')[0],
-    handleCodeInApp: true,
-  };
-  try {
-    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-    window.localStorage.setItem('emailForSignIn', email);
-    window.showToast("Login link aapke Gmail par bhej diya gaya hai! Check your inbox.");
-  } catch (error) {
-    window.showToast("Error sending email link: " + error.message, "error");
-  }
-};
-
-function syncUserToExcel(payloadData) {
-  if (!navigator.onLine) return;
-  fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payloadData)
-  }).catch(err => console.log("Excel user sync error:", err));
-}
-
-function updateAuthUI() {
-  const headerAuthArea = document.getElementById('headerAuthArea');
-  const drawerUserSection = document.getElementById('drawerUserSection');
-  if (currentUser) {
-    headerAuthArea.innerHTML = `
-      <button onclick="window.toggleProfileModal()" style="background:none; border:none; cursor:pointer; display: flex; align-items:center;">
-        <div class="user-avatar-small" style="width:34px; height:34px; font-size:14px;">${currentUser.name.charAt(0).toUpperCase()}</div>
-      </button>`;
-    drawerUserSection.innerHTML = `
-      <div class="user-profile-brief" onclick="window.toggleProfileModal()">
-        <div class="user-avatar-small">${currentUser.name.charAt(0).toUpperCase()}</div>
-        <div>
-          <div style="font-weight: 700; color: white; font-size: 14px;">${currentUser.name}</div>
-          <div style="font-size: 12px; color: #38bdf8;">${currentUser.phone} (View Profile)</div>
+    <!-- Offline Connection Warning Modal -->
+    <div class="modal" id="offlineModal" style="display: none; z-index: 10000;">
+        <div class="modal-content" style="text-align: center; border: 2px solid #ef4444; background: #1e293b;">
+            <div style="font-size: 50px; margin-bottom: 10px;">📡</div>
+            <h2 style="color: #ef4444; margin-bottom: 10px; font-size: 22px;">Network Issue!</h2>
+            <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Aapka Internet connection chalu nahi hai. Kripya apna Net connect karein!</p>
+            <button onclick="window.checkNetworkStatus()" style="background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px;">Retry Connection 🔄</button>
         </div>
-      </div>`;
-  } else {
-    headerAuthArea.innerHTML = `<button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Sign Up</button>`;
-    drawerUserSection.innerHTML = `
-      <div style="margin-bottom: 20px;">
-        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login / Sign Up</button>
-      </div>`;
-  }
-}
+    </div>
 
-window.toggleProfileModal = () => {
-  if (!currentUser) {
-    window.toggleAuthModal();
-    return;
-  }
-  const modal = document.getElementById('profileModal');
-  const isOpen = modal.style.display === 'flex';
-  modal.style.display = isOpen ? 'none' : 'flex';
-  if (!isOpen) {
-    document.getElementById('profileAvatarDisplay').innerText = currentUser.name.charAt(0).toUpperCase();
-    document.getElementById('profileNameDisplay').innerText = currentUser.name;
-    document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
-    renderSavedAddresses();
-    pushNavState('profile');
-  } else if (history.state && history.state.appNav === 'profile') {
-    history.back();
-  }
-};
+    <!-- Image Lightbox Zoom Modal -->
+    <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal(false)">
+        <span class="zoom-close" onclick="window.closeZoomModal(true)">&times;</span>
+        <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
+    </div>
 
-function renderSavedAddresses() {
-  const listDiv = document.getElementById('savedAddressesList');
-  if (!currentUser.addresses || currentUser.addresses.length === 0) {
-    listDiv.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No saved addresses yet.</p>';
-    return;
-  }
-  listDiv.innerHTML = '';
-  currentUser.addresses.forEach((addr, idx) => {
-    listDiv.innerHTML += `
-      <div class="address-chip">
-        <span>${addr}</span>
-        <button onclick="window.deleteAddress(${idx})" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer;">X</button>
-      </div>`;
-  });
-}
-
-window.saveNewAddress = () => {
-  const newAddr = document.getElementById('newAddressInput').value.trim();
-  if (!newAddr) {
-    window.showToast("Address daalna zaroori hai!", "error");
-    return;
-  }
-  if (!currentUser.addresses) currentUser.addresses = [];
-  currentUser.addresses.push(newAddr);
-  updateUserDataInStorage();
-  document.getElementById('newAddressInput').value = '';
-  renderSavedAddresses();
-  window.showToast("Address saved successfully!");
-};
-
-window.deleteAddress = (idx) => {
-  currentUser.addresses.splice(idx, 1);
-  updateUserDataInStorage();
-  renderSavedAddresses();
-  window.showToast("Address removed.");
-};
-
-function updateUserDataInStorage() {
-  let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-  registeredUsers = registeredUsers.map(u => u.phone === currentUser.phone ? currentUser : u);
-  localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-  localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
-}
-
-window.logoutUser = () => {
-  currentUser = null;
-  localStorage.removeItem('arpit_current_user');
-  cart = [];
-  watchlist = [];
-  document.getElementById('cartCount').innerText = '0';
-  document.getElementById('profileModal').style.display = 'none';
-  updateAuthUI();
-  window.goHome();
-  window.showToast("Logged out successfully!", "success");
-};
-
-window.checkNetworkStatus = () => {
-  const offlineModal = document.getElementById('offlineModal');
-  if (!navigator.onLine) {
-    if (offlineModal) offlineModal.style.display = 'flex';
-  } else {
-    if (offlineModal) offlineModal.style.display = 'none';
-  }
-};
-
-window.addEventListener('online', window.checkNetworkStatus);
-window.addEventListener('offline', window.checkNetworkStatus);
-
-function pushNavState(type) {
-  history.pushState({ appNav: type }, "");
-}
-
-window.addEventListener('popstate', e => {
-  const zoomModal = document.getElementById('imageZoomModal');
-  if (zoomModal && zoomModal.style.display === 'flex') {
-    if (zoomScale > 1) {
-      resetZoom();
-      pushNavState('zoom');
-      return;
-    }
-    zoomModal.style.display = 'none';
-    resetZoom();
-    return;
-  }
-  const cartModal = document.getElementById('cartModal');
-  if (cartModal && cartModal.style.display === 'flex') {
-    cartModal.style.display = 'none';
-    return;
-  }
-  const authModal = document.getElementById('authModal');
-  if (authModal && authModal.style.display === 'flex') {
-    authModal.style.display = 'none';
-    return;
-  }
-  const profileModal = document.getElementById('profileModal');
-  if (profileModal && profileModal.style.display === 'flex') {
-    profileModal.style.display = 'none';
-    return;
-  }
-  const drawer = document.getElementById('drawer');
-  if (drawer && drawer.classList.contains('open')) {
-    drawer.classList.remove('open');
-    const overlay = document.getElementById('overlay');
-    if (overlay) overlay.style.display = 'none';
-    return;
-  }
-  const detailView = document.getElementById('detailView');
-  if (detailView && detailView.style.display === 'block') {
-    document.getElementById('detailView').style.display = 'none';
-    document.getElementById('homeView').style.display = 'block';
-    return;
-  }
-  if (currentCategory !== 'All') {
-    window.goHomeSilently();
-    return;
-  }
-});
-
-function getDistance(touches) {
-  const dx = touches[0].clientX - touches[1].clientX;
-  const dy = touches[0].clientY - touches[1].clientY;
-  return Math.hypot(dx, dy);
-}
-
-function applyZoomTransform() {
-  const zoomedImg = document.getElementById('zoomedImg');
-  if (zoomedImg) {
-    zoomedImg.style.transform = `translate(${zoomPosX}px, ${zoomPosY}px) scale(${zoomScale})`;
-  }
-}
-
-function resetZoom() {
-  zoomScale = 1;
-  zoomLastScale = 1;
-  zoomStartDistance = 0;
-  zoomPosX = 0;
-  zoomPosY = 0;
-  isDragging = false;
-  isPinching = false;
-  applyZoomTransform();
-}
-
-window.openZoomModal = (imgUrl) => {
-  const modal = document.getElementById('imageZoomModal');
-  const zoomedImg = document.getElementById('zoomedImg');
-  if (modal && zoomedImg) {
-    zoomedImg.src = imgUrl;
-    resetZoom();
-    modal.style.display = 'flex';
-    pushNavState('zoom');
-  }
-};
-
-window.closeZoomModal = (force = false) => {
-  if (!force && (preventClick || justPinched || zoomScale > 1)) return;
-  const modal = document.getElementById('imageZoomModal');
-  if (modal && modal.style.display === 'flex') {
-    modal.style.display = 'none';
-    resetZoom();
-    if (history.state && history.state.appNav === 'zoom') {
-      history.back();
-    }
-  }
-};
-
-const zoomContainer = document.getElementById('imageZoomModal');
-if (zoomContainer) {
-  zoomContainer.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) {
-      isPinching = true;
-      isDragging = false;
-      e.preventDefault();
-      zoomStartDistance = getDistance(e.touches);
-      zoomLastScale = zoomScale;
-    } else if (e.touches.length === 1) {
-      const currentTime = new Date().getTime();
-      const tapLength = currentTime - zoomLastTap;
-      if (tapLength < 300 && tapLength > 0) {
-        e.preventDefault();
-        if (zoomScale > 1) {
-          resetZoom();
-        } else {
-          zoomScale = 2.5;
-          zoomLastScale = 2.5;
-          zoomPosX = 0;
-          zoomPosY = 0;
-          applyZoomTransform();
-        }
-      } else if (zoomScale > 1 && !isPinching) {
-        isDragging = true;
-        startPosX = e.touches[0].clientX - zoomPosX;
-        startPosY = e.touches[0].clientY - zoomPosY;
-      }
-      zoomLastTap = currentTime;
-    }
-  }, { passive: false });
-
-  zoomContainer.addEventListener('touchmove', e => {
-    if (e.touches.length === 2 && isPinching) {
-      e.preventDefault();
-      const currentDistance = getDistance(e.touches);
-      if (zoomStartDistance > 0) {
-        const factor = currentDistance / zoomStartDistance;
-        zoomScale = Math.min(Math.max(zoomLastScale * factor, MIN_ZOOM), MAX_ZOOM);
-      }
-      if (zoomScale === 1) { zoomPosX = 0; zoomPosY = 0; }
-      applyZoomTransform();
-    } else if (e.touches.length === 1 && isDragging && zoomScale > 1) {
-      e.preventDefault();
-      zoomPosX = e.touches[0].clientX - startPosX;
-      zoomPosY = e.touches[0].clientY - startPosY;
-      applyZoomTransform();
-    }
-  }, { passive: false });
-
-  zoomContainer.addEventListener('touchend', e => {
-    if (isPinching) {
-      justPinched = true;
-      setTimeout(() => { justPinched = false; }, 400);
-      if (e.touches.length === 1) {
-        isPinching = false;
-        zoomLastScale = zoomScale;
-        isDragging = true;
-        startPosX = e.touches[0].clientX - zoomPosX;
-        startPosY = e.touches[0].clientY - zoomPosY;
-      } else if (e.touches.length === 0) {
-        isPinching = false;
-        isDragging = false;
-        zoomLastScale = zoomScale;
-      }
-    } else if (e.touches.length === 0) {
-      isDragging = false;
-    }
-    preventClick = true;
-    setTimeout(() => { preventClick = false; }, 300);
-  });
-}
-
-function saveActiveTab(tabName) {
-  sessionStorage.setItem('active_store_tab', tabName);
-}
-
-window.showToast = (message, type = "success") => {
-  const container = document.getElementById("toastContainer");
-  const toast = document.createElement("div");
-  toast.className = `toast ${type}`;
-  toast.innerHTML = type === "error" ? `⚠️ ${message}` : `✓ ${message}`;
-  container.appendChild(toast);
-  setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
-};
-
-function formatMediaUrl(url) {
-  if (!url) return "";
-  if (url.includes('drive.google.com') || url.includes('googleusercontent.com')) {
-    const match = url.match(/[-\w]{25,}/);
-    if (match && match[0]) {
-      return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w1000`;
-    }
-  }
-  return url;
-}
-
-function listenToProducts() {
-  window.checkNetworkStatus();
-  fetchLiveStatusForAllOrders();
-  if (productsUnsubscribe) productsUnsubscribe();
-  const productsRef = collection(db, "products");
-  productsUnsubscribe = onSnapshot(productsRef, (snapshot) => {
-    if (!snapshot.empty) {
-      liveProducts = [];
-      snapshot.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
-      document.getElementById('loader').style.display = 'none';
-      restoreSavedTab();
-    } else {
-      onSnapshot(collection(db, "product"), (snap2) => {
-        liveProducts = [];
-        snap2.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
-        document.getElementById('loader').style.display = 'none';
-        restoreSavedTab();
-      });
-    }
-  }, (error) => { window.checkNetworkStatus(); });
-}
-
-function restoreSavedTab() {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('id')) { return; }
-  const savedTab = sessionStorage.getItem('active_store_tab');
-  if (savedTab) {
-    if (savedTab === 'MyOrders') window.showMyOrders();
-    else if (savedTab === 'Watchlist') window.showWatchlist();
-    else window.filterCategory(savedTab);
-  } else { window.applyFiltersAndRender(); }
-}
-
-window.toggleFilterSortMenu = () => {
-  const menu = document.getElementById('filterSortDropdown');
-  const isHidden = menu.style.display === 'none';
-  menu.style.display = isHidden ? 'block' : 'none';
-  const btn = document.getElementById('filterToggleBtn');
-  if (btn) btn.style.background = isHidden ? 'rgba(56, 189, 248, 0.25)' : 'rgba(30, 41, 59, 0.8)';
-};
-
-window.toggleDrawer = () => {
-  const drawer = document.getElementById('drawer');
-  const overlay = document.getElementById('overlay');
-  if (!drawer || !overlay) return;
-  const isOpen = drawer.classList.contains('open');
-  if (isOpen) {
-    drawer.classList.remove('open');
-    overlay.style.display = 'none';
-  } else {
-    drawer.classList.add('open');
-    overlay.style.display = 'block';
-    pushNavState('drawer');
-  }
-};
-
-window.goHome = () => {
-  saveActiveTab('All');
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('homeView').style.display = 'block';
-  window.clearSearchBox();
-  window.filterCategory('All');
-  window.scrollTo(0,0);
-};
-
-window.goHomeSilently = () => {
-  saveActiveTab('All');
-  currentCategory = 'All';
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('homeView').style.display = 'block';
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  const homeTab = document.getElementById('tab-All');
-  if (homeTab) homeTab.classList.add('active');
-  document.getElementById('pageTitle').innerText = 'All Products';
-  document.getElementById('sareeOfferBanner').style.display = 'none';
-  window.applyFiltersAndRender();
-};
-
-window.toggleLike = (id, event) => {
-  if (event) event.stopPropagation();
-  let isAdding = false;
-  let key = getUserWatchlistKey();
-  if (watchlist.includes(id)) {
-    watchlist = watchlist.filter(itemId => itemId !== id);
-  } else {
-    watchlist.push(id);
-    isAdding = true;
-  }
-  localStorage.setItem(key, JSON.stringify(watchlist));
-  window.applyFiltersAndRender();
-  const detailLikeBtn = document.getElementById('detailLikeBtn');
-  if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
-  if (isAdding) window.showToast("Saved to Watchlist!");
-};
-
-window.showWatchlist = () => {
-  saveActiveTab('Watchlist');
-  currentCategory = 'Watchlist';
-  if (document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('homeView').style.display = 'block';
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  const watchTab = document.getElementById('tab-Watchlist');
-  if (watchTab) watchTab.classList.add('active');
-  document.getElementById('pageTitle').innerText = 'My Watchlist';
-  document.getElementById('sareeOfferBanner').style.display = 'none';
-  pushNavState('watchlist');
-  window.applyFiltersAndRender();
-};
-
-window.showMyOrders = () => {
-  saveActiveTab('MyOrders');
-  currentCategory = 'MyOrders';
-  if (document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('homeView').style.display = 'block';
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  const orderTab = document.getElementById('tab-Orders');
-  if (orderTab) orderTab.classList.add('active');
-  document.getElementById('pageTitle').innerText = 'My Orders';
-  document.getElementById('sareeOfferBanner').style.display = 'none';
-  pushNavState('orders');
-  fetchLiveStatusForAllOrders();
-  renderOrdersUI();
-};
-
-window.filterCategory = (cat) => {
-  saveActiveTab(cat);
-  if (cat === 'Watchlist') { window.showWatchlist(); return; }
-  if (cat === 'MyOrders') { window.showMyOrders(); return; }
-  currentCategory = cat;
-  if (document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
-  document.getElementById('detailView').style.display = 'none';
-  document.getElementById('homeView').style.display = 'block';
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  const activeTab = document.getElementById('tab-' + cat);
-  if (activeTab) activeTab.classList.add('active');
-  document.getElementById('pageTitle').innerText = cat === 'All' ? 'All Products' : cat + ' Collection';
-  const banner = document.getElementById('sareeOfferBanner');
-  if (cat === 'Saree') banner.style.display = 'block'; else banner.style.display = 'none';
-  if (cat !== 'All') pushNavState('category');
-  window.applyFiltersAndRender();
-};
-
-window.handleSearch = (val) => {
-  searchQuery = val.trim().toLowerCase();
-  const clearBtn = document.getElementById('clearSearchBtn');
-  clearBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
-  window.applyFiltersAndRender();
-};
-
-window.clearSearchBox = () => {
-  document.getElementById('searchInput').value = '';
-  searchQuery = '';
-  document.getElementById('clearSearchBtn').style.display = 'none';
-  window.applyFiltersAndRender();
-};
-
-window.applyFiltersAndRender = () => {
-  if (currentCategory === 'MyOrders') { renderOrdersUI(); return; }
-  let filtered = [];
-  if (currentCategory === 'Watchlist') filtered = liveProducts.filter(p => watchlist.includes(p.id));
-  else if (currentCategory === 'All') filtered = [...liveProducts];
-  else {
-    filtered = liveProducts.filter(p => {
-      let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
-      let target = currentCategory.toLowerCase();
-      return productCat.includes(target) || target.includes(productCat);
-    });
-  }
-  if (searchQuery !== '') {
-    filtered = filtered.filter(p => {
-      let name = (p.name || '').toLowerCase();
-      let desc = (p.description || '').toLowerCase();
-      let cat = (p.category || p.type || p.cat || '').toLowerCase();
-      return name.includes(searchQuery) || desc.includes(searchQuery) || cat.includes(searchQuery);
-    });
-  }
-  const sortVal = document.getElementById('sortSelect').value;
-  if (sortVal === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
-  else if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
-  else if (sortVal === 'name') filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-  
-  updateActiveFiltersUI();
-  renderProductsUI(filtered);
-};
-
-function updateActiveFiltersUI() {
-  const badgeContainer = document.getElementById('activeFilters');
-  badgeContainer.innerHTML = '';
-  let badgesHtml = '';
-  if (currentCategory !== 'All' && currentCategory !== 'MyOrders') {
-    badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
-  }
-  if (searchQuery !== '') {
-    badgesHtml += `<div class="filter-badge">Keyword: "${searchQuery}" <span onclick="window.clearSearchBox()">×</span></div>`;
-  }
-  badgeContainer.innerHTML = badgesHtml;
-}
-
-function renderProductsUI(items) {
-  const grid = document.getElementById('productGrid');
-  grid.innerHTML = '';
-  if (items.length === 0) {
-    if (currentCategory === 'Watchlist') grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🤍</div><p style="color: #94a3b8; font-size:16px;">Aapki Watchlist khaali hai.<br>Products par ❤️ dabayein!</p></div>';
-    else if (searchQuery !== '') grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for "<b>${searchQuery}</b>"</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding: 10px 20px; background:#38bdf8; border:none; border-radius: 10px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
-    else grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me abhi koi product nahi hai!</p>';
-    return;
-  }
-  items.forEach(p => {
-    let isLiked = watchlist.includes(p.id);
-    let heartIcon = isLiked ? '❤️' : '🤍';
-    let categoryTag = p.category || p.type || p.cat || 'General';
-    let sellingPrice = Number(p.price) || 0;
-    let mrpPrice = Number(p.mrp) || 0;
-    let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
-    if (mrpPrice > sellingPrice) {
-      let offAmount = mrpPrice - sellingPrice;
-      let offPercent = Math.round((offAmount / mrpPrice) * 100);
-      priceHtml = `
-        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-          <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
-          <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
-          <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">${offPercent}% OFF</span>
-        </div>`;
-    }
-    let mediaHtml = '<div class="media-slider">';
-    if (p.media && p.media.length > 0) {
-      p.media.forEach(rawLink => {
-        let link = formatMediaUrl(rawLink);
-        mediaHtml += `<img src="${link}" class="slide-item" loading="lazy" onerror="this.src='https://via.placeholder.com/300x180?text=Image+Error'">`;
-      });
-    } else {
-      mediaHtml += '<img src="https://via.placeholder.com/300x180?text=No+Image" class="slide-item">';
-    }
-    mediaHtml += '</div>';
-
-    grid.innerHTML += `
-      <div class="card" onclick="window.showProductDetail('${p.id}')">
-        <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</div>
-        ${mediaHtml}
-        <div>
-          <small>${categoryTag}</small>
-          <h3>${p.name}</h3>
-          ${priceHtml}
-        </div>
-        <button class="add-btn" onclick="event.stopPropagation(); window.showProductDetail('${p.id}')">Select Options</button>
-      </div>`;
-  });
-}
-
-function renderOrdersUI() {
-  const grid = document.getElementById('productGrid');
-  grid.innerHTML = '';
-  if (!currentUser) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size: 16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius: 10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up</button></div>';
-    return;
-  }
-  let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
-  if (savedOrders.length === 0) {
-    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
-    return;
-  }
-  savedOrders.forEach((ord, ordIndex) => {
-    let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
-    ord.items.forEach(it => {
-      let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
-      if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
-      let variantTxt = "";
-      if (it.selectedColor || it.selectedSize) {
-        variantTxt = `<div style="color:#cbd5e1; font-size:11px; display:flex; gap:6px; align-items:center; margin-top:2px;">`;
-        if (it.selectedColor) variantTxt += `<span style="background:rgba(56,189,248,0.2); padding: 1px 5px; border-radius:4px;">${it.selectedColor}</span>`;
-        if (it.selectedSize) variantTxt += `<span style="background:rgba(244,63,94,0.2); padding:1px 5px; border-radius: 4px;">${it.selectedSize}</span>`;
-        variantTxt += `</div>`;
-      }
-      itemsListHtml += `
-        <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
-            <div>
-              <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
-              ${variantTxt}
-              <div style="color: #38bdf8; font-size: 13px; font-weight: bold; margin-top:2px;">₹${it.price} x ${it.quantity || 1}</div>
+    <!-- Auth / Login / Signup Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
+            <div class="auth-tab-header">
+                <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
+                <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
             </div>
-          </div>
-          <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Buy Again</button>
-        </li>`;
-    });
-    itemsListHtml += '</ul>';
 
-    let badgeBg = '#0284c7';
-    let currentStatus = ord.status || "Hi, your order is ready";
-    if (currentStatus === "Your order on the way") { badgeBg = '#eab308'; }
-    else if (currentStatus === "Your order is delivered") { badgeBg = '#22c55e'; }
-    else if (currentStatus === "Cancel your order") { badgeBg = '#ef4444'; }
+            <!-- Google Login Option -->
+            <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
+                Continue with Google
+            </button>
+            <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR Mobile Number & Password se Login karein</div>
 
-    let cancelBtnHtml = "";
-    if (currentStatus !== "Your order on the way" && currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
-      cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ✖</button>`;
-    }
+            <div id="authFormContainer">
+                <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
+                <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
+                <input type="password" id="authPassword" class="input-box" placeholder="Password">
+                <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
+            </div>
 
-    grid.innerHTML += `
-      <div class="order-card" style="grid-column: 1/-1;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-          <span class="order-status-badge" style="background: ${badgeBg}; margin: 0;">${currentStatus}</span>
-          ${cancelBtnHtml}
+            <!-- Firebase Gmail Link / OTP Login Section -->
+            <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📧 Or Login with Gmail Link</div>
+                <input type="email" id="authEmail" class="input-box" placeholder="Enter Gmail Address">
+                <button class="pay-btn" style="background: linear-gradient(135deg, #0284c7, #6366f1); margin-top:0;" onclick="window.handleEmailLinkLogin()">Send Login Link to Gmail ✉️</button>
+            </div>
         </div>
-        <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
-        <p style="color:#94a3b8; font-size: 12px; margin-bottom:10px;">Date & Time: ${ord.date}</p>
-        ${itemsListHtml}
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
-          <span style="color:#94a3b8; font-size: 14px;">Total Paid:</span>
-          <span style="color:#38bdf8; font-weight:bold; font-size:18px;">₹${ord.total}</span>
+    </div>
+
+    <!-- Customer Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="window.toggleProfileModal()">&times;</button>
+            <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">My Profile</h2>
+            
+            <div style="text-align: center; margin-bottom: 15px;">
+                <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
+                <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
+                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">-</p>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses:</h4>
+                <div id="savedAddressesList"></div>
+
+                <div style="margin-top: 15px; background: rgba(15,23,42,0.5); padding: 12px; border-radius: 10px;">
+                    <h5 style="color: #38bdf8; margin-bottom: 8px;">Add New Address</h5>
+                    <textarea id="newAddressInput" class="input-box" placeholder="Enter full address here..." rows="2" style="margin-bottom: 10px;"></textarea>
+                    <button class="add-btn" onclick="window.saveNewAddress()">Save Address</button>
+                </div>
+            </div>
+
+            <button onclick="window.logoutUser()" class="remove-btn" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 14px;">Logout 🚪</button>
         </div>
-      </div>`;
-  });
-}
+    </div>
 
-window.cancelCustomerOrder = (index) => {
-  if (!confirm("Kya aap apna order cancel karna chahte hain?")) return;
-  let key = getUserOrdersKey();
-  let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-  if (savedOrders[index]) {
-    savedOrders[index].status = "Cancel your order";
-    localStorage.setItem(key, JSON.stringify(savedOrders));
-    let ord = savedOrders[index];
+    <!-- Top Announcement Bar -->
+    <div class="announcement-bar">
+        ⚡ Cash on Delivery Available • Fast Shipping - FREE
+    </div>
 
-    if (navigator.onLine) {
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'cancel_order',
-          orderId: ord.orderId,
-          name: currentUser ? currentUser.name : (ord.name || 'Customer'),
-          phone: currentUser ? currentUser.phone : (ord.phone || 'N/A'),
-          total: ord.total,
-          items: ord.items,
-          status: 'Cancel your order'
-        })
-      }).catch(e => console.log("Cancel sync error:", e));
-    }
-    window.showToast("Order cancelled successfully!", "error");
-    renderOrdersUI();
-  }
-};
+    <!-- Drawer Menu Overlay -->
+    <div class="overlay" id="overlay" onclick="window.toggleDrawer()"></div>
+    
+    <!-- Side Drawer Menu -->
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span>Menu</span>
+            <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
+        </div>
 
-function fetchLiveStatusForAllOrders() {
-  if (!navigator.onLine || !currentUser) return;
-  let key = getUserOrdersKey();
-  let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-  if (savedOrders.length === 0) return;
-  let statusChanged = false;
-  let fetchPromises = savedOrders.map((ord, index) => {
-    let cleanId = ord.orderId.toString().replace('#', '').trim();
-    return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.status && data.status !== ord.status) {
-          savedOrders[index].status = data.status;
-          statusChanged = true;
+        <div id="drawerUserSection"></div>
+
+        <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
+        <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
+        <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
+        <div class="drawer-item" onclick="window.filterCategory('Saree')">🥻 Sarees</div>
+        <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
+        <div class="drawer-item" onclick="window.refreshAppData()" style="color: #38bdf8;">🔄 Refresh App</div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <button class="menu-icon" onclick="window.toggleDrawer()" aria-label="Open Menu">☰</button>
+            <div class="logo" onclick="window.goHome()">Arpit Store</div>
+        </div>
+        <div class="header-right">
+            <div id="headerAuthArea"></div>
+            <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Home / Main View -->
+        <div id="homeView">
+            
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords..." oninput="window.handleSearch(this.value)">
+                <button id="clearSearchBtn" class="clear-search" onclick="window.clearSearchBox()">✕</button>
+            </div>
+
+            <div id="activeFilters" class="active-filters"></div>
+
+            <!-- Filter & Category Bar -->
+            <div class="filter-sort-bar">
+                <div class="category-tabs">
+                    <button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">🏠 All</button>
+                    <button class="tab-btn" id="tab-Orders" onclick="window.showMyOrders()">📦 My Orders</button>
+                    <button class="tab-btn" id="tab-Watchlist" onclick="window.showWatchlist()">❤️ Watchlist</button>
+                    <button class="tab-btn" id="tab-Saree" onclick="window.filterCategory('Saree')">🥻 Sarees</button>
+                    <button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">💄 Beauty</button>
+                    
+                    <button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">🎛️ Filter</button>
+                </div>
+
+                <div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
+                    <select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
+                        <option value="featured">✨ Featured</option>
+                        <option value="low">💰 Price: Low to High</option>
+                        <option value="high">💎 Price: High to Low</option>
+                        <option value="name">🔤 Name: A to Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="sareeOfferBanner" class="saree-offer-banner">
+                <span class="offer-badge">🔥 Mega Saree Special Offer</span>
+                <div class="offer-title">🥻 5 Saree Combo Trial Offer (COD Available)</div>
+                <div class="offer-desc">
+                    Cart mein 5 Sarees add karke <b>Cash on Delivery (COD)</b> order karein! Pasand aane par sirf <b>1 Saree rakhein</b> (Delivery Charge Bilkul Free), aur baaki <b>4 Sarees bilkul free return</b> kardein bina kisi extra charge ke!<br><br>
+                    <span style="color: #38bdf8; font-weight: 600;">✨ Order 5 Sarees via COD, keep your favorite 1 & return the remaining 4 absolutely FREE with zero charges!</span>
+                </div>
+                <div class="offer-footer">
+                    <span>⚡ 100% Risk-Free Shopping</span>
+                    <span>✨ No Question Asked Return</span>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <span id="pageTitle">All Products</span>
+            </div>
+            
+            <!-- Loading Spinner -->
+            <div id="loader" class="loader-container">
+                <div class="spinner"></div>
+                <p style="color: #38bdf8; font-weight: 600;">Products load ho rahe hain...</p>
+            </div>
+
+            <div class="product-grid" id="productGrid"></div>
+        </div>
+
+        <!-- Product Detail View -->
+        <div id="detailView">
+            <div class="back-link" onclick="window.goHome()">← Back to Store</div>
+            <div class="detail-container" id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="window.toggleCart()">&times;</button>
+            <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Your Cart</h2>
+            <div id="cartList" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
+                <input type="text" id="custName" class="input-box" placeholder="Full Name">
+                <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number">
+                
+                <div id="checkoutAddressSection">
+                    <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
+                    <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
+                </div>
+                <textarea id="custAddress" class="input-box" placeholder="Delivery Address..." rows="2"></textarea>
+
+                <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
+                <select id="paymentMode" class="input-box" onchange="window.handlePaymentMode()">
+                    <option value="COD">Cash on Delivery</option>
+                    <option value="Online">Online Payment (UPI / QR)</option>
+                </select>
+
+                <div id="onlinePaymentSection">
+                    <h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
+                    
+                    <a id="directPayLink" href="#" style="display: block; width: 100%; background: #22c55e; color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 14px; border-radius: 8px; margin-bottom: 15px; text-decoration: none;">
+                        📱 Pay via PhonePe / GPay / Paytm
+                    </a>
+                    
+                    <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 10px;">Ya fir niche diya QR Code scan karein:</p>
+                    
+                    <img id="qrCodeImg" src="" alt="UPI QR Code" width="180" height="180" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
+                    
+                    <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment hone ke baad apna UTR / Transaction Number niche zaroor daalein 👇</p>
+                    <input type="text" id="utrNumber" class="input-box" placeholder="Daalein 12-Digit UTR Number *" style="border-color: #ef4444;">
+                </div>
+
+                <button class="pay-btn" id="submitBtn" onclick="window.submitOrder()">Confirm & Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
+            <div style="font-size: 60px; color: #22c55e; margin-bottom: 10px;">✔️</div>
+            <h2 style="color: white; font-size: 24px; margin-bottom: 5px;">Order Done!</h2>
+            <p style="color: #94a3b8; font-size: 15px;">Aapka order successfully place ho gaya hai!</p>
+        </div>
+    </div>
+
+    <!-- Firebase & Core Engine Module -->
+    <script type="module">
+               import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+               import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+               import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+
+        // PULL TO REFRESH LOGIC
+        let ptrStart = 0;
+        let ptrCurrent = 0;
+        let isPtrPulling = false;
+
+        document.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                ptrStart = e.touches[0].clientY;
+                isPtrPulling = true;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isPtrPulling) return;
+            ptrCurrent = e.touches[0].clientY;
+            let distance = ptrCurrent - ptrStart;
+            
+            if (distance > 0 && window.scrollY === 0) {
+                if (e.cancelable) e.preventDefault();
+                const ptr = document.getElementById('ptrContainer');
+                const txt = document.getElementById('ptrText');
+                
+                let offset = Math.min(distance / 2, 80) - 60; 
+                ptr.style.transform = `translateY(${offset}px)`;
+                
+                if (distance > 120) {
+                    txt.innerText = "Release to refresh 🔄";
+                    txt.style.borderColor = "#22c55e";
+                    txt.style.color = "#22c55e";
+                } else {
+                    txt.innerText = "Pull down to refresh ↓";
+                    txt.style.borderColor = "rgba(56, 189, 248, 0.3)";
+                    txt.style.color = "#38bdf8";
+                }
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (!isPtrPulling) return;
+            isPtrPulling = false;
+            let distance = ptrCurrent - ptrStart;
+            
+            const ptr = document.getElementById('ptrContainer');
+            if (ptr) ptr.style.transform = `translateY(-100%)`;
+            
+            if (distance > 120 && window.scrollY === 0) {
+                window.refreshAppData();
+            }
+            document.getElementById('ptrText').innerText = "Pull down to refresh ↓";
+        });
+
+        // FIREBASE CONFIG & INITIALIZATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
+            authDomain: "arpit-store.firebaseapp.com",
+            projectId: "arpit-store",
+            storageBucket: "arpit-store.firebasestorage.app",
+            messagingSenderId: "607228237560",
+            appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
+            measurementId: "G-9T9Q26ZC9M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Updated Google Apps Script URL
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
+        const UPI_ID = "7665913393@ptsbi";
+
+        let liveProducts = [];
+        let productsUnsubscribe = null;
+        let currentProduct = null;
+        
+        // AUTHENTICATION & USER PROFILE STATE
+        let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
+        let authMode = 'login'; // 'login' or 'signup'
+
+        // USER SPECIFIC KEYS & STATE
+        function getUserOrdersKey() {
+            return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
         }
-      }).catch(err => console.log("Status error:", err));
-  });
-  Promise.all(fetchPromises).then(() => {
-    if (statusChanged) {
-      localStorage.setItem(key, JSON.stringify(savedOrders));
-      if (currentCategory === 'MyOrders') renderOrdersUI();
-    }
-  });
-}
+        function getUserCartKey() {
+            return currentUser ? 'arpit_cart_' + currentUser.phone : 'arpit_cart_guest';
+        }
+        function getUserWatchlistKey() {
+            return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
+        }
 
-function updateGalleryImages(colorName) {
-  if (!currentProduct) return;
-  let currentImages = [];
-  const selectedColorData = (currentProduct.colors && Array.isArray(currentProduct.colors))
-    ? currentProduct.colors.find(c => (typeof c === 'object' ? c.name : c) === colorName)
-    : null;
-  if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
-    let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
-    currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
-  } else if (currentProduct.media && Array.isArray(currentProduct.media) && currentProduct.media.length > 0) {
-    currentImages = currentProduct.media.map(url => formatMediaUrl(url)).filter(url => url);
-  }
-  if (currentImages.length === 0) {
-    currentImages = ['https://via.placeholder.com/400x300?text=No+Image'];
-  }
-  selectedImage = currentImages[0];
-  selectedColorImg = currentImages[0];
-  const sliderContainer = document.getElementById('detailSliderContainer');
-  if (sliderContainer) {
-    let mediaHtml = '<div class="detail-slider">';
-    currentImages.forEach((imgUrl, idx) => {
-      let imgId = idx === 0 ? 'id="mainProductImage"' : '';
-      mediaHtml += `<img src="${imgUrl}" ${imgId} class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" alt="Product Image">`;
-    });
-    mediaHtml += '</div>';
-    sliderContainer.innerHTML = mediaHtml;
-  }
-}
+        let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+        let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
 
-window.selectColor = (colorName, el) => {
-  selectedColor = colorName;
-  const label = document.getElementById('colorLabel');
-  if (label) label.innerText = colorName;
-  if (el) {
-    const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
-    siblings.forEach(btn => btn.classList.remove('active'));
-    el.classList.add('active');
-  }
-  updateGalleryImages(colorName);
-};
+        let currentCategory = 'All';
+        let searchQuery = '';
+        let cartTotalAmount = 0;
 
-window.selectSize = (size, el) => {
-  selectedSize = size;
-  const label = document.getElementById('sizeLabel');
-  if (label) label.innerText = size;
-  const siblings = el.parentElement.querySelectorAll('.size-btn');
-  siblings.forEach(btn => btn.classList.remove('active'));
-  if (el) el.classList.add('active');
-};
+        let selectedColor = "";
+        let selectedColorImg = "";
+        let selectedSize = "";
+        let selectedImage = "";
 
-window.showProductDetail = (id) => {
-  const p = liveProducts.find(item => item.id === id);
-  if (!p) { window.showToast("Product unavailable!", "error"); return; }
-  currentProduct = p;
-  pushNavState('detail');
-  document.getElementById('homeView').style.display = 'none';
-  document.getElementById('detailView').style.display = 'block';
-  selectedSize = "";
-  selectedColor = "";
-  selectedColorImg = "";
-  let isLiked = watchlist.includes(p.id);
-  let heartIcon = isLiked ? '❤️' : '🤍';
-  let categoryTag = p.category || p.type || p.cat || 'General';
-  let detailSellingPrice = Number(p.price) || 0;
-  let detailMrpPrice = Number(p.mrp) || 0;
-  let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
-  if (detailMrpPrice > detailSellingPrice) {
-    let offAmount = detailMrpPrice - detailSellingPrice;
-    let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
-    detailPriceHtml = `
-      <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
-        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
-        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAVE ₹${offAmount} (${offPercent}% OFF)</span>
-      </div>`;
-  }
-  let variantHtml = '';
-  if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-    let firstColorObj = p.colors[0];
-    selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
-    variantHtml += `
-      <div class="variant-section">
-        <div class="variant-title">Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
-        <div class="color-options">`;
-    p.colors.forEach((c, idx) => {
-      let cName = typeof c === 'object' ? c.name : c;
-      let cImg = '';
-      if (typeof c === 'object' && c.image) {
-        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
-        cImg = formatMediaUrl(imgUrl);
-      } else if (p.media && p.media.length > 0) {
-        cImg = formatMediaUrl(p.media[0]);
-      }
-      let activeClass = (idx === 0) ? 'active' : '';
-      if (cImg) {
-        variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="${cName}">`;
-      } else {
-        variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${cName}', this)">${cName}</button>`;
-      }
-    });
-    variantHtml += '</div></div>';
-  }
-  if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
-    selectedSize = p.sizes[0];
-    variantHtml += `
-      <div class="variant-section">
-        <div class="variant-title">Size: <span id="sizeLabel" style="color:#38bdf8">${selectedSize}</span></div>
-        <div class="size-options">`;
-    p.sizes.forEach((s, idx) => {
-      let activeClass = (idx === 0) ? 'active' : '';
-      variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectSize('${s}', this)">${s}</button>`;
-    });
-    variantHtml += '</div></div>';
-  }
+        // LIGHTBOX & ZOOM VARIABLES
+        let zoomScale = 1;
+        let zoomLastScale = 1;
+        let zoomStartDistance = 0;
+        let zoomLastTap = 0;
+        let zoomPosX = 0, zoomPosY = 0;
+        let startPosX = 0, startPosY = 0;
+        let isDragging = false;
+        let isPinching = false;
+        let preventClick = false;
+        let justPinched = false;
+        const MIN_ZOOM = 1;
+        const MAX_ZOOM = 4;
 
-  const detailContent = document.getElementById('detailContent');
-  detailContent.innerHTML = `
-    <div id="detailSliderContainer"></div>
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-      <div>
-        <small style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">${categoryTag}</small>
-        <h1 style="color: white; font-size: 22px; margin-top: 4px;">${p.name}</h1>
-      </div>
-      <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
-    </div>
-    ${detailPriceHtml}
-    ${variantHtml}
-    <div style="margin: 20px 0; background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-      <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
-      <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available.'}</p>
-    </div>
-    <div style="display: flex; gap: 10px;">
-      <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1);" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
-      <button class="pay-btn" style="flex: 1;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
-    </div>`;
+        // INITIAL UI UPDATE
+        document.getElementById('cartCount').innerText = cart.length;
+        updateAuthUI();
 
-  updateGalleryImages(selectedColor);
-  window.scrollTo(0, 0);
-};
+        // HANDLE GOOGLE REDIRECT LOGIN RESULT
+        getRedirectResult(auth).then((result) => {
+            if (result && result.user) {
+                handleSuccessfulAuthUser(result.user);
+            }
+        }).catch((error) => {
+            console.error("Google Redirect Error:", error);
+        });
 
-window.addToCartDirect = (id) => {
-  const p = liveProducts.find(item => item.id === id);
-  if (!p) return;
-  let cartItem = {
-    id: p.id,
-    name: p.name,
-    price: Number(p.price) || 0,
-    selectedColor: selectedColor || "",
-    selectedSize: selectedSize || "",
-    selectedImage: selectedImage || (p.media && p.media[0] ? p.media[0] : ""),
-    quantity: 1,
-    media: p.media || []
-  };
-  let existingIdx = cart.findIndex(ci => ci.id === p.id && ci.selectedColor === cartItem.selectedColor && ci.selectedSize === cartItem.selectedSize);
-  if (existingIdx > -1) {
-    cart[existingIdx].quantity += 1;
-  } else {
-    cart.push(cartItem);
-  }
-  localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-  document.getElementById('cartCount').innerText = cart.length;
-  window.showToast("Product Cart me add ho gaya hai!");
-};
+        // CHECK EMAIL LINK LOGIN ON LOAD
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            if (!email) {
+                email = window.prompt('Please provide your Gmail address for confirmation:');
+            }
+            signInWithEmailLink(auth, email, window.location.href)
+                .then((result) => {
+                    window.localStorage.removeItem('emailForSignIn');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    handleSuccessfulAuthUser(result.user);
+                })
+                .catch((error) => {
+                    window.showToast("Email link login failed: " + error.message, "error");
+                });
+        }
 
-window.buyNowDirect = (id) => {
-  window.addToCartDirect(id);
-  window.toggleCart();
-};
+        // APP REFRESH FUNCTION
+        window.refreshAppData = () => {
+            window.showToast("App data refresh ho raha hai... 🔄");
+            listenToProducts();
+            if (currentUser) {
+                fetchLiveStatusForAllOrders();
+            }
+            window.applyFiltersAndRender();
+        };
 
-window.toggleCart = () => {
-  const modal = document.getElementById('cartModal');
-  const isOpen = modal.style.display === 'flex';
-  modal.style.display = isOpen ? 'none' : 'flex';
-  if (!isOpen) {
-    renderCartUI();
-    pushNavState('cart');
-  } else if (history.state && history.state.appNav === 'cart') {
-    history.back();
-  }
-};
+        setInterval(() => {
+            if (currentUser && currentCategory === 'MyOrders') {
+                fetchLiveStatusForAllOrders();
+            }
+        }, 6000);
 
-function renderCartUI() {
-  const cartList = document.getElementById('cartList');
-  cartList.innerHTML = "";
-  if (cart.length === 0) {
-    cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
-    cartTotalAmount = 0;
-  } else {
-    cartTotalAmount = 0;
-    cart.forEach((item, index) => {
-      let itemTotal = item.price * (item.quantity || 1);
-      cartTotalAmount += itemTotal;
-      let imgUrl = item.selectedImage ? formatMediaUrl(item.selectedImage) : (item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/50');
-      let variantTxt = "";
-      if (item.selectedColor || item.selectedSize) {
-        variantTxt = `<div style="font-size: 11px; color: #cbd5e1;">${item.selectedColor ? 'Color: ' + item.selectedColor : ''} ${item.selectedSize ? ' | Size: ' + item.selectedSize : ''}</div>`;
-      }
-      cartList.innerHTML += `
-        <div class="cart-item">
-          <img src="${imgUrl}" class="cart-item-img" alt="Cart Product">
-          <div class="cart-item-info">
-            <h4>${item.name}</h4>
-            ${variantTxt}
-            <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">-</button>
-            <span style="font-weight: bold; font-size: 13px;">${item.quantity || 1}</span>
-            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">+</button>
-            <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px; padding: 4px 8px;">X</button>
-          </div>
-        </div>`;
-    });
-  }
-  document.getElementById('qrTotal').innerText = cartTotalAmount;
-  const nameInput = document.getElementById('custName');
-  const phoneInput = document.getElementById('custPhone');
-  const addressSelectSection = document.getElementById('checkoutAddressSection');
-  const addressSelect = document.getElementById('checkoutAddressSelect');
-  if (currentUser) {
-    nameInput.value = currentUser.name || "";
-    phoneInput.value = currentUser.phone || "";
-    if (currentUser.addresses && currentUser.addresses.length > 0) {
-      addressSelectSection.style.display = 'block';
-      addressSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
-      currentUser.addresses.forEach((addr, idx) => {
-        addressSelect.innerHTML += `<option value="${idx}">${addr}</option>`;
-      });
-    } else {
-      addressSelectSection.style.display = 'none';
-    }
-  } else {
-    nameInput.value = '';
-    phoneInput.value = '';
-    addressSelectSection.style.display = 'none';
-  }
-  window.handlePaymentMode();
-}
+        // AUTHENTICATION & PROFILE FUNCTIONS
+        window.toggleAuthModal = () => {
+            const modal = document.getElementById('authModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                pushNavState('auth');
+            } else if (history.state && history.state.appNav === 'auth') {
+                history.back();
+            }
+        };
 
-window.updateCartQuantity = (index, change) => {
-  if (!cart[index]) return;
-  cart[index].quantity = (cart[index].quantity || 1) + change;
-  if (cart[index].quantity <= 0) {
-    cart.splice(index, 1);
-  }
-  localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-  document.getElementById('cartCount').innerText = cart.length;
-  renderCartUI();
-};
+        window.switchAuthTab = (mode) => {
+            authMode = mode;
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const signupBtn = document.getElementById('tabSignupBtn');
+            const nameInput = document.getElementById('authName');
+            const submitBtn = document.getElementById('authSubmitBtn');
 
-window.removeFromCart = (index) => {
-  if (!cart[index]) return;
-  cart.splice(index, 1);
-  localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-  document.getElementById('cartCount').innerText = cart.length;
-  renderCartUI();
-};
+            if (mode === 'login') {
+                loginBtn.classList.add('active');
+                signupBtn.classList.remove('active');
+                nameInput.style.display = 'none';
+                submitBtn.innerText = 'Login';
+            } else {
+                signupBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+                nameInput.style.display = 'block';
+                submitBtn.innerText = 'Sign Up';
+            }
+        };
 
-window.handleCheckoutAddressSelect = () => {
-  const select = document.getElementById('checkoutAddressSelect');
-  const idx = select.value;
-  if (idx !== "" && currentUser && currentUser.addresses && currentUser.addresses[idx]) {
-    document.getElementById('custAddress').value = currentUser.addresses[idx];
-  }
-};
+        function reloadUserSpecificState() {
+            cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
+            watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
+            document.getElementById('cartCount').innerText = cart.length;
+            fetchLiveStatusForAllOrders();
+        }
 
-window.handlePaymentMode = () => {
-  const mode = document.getElementById('paymentMode').value;
-  const onlineSec = document.getElementById('onlinePaymentSection');
-  if (mode === 'Online') {
-    onlineSec.style.display = 'block';
-    let total = cartTotalAmount;
-    document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${total}&cu=INR`)}`;
-    document.getElementById('directPayLink').href = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${total}&cu=INR`;
-  } else {
-    onlineSec.style.display = 'none';
-  }
-};
+        function handleSuccessfulAuthUser(user) {
+            let phone = prompt("Enter your 10-digit Mobile Number for order notifications:", "9876543210");
+            if (!phone || phone.length !== 10) phone = "9999999999";
 
-window.submitOrder = () => {
-  const name = document.getElementById('custName').value.trim();
-  const phone = document.getElementById('custPhone').value.trim();
-  const address = document.getElementById('custAddress').value.trim();
-  const paymentMode = document.getElementById('paymentMode').value;
-  const utr = document.getElementById('utrNumber').value.trim();
+            currentUser = {
+                name: user.displayName || (user.email ? user.email.split('@')[0] : "Google User"),
+                phone: phone,
+                email: user.email || "",
+                password: 'google_auth_user',
+                addresses: []
+            };
 
-  if (!name || !phone || !address) {
-    window.showToast("Kripya apna naam, mobile number aur address bharein!", "error");
-    return;
-  }
-  if (phone.length !== 10) {
-    window.showToast("Kripya sahi 10-digit mobile number daalein!", "error");
-    return;
-  }
-  if (cart.length === 0) {
-    window.showToast("Aapka cart khaali hai!", "error");
-    return;
-  }
-  if (paymentMode === 'Online' && !utr) {
-    window.showToast("Online payment ke liye UTR / Transaction number daalna zaroori hai!", "error");
-    return;
-  }
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            let existing = registeredUsers.find(u => u.phone === phone);
+            if (!existing) {
+                registeredUsers.push(currentUser);
+                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+            } else {
+                currentUser = existing;
+            }
 
-  let orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
-  let orderData = {
-    action: 'order',
-    orderId: orderId,
-    name: name,
-    phone: phone,
-    address: address,
-    paymentMode: paymentMode,
-    utr: utr,
-    total: cartTotalAmount,
-    items: cart,
-    date: new Date().toLocaleString('en-IN')
-  };
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+            syncUserToExcel({ action: 'signup', name: currentUser.name, phone: currentUser.phone, password: 'google_auth_user', email: currentUser.email });
+            
+            if(document.getElementById('authModal').style.display === 'flex') {
+                window.toggleAuthModal();
+            }
+            updateAuthUI();
+            reloadUserSpecificState();
+            window.showToast("Login Successful! 🎉");
+        }
 
-  let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
-  savedOrders.unshift({
-    orderId: orderId,
-    name: name,
-    phone: phone,
-    items: cart,
-    total: cartTotalAmount,
-    status: 'Hi, your order is ready',
-    date: new Date().toLocaleString('en-IN')
-  });
-  localStorage.setItem(getUserOrdersKey(), JSON.stringify(savedOrders));
+        // Mobile + Password Authentication
+        window.submitAuth = () => {
+            const phone = document.getElementById('authPhone').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const name = document.getElementById('authName').value.trim();
 
-  if (navigator.onLine) {
-    fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderData)
-    }).catch(err => console.log("Order sync error:", err));
-  }
+            if (!phone || phone.length !== 10 || !password) {
+                window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
+                return;
+            }
 
-  cart = [];
-  localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-  document.getElementById('cartCount').innerText = '0';
-  document.getElementById('cartModal').style.display = 'none';
-  document.getElementById('successModal').style.display = 'flex';
-  setTimeout(() => {
-    document.getElementById('successModal').style.display = 'none';
-    window.showMyOrders();
-  }, 2500);
-};
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
 
-listenToProducts();
-</script>
+            if (authMode === 'signup') {
+                if (!name) {
+                    window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
+                    return;
+                }
+                let existing = registeredUsers.find(u => u.phone === phone);
+                if (existing) {
+                    window.showToast("Yeh mobile number pehle se registered hai! Login karein.", "error");
+                    window.switchAuthTab('login');
+                    return;
+                }
+
+                let newUser = { name, phone, password, addresses: [] };
+                registeredUsers.push(newUser);
+                localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+
+                syncUserToExcel({ action: 'signup', name, phone, password, email: '' });
+
+                currentUser = newUser;
+                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+                window.toggleAuthModal();
+                updateAuthUI();
+                reloadUserSpecificState();
+                window.showToast("Sign up successful! Welcome.");
+
+            } else {
+                let user = registeredUsers.find(u => u.phone === phone && u.password === password);
+                if (!user) {
+                    window.showToast("Galat mobile number ya password! Pehle Sign Up karein.", "error");
+                    return;
+                }
+                currentUser = user;
+                localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+                window.toggleAuthModal();
+                updateAuthUI();
+                reloadUserSpecificState();
+                window.showToast("Login successful!");
+            }
+        };
+
+        // Firebase Google Login
+        window.handleGoogleLogin = async () => {
+            const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
+            
+           const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            try {
+                await signInWithRedirect(auth, provider);
+            } catch (error) {
+                console.warn("Popup blocked or failed, switching to redirect mode:", error);
+                if (error.code === 'auth/disallowed-useragent' || isWebView) {
+                    window.showToast("App me Google Login restricted hai. Mobile Number se Sign Up karein!", "error");
+                    window.switchAuthTab('signup');
+                } else if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
+                    try {
+                        await signInWithRedirect(auth, provider);
+                    } catch (redirectError) {
+                        window.showToast("Google Login Error: " + redirectError.message, "error");
+                    }
+                } else {
+                    window.showToast("Google Login failed: " + error.message, "error");
+                }
+            }
+        };
+
+        // Firebase Gmail Link / OTP Login
+        window.handleEmailLinkLogin = async () => {
+            const email = document.getElementById('authEmail').value.trim();
+            if (!email || !email.includes('@')) {
+                window.showToast("Kripya sahi Gmail address bharein!", "error");
+                return;
+            }
+            const actionCodeSettings = {
+                url: window.location.href.split('?')[0],
+                handleCodeInApp: true,
+            };
+            try {
+                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                window.localStorage.setItem('emailForSignIn', email);
+                window.showToast("Login link aapke Gmail par bhej diya gaya hai! Check your inbox.");
+            } catch (error) {
+                window.showToast("Error sending email link: " + error.message, "error");
+            }
+        };
+
+        function syncUserToExcel(payloadData) {
+            if (!navigator.onLine) return;
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadData)
+            }).catch(err => console.log("Excel user sync error:", err));
+        }
+
+        function updateAuthUI() {
+            const headerAuthArea = document.getElementById('headerAuthArea');
+            const drawerUserSection = document.getElementById('drawerUserSection');
+
+            if (currentUser) {
+                headerAuthArea.innerHTML = `
+                    <button onclick="window.toggleProfileModal()" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;">
+                        <div class="user-avatar-small" style="width:34px; height:34px; font-size:14px;">${currentUser.name.charAt(0).toUpperCase()}</div>
+                    </button>
+                `;
+                drawerUserSection.innerHTML = `
+                    <div class="user-profile-brief" onclick="window.toggleProfileModal()">
+                        <div class="user-avatar-small">${currentUser.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div style="font-weight: 700; color: white; font-size: 14px;">${currentUser.name}</div>
+                            <div style="font-size: 12px; color: #38bdf8;">${currentUser.phone} (View Profile)</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                headerAuthArea.innerHTML = `
+                    <button class="auth-highlight-btn" onclick="window.toggleAuthModal()">Sign Up</button>
+                `;
+                drawerUserSection.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <button class="pay-btn" onclick="window.toggleAuthModal()" style="margin-top:0; padding:10px; font-size:14px;">Login / Sign Up 🚀</button>
+                    </div>
+                `;
+            }
+        }
+
+        window.toggleProfileModal = () => {
+            if (!currentUser) {
+                window.toggleAuthModal();
+                return;
+            }
+            const modal = document.getElementById('profileModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                document.getElementById('profileAvatarDisplay').innerText = currentUser.name.charAt(0).toUpperCase();
+                document.getElementById('profileNameDisplay').innerText = currentUser.name;
+                document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
+                renderSavedAddresses();
+                pushNavState('profile');
+            } else if (history.state && history.state.appNav === 'profile') {
+                history.back();
+            }
+        };
+
+        function renderSavedAddresses() {
+            const listDiv = document.getElementById('savedAddressesList');
+            if (!currentUser.addresses || currentUser.addresses.length === 0) {
+                listDiv.innerHTML = '<p style="color: #94a3b8; font-size: 13px;">No saved addresses yet.</p>';
+                return;
+            }
+            listDiv.innerHTML = '';
+            currentUser.addresses.forEach((addr, idx) => {
+                listDiv.innerHTML += `
+                    <div class="address-chip">
+                        <span>📍 ${addr}</span>
+                        <button onclick="window.deleteAddress(${idx})" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer;">✕</button>
+                    </div>
+                `;
+            });
+        }
+
+        window.saveNewAddress = () => {
+            const newAddr = document.getElementById('newAddressInput').value.trim();
+            if (!newAddr) {
+                window.showToast("Address daalna zaroori hai!", "error");
+                return;
+            }
+            if (!currentUser.addresses) currentUser.addresses = [];
+            currentUser.addresses.push(newAddr);
+            
+            updateUserDataInStorage();
+            document.getElementById('newAddressInput').value = '';
+            renderSavedAddresses();
+            window.showToast("Address saved successfully!");
+        };
+
+        window.deleteAddress = (idx) => {
+            currentUser.addresses.splice(idx, 1);
+            updateUserDataInStorage();
+            renderSavedAddresses();
+            window.showToast("Address removed.");
+        };
+
+        function updateUserDataInStorage() {
+            let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+            registeredUsers = registeredUsers.map(u => u.phone === currentUser.phone ? currentUser : u);
+            localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
+            localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
+        }
+
+        window.logoutUser = () => {
+            currentUser = null;
+            localStorage.removeItem('arpit_current_user');
+            cart = [];
+            watchlist = [];
+            document.getElementById('cartCount').innerText = '0';
+            document.getElementById('profileModal').style.display = 'none';
+            updateAuthUI();
+            window.goHome();
+            window.showToast("Logged out successfully!", "success");
+        };
+
+        window.checkNetworkStatus = () => {
+            const offlineModal = document.getElementById('offlineModal');
+            if (!navigator.onLine) {
+                if (offlineModal) offlineModal.style.display = 'flex';
+            } else {
+                if (offlineModal) offlineModal.style.display = 'none';
+            }
+        };
+        window.addEventListener('online', window.checkNetworkStatus);
+        window.addEventListener('offline', window.checkNetworkStatus);
+
+        function pushNavState(type) {
+            history.pushState({ appNav: type }, '');
+        }
+
+        window.addEventListener('popstate', (e) => {
+            const zoomModal = document.getElementById('imageZoomModal');
+            if (zoomModal && zoomModal.style.display === 'flex') {
+                if (zoomScale > 1) {
+                    resetZoom();
+                    pushNavState('zoom');
+                    return;
+                }
+                zoomModal.style.display = 'none';
+                resetZoom();
+                return;
+            }
+
+            const cartModal = document.getElementById('cartModal');
+            if (cartModal && cartModal.style.display === 'flex') {
+                cartModal.style.display = 'none';
+                return;
+            }
+
+            const authModal = document.getElementById('authModal');
+            if (authModal && authModal.style.display === 'flex') {
+                authModal.style.display = 'none';
+                return;
+            }
+
+            const profileModal = document.getElementById('profileModal');
+            if (profileModal && profileModal.style.display === 'flex') {
+                profileModal.style.display = 'none';
+                return;
+            }
+
+            const drawer = document.getElementById('drawer');
+            if (drawer && drawer.classList.contains('open')) {
+                drawer.classList.remove('open');
+                const overlay = document.getElementById('overlay');
+                if(overlay) overlay.style.display = 'none';
+                return;
+            }
+
+            const detailView = document.getElementById('detailView');
+            if (detailView && detailView.style.display === 'block') {
+                document.getElementById('detailView').style.display = 'none';
+                document.getElementById('homeView').style.display = 'block';
+                return;
+            }
+
+            if (currentCategory !== 'All') {
+                window.goHomeSilently();
+                return;
+            }
+        });
+
+        function getDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.hypot(dx, dy);
+        }
+
+        function applyZoomTransform() {
+            const zoomedImg = document.getElementById('zoomedImg');
+            if (zoomedImg) {
+                zoomedImg.style.transform = `translate(${zoomPosX}px, ${zoomPosY}px) scale(${zoomScale})`;
+            }
+        }
+
+        function resetZoom() {
+            zoomScale = 1;
+            zoomLastScale = 1;
+            zoomStartDistance = 0;
+            zoomPosX = 0;
+            zoomPosY = 0;
+            isDragging = false;
+            isPinching = false;
+            applyZoomTransform();
+        }
+
+        window.openZoomModal = (imgUrl) => {
+            const modal = document.getElementById('imageZoomModal');
+            const zoomedImg = document.getElementById('zoomedImg');
+            if(modal && zoomedImg) {
+                zoomedImg.src = imgUrl;
+                resetZoom();
+                modal.style.display = 'flex';
+                pushNavState('zoom');
+            }
+        };
+
+        window.closeZoomModal = (force = false) => {
+            if (!force && (preventClick || justPinched || zoomScale > 1)) return;
+            const modal = document.getElementById('imageZoomModal');
+            if(modal && modal.style.display === 'flex') {
+                modal.style.display = 'none';
+                resetZoom();
+                if (history.state && history.state.appNav === 'zoom') {
+                    history.back();
+                }
+            }
+        };
+
+        const zoomContainer = document.getElementById('imageZoomModal');
+        if (zoomContainer) {
+            zoomContainer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    isPinching = true;
+                    isDragging = false;
+                    e.preventDefault();
+                    zoomStartDistance = getDistance(e.touches);
+                    zoomLastScale = zoomScale;
+                } else if (e.touches.length === 1) {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - zoomLastTap;
+                    
+                    if (tapLength < 300 && tapLength > 0) {
+                        e.preventDefault();
+                        if (zoomScale > 1) {
+                            resetZoom();
+                        } else {
+                            zoomScale = 2.5;
+                            zoomLastScale = 2.5;
+                            zoomPosX = 0;
+                            zoomPosY = 0;
+                            applyZoomTransform();
+                        }
+                    } else if (zoomScale > 1 && !isPinching) {
+                        isDragging = true;
+                        startPosX = e.touches[0].clientX - zoomPosX;
+                        startPosY = e.touches[0].clientY - zoomPosY;
+                    }
+                    zoomLastTap = currentTime;
+                }
+            }, { passive: false });
+
+            zoomContainer.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && isPinching) {
+                    e.preventDefault();
+                    const currentDistance = getDistance(e.touches);
+                    if (zoomStartDistance > 0) {
+                        const factor = currentDistance / zoomStartDistance;
+                        zoomScale = Math.min(Math.max(zoomLastScale * factor, MIN_ZOOM), MAX_ZOOM);
+                        if (zoomScale === 1) { zoomPosX = 0; zoomPosY = 0; }
+                        applyZoomTransform();
+                    }
+                } else if (e.touches.length === 1 && isDragging && zoomScale > 1) {
+                    e.preventDefault();
+                    zoomPosX = e.touches[0].clientX - startPosX;
+                    zoomPosY = e.touches[0].clientY - startPosY;
+                    applyZoomTransform();
+                }
+            }, { passive: false });
+
+            zoomContainer.addEventListener('touchend', (e) => {
+                if (isPinching) {
+                    justPinched = true;
+                    setTimeout(() => { justPinched = false; }, 400);
+                    if (e.touches.length === 1) {
+                        isPinching = false;
+                        zoomLastScale = zoomScale;
+                        isDragging = true;
+                        startPosX = e.touches[0].clientX - zoomPosX;
+                        startPosY = e.touches[0].clientY - zoomPosY;
+                    } else if (e.touches.length === 0) {
+                        isPinching = false;
+                        isDragging = false;
+                        zoomLastScale = zoomScale;
+                    }
+                } else if (e.touches.length === 0) {
+                    isDragging = false;
+                }
+                preventClick = true;
+                setTimeout(() => { preventClick = false; }, 300);
+            });
+        }
+
+        function saveActiveTab(tabName) {
+            sessionStorage.setItem('active_store_tab', tabName);
+        }
+
+        window.showToast = (message, type = "success") => {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === "error" ? `⚠️ ${message}` : `✅ ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, 3000);
+        };
+
+        function formatMediaUrl(url) {
+            if(!url) return '';
+            if (url.includes('drive.google.com') || url.includes('googleusercontent.com')) {
+                const match = url.match(/[-\w]{25,}/);
+                if (match && match[0]) {
+                    return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w1000`;
+                }
+            }
+            return url;
+        }
+
+        function listenToProducts() {
+            window.checkNetworkStatus();
+            fetchLiveStatusForAllOrders();
+
+            if (productsUnsubscribe) productsUnsubscribe();
+
+            const productsRef = collection(db, "products");
+            productsUnsubscribe = onSnapshot(productsRef, (snapshot) => {
+                if(!snapshot.empty) {
+                    liveProducts = [];
+                    snapshot.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
+                    document.getElementById('loader').style.display = 'none';
+                    restoreSavedTab();
+                } else {
+                    onSnapshot(collection(db, "product"), (snap2) => {
+                        liveProducts = [];
+                        snap2.forEach(doc => liveProducts.push({ id: doc.id, ...doc.data() }));
+                        document.getElementById('loader').style.display = 'none';
+                        restoreSavedTab();
+                    });
+                }
+            }, (error) => { window.checkNetworkStatus(); });
+        }
+
+        function restoreSavedTab() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('id')) { window.checkSharedLink(); return; }
+            const savedTab = sessionStorage.getItem('active_store_tab');
+            if (savedTab) {
+                if (savedTab === 'MyOrders') window.showMyOrders();
+                else if (savedTab === 'Watchlist') window.showWatchlist();
+                else window.filterCategory(savedTab);
+            } else { window.applyFiltersAndRender(); }
+        }
+
+        window.toggleFilterSortMenu = () => {
+            const menu = document.getElementById('filterSortDropdown');
+            const isHidden = menu.style.display === 'none';
+            menu.style.display = isHidden ? 'block' : 'none';
+            const btn = document.getElementById('filterToggleBtn');
+            if (btn) btn.style.background = isHidden ? 'rgba(56, 189, 248, 0.25)' : 'rgba(30, 41, 59, 0.8)';
+        };
+
+        window.toggleDrawer = () => {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('overlay');
+            if (!drawer || !overlay) return;
+            
+            const isOpen = drawer.classList.contains('open');
+            if (isOpen) {
+                drawer.classList.remove('open');
+                overlay.style.display = 'none';
+            } else {
+                drawer.classList.add('open');
+                overlay.style.display = 'block';
+                pushNavState('drawer');
+            }
+        };
+
+        window.goHome = () => {
+            saveActiveTab('All');
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+            window.clearSearchBox();
+            window.filterCategory('All');
+            window.scrollTo(0, 0);
+        };
+
+        window.goHomeSilently = () => {
+            saveActiveTab('All');
+            currentCategory = 'All';
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const homeTab = document.getElementById('tab-All');
+            if(homeTab) homeTab.classList.add('active');
+            document.getElementById('pageTitle').innerText = 'All Products';
+            document.getElementById('sareeOfferBanner').style.display = 'none';
+            window.applyFiltersAndRender();
+        };
+
+        window.toggleLike = (id, event) => {
+            if(event) event.stopPropagation(); 
+            let isAdding = false;
+            let key = getUserWatchlistKey();
+            if (watchlist.includes(id)) {
+                watchlist = watchlist.filter(itemId => itemId !== id);
+            } else {
+                watchlist.push(id);
+                isAdding = true;
+            }
+            localStorage.setItem(key, JSON.stringify(watchlist));
+            window.applyFiltersAndRender();
+            const detailLikeBtn = document.getElementById('detailLikeBtn');
+            if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
+            if(isAdding) window.showToast("Saved to Watchlist!");
+        };
+
+        window.showWatchlist = () => {
+            saveActiveTab('Watchlist');
+            currentCategory = 'Watchlist';
+            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const watchTab = document.getElementById('tab-Watchlist');
+            if(watchTab) watchTab.classList.add('active');
+            document.getElementById('pageTitle').innerText = '❤️ My Watchlist';
+            document.getElementById('sareeOfferBanner').style.display = 'none';
+            pushNavState('watchlist');
+            window.applyFiltersAndRender();
+        };
+
+        window.showMyOrders = () => {
+            saveActiveTab('MyOrders');
+            currentCategory = 'MyOrders';
+            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const orderTab = document.getElementById('tab-Orders');
+            if(orderTab) orderTab.classList.add('active');
+            document.getElementById('pageTitle').innerText = '📦 My Orders';
+            document.getElementById('sareeOfferBanner').style.display = 'none';
+            pushNavState('orders');
+            fetchLiveStatusForAllOrders();
+            renderOrdersUI();
+        };
+
+        window.filterCategory = (cat) => {
+            saveActiveTab(cat);
+            if(cat === 'Watchlist') { window.showWatchlist(); return; }
+            if(cat === 'MyOrders') { window.showMyOrders(); return; }
+            currentCategory = cat;
+            if(document.getElementById('drawer').classList.contains('open')) window.toggleDrawer();
+            
+            document.getElementById('detailView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'block';
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeTab = document.getElementById('tab-' + cat);
+            if(activeTab) activeTab.classList.add('active');
+            document.getElementById('pageTitle').innerText = cat === 'All' ? 'All Products' : cat + ' Collection';
+            const banner = document.getElementById('sareeOfferBanner');
+            if (cat === 'Saree') banner.style.display = 'block'; else banner.style.display = 'none';
+            if(cat !== 'All') pushNavState('category');
+            window.applyFiltersAndRender();
+        };
+
+        window.handleSearch = (val) => {
+            searchQuery = val.trim().toLowerCase();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            clearBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
+            window.applyFiltersAndRender();
+        };
+
+        window.clearSearchBox = () => {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearchBtn').style.display = 'none';
+            window.applyFiltersAndRender();
+        };
+
+        window.applyFiltersAndRender = () => {
+            if (currentCategory === 'MyOrders') { renderOrdersUI(); return; }
+            let filtered = [];
+            if (currentCategory === 'Watchlist') filtered = liveProducts.filter(p => watchlist.includes(p.id));
+            else if (currentCategory === 'All') filtered = [...liveProducts];
+            else {
+                filtered = liveProducts.filter(p => {
+                    let productCat = (p.category || p.type || p.cat || '').toString().trim().toLowerCase();
+                    let target = currentCategory.toLowerCase();
+                    return productCat.includes(target) || target.includes(productCat);
+                });
+            }
+            if (searchQuery !== '') {
+                filtered = filtered.filter(p => {
+                    let name = (p.name || '').toLowerCase();
+                    let desc = (p.description || '').toLowerCase();
+                    let cat = (p.category || p.type || p.cat || '').toLowerCase();
+                    return name.includes(searchQuery) || desc.includes(searchQuery) || cat.includes(searchQuery);
+                });
+            }
+            const sortVal = document.getElementById('sortSelect').value;
+            if (sortVal === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
+            else if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
+            else if (sortVal === 'name') filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+            updateActiveFiltersUI();
+            renderProductsUI(filtered);
+        };
+
+        function updateActiveFiltersUI() {
+            const badgeContainer = document.getElementById('activeFilters');
+            badgeContainer.innerHTML = '';
+            let badgesHtml = '';
+            if (currentCategory !== 'All' && currentCategory !== 'MyOrders') {
+                badgesHtml += `<div class="filter-badge">Category: ${currentCategory} <span onclick="window.filterCategory('All')">×</span></div>`;
+            }
+            if (searchQuery !== '') {
+                badgesHtml += `<div class="filter-badge">Keyword: "${searchQuery}" <span onclick="window.clearSearchBox()">×</span></div>`;
+            }
+            badgeContainer.innerHTML = badgesHtml;
+        }
+
+        function renderProductsUI(items) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            if(items.length === 0) {
+                if(currentCategory === 'Watchlist') grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">💔</div><p style="color: #94a3b8; font-size:16px;">Aapki Watchlist khaali hai.<br>Products par ❤️ dabayein!</p></div>';
+                else if(searchQuery !== '') grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for "<b>${searchQuery}</b>"</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding:10px 20px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
+                else grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me abhi koi product nahi hai!</p>';
+                return;
+            }
+
+            items.forEach(p => {
+                let isLiked = watchlist.includes(p.id);
+                let heartIcon = isLiked ? '❤️' : '🤍';
+                let categoryTag = p.category || p.type || p.cat || 'General';
+                let sellingPrice = Number(p.price) || 0;
+                let mrpPrice = Number(p.mrp) || 0;
+                let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
+
+                if (mrpPrice > sellingPrice) {
+                    let offAmount = mrpPrice - sellingPrice;
+                    let offPercent = Math.round((offAmount / mrpPrice) * 100);
+                    priceHtml = `
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span style="font-weight: 800; color: #38bdf8; font-size: 18px;">₹${sellingPrice}</span>
+                            <span style="color: #94a3b8; font-size: 12px; text-decoration: line-through;">₹${mrpPrice}</span>
+                            <span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px;">
+                                ${offPercent}% OFF
+                            </span>
+                        </div>
+                    `;
+                }
+
+                let mediaHtml = '<div class="media-slider">';
+                if (p.media && p.media.length > 0) {
+                    p.media.forEach(rawLink => {
+                        let link = formatMediaUrl(rawLink);
+                        mediaHtml += `<img src="${link}" class="slide-item" loading="lazy" onerror="this.src='https://via.placeholder.com/300x180?text=Image+Error'">`;
+                    });
+                } else {
+                    mediaHtml += `<img src="https://via.placeholder.com/300x180?text=No+Image" class="slide-item">`;
+                }
+                mediaHtml += '</div>';
+
+                grid.innerHTML += `
+                    <div class="card" onclick="window.showProductDetail('${p.id}')">
+                        <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</div>
+                        ${mediaHtml}
+                        <div>
+                            <small>${categoryTag}</small>
+                            <h3>${p.name}</h3>
+                            ${priceHtml}
+                        </div>
+                        <button class="add-btn" onclick="event.stopPropagation(); window.showProductDetail('${p.id}')">Select Options</button>
+                    </div>
+                `;
+            });
+        }
+
+        // RENDER ORDERS UI: Customer app view with Cancel button restriction when on the way or delivered
+        function renderOrdersUI() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            if (!currentUser) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up 🚀</button></div>';
+                return;
+            }
+
+            let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+            if(savedOrders.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
+                return;
+            }
+
+            savedOrders.forEach((ord, ordIndex) => {
+                let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
+                ord.items.forEach(it => {
+                    let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
+                    if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
+                    
+                    let variantTxt = '';
+                    if (it.selectedColor || it.selectedSize) {
+                        variantTxt = `<div style="color:#cbd5e1; font-size:11px; display:flex; gap:6px; align-items:center; margin-top:2px;">`;
+                        if (it.selectedColor) variantTxt += `<span style="background:rgba(56,189,248,0.2); padding:1px 5px; border-radius:4px;">🎨 ${it.selectedColor}</span>`;
+                        if (it.selectedSize) variantTxt += `<span style="background:rgba(244,63,94,0.2); padding:1px 5px; border-radius:4px;">📏 ${it.selectedSize}</span>`;
+                        variantTxt += `</div>`;
+                    }
+                    
+                    itemsListHtml += `
+                        <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${imgUrl}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px;" loading="lazy">
+                                <div>
+                                    <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
+                                    ${variantTxt}
+                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold; margin-top:2px;">₹${it.price}</div>
+                                </div>
+                            </div>
+                            <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Buy Again 🔄</button>
+                        </li>
+                    `;
+                });
+                itemsListHtml += '</ul>';
+
+                let subText = "Hi, your order is ready";
+                let badgeBg = '#0284c7';
+                let currentStatus = ord.status || "Hi, your order is ready";
+                
+                if (currentStatus === "Your order on the way") { badgeBg = '#eab308'; subText = "Order on the way! 🚚"; }
+                else if (currentStatus === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
+                else if (currentStatus === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
+
+                // Customer cannot cancel if product is on the way, delivered, or already cancelled
+                let cancelBtnHtml = '';
+                if (currentStatus !== "Your order on the way" && currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
+                    cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
+                }
+
+                grid.innerHTML += `
+                    <div class="order-card" style="grid-column: 1/-1;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span class="order-status-badge" style="background: ${badgeBg}; margin: 0;">${currentStatus}</span>
+                            ${cancelBtnHtml}
+                        </div>
+                        <h4 style="color:white; margin-bottom: 5px;">Order ID: #${ord.orderId}</h4>
+                        <p style="color:#94a3b8; font-size:12px; margin-bottom:10px;">Date & Time: ${ord.date}</p>
+                        ${itemsListHtml}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px;">
+                            <span style="color:#94a3b8; font-size:14px;">Total Paid:</span>
+                            <span style="color:#38bdf8; font-weight:bold; font-size:18px;">₹${ord.total}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.cancelCustomerOrder = (index) => {
+            if (!confirm("Kya aap apna order cancel karna chahte hain?")) return;
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            if (savedOrders[index]) {
+                savedOrders[index].status = "Cancel your order";
+                localStorage.setItem(key, JSON.stringify(savedOrders));
+                
+                // Send cancellation update to Google script / Telegram
+                let ord = savedOrders[index];
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'update_status',
+                        orderId: ord.orderId,
+                        status: 'Cancel your order'
+                    })
+                }).catch(e => console.log(e));
+
+                window.showToast("Order cancelled successfully!", "error");
+                renderOrdersUI();
+            }
+        };
+
+        function fetchLiveStatusForAllOrders() {
+            if (!navigator.onLine || !currentUser) return;
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            if (savedOrders.length === 0) return;
+            
+            let statusChanged = false;
+            let fetchPromises = savedOrders.map((ord, index) => {
+                let cleanId = ord.orderId.toString().replace('#', '').trim();
+                return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.status && data.status !== ord.status) {
+                            savedOrders[index].status = data.status;
+                            statusChanged = true;
+                        }
+                    }).catch(err => console.log("Status error:", err));
+            });
+            
+            Promise.all(fetchPromises).then(() => {
+                if(statusChanged) {
+                    localStorage.setItem(key, JSON.stringify(savedOrders));
+                    if(currentCategory === 'MyOrders') renderOrdersUI();
+                }
+            });
+        }
+
+        function updateGalleryImages(colorName) {
+            if (!currentProduct) return;
+
+            let currentImages = [];
+            const selectedColorData = (currentProduct.colors && Array.isArray(currentProduct.colors)) 
+                ? currentProduct.colors.find(c => (typeof c === 'object' ? c.name : c) === colorName) 
+                : null;
+
+            if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
+                let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
+                currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
+            } else if (currentProduct.media && Array.isArray(currentProduct.media) && currentProduct.media.length > 0) {
+                currentImages = currentProduct.media.map(url => formatMediaUrl(url)).filter(url => url);
+            }
+
+            if (currentImages.length === 0) {
+                currentImages = ['https://via.placeholder.com/400x300?text=No+Image'];
+            }
+
+            selectedImage = currentImages[0];
+            selectedColorImg = currentImages[0];
+
+            const sliderContainer = document.getElementById('detailSliderContainer');
+            if (sliderContainer) {
+                let mediaHtml = '<div class="detail-slider">';
+                currentImages.forEach((imgUrl, idx) => {
+                    let imgId = idx === 0 ? 'id="mainProductImage"' : '';
+                    mediaHtml += `<img src="${imgUrl}" ${imgId} class="detail-slide-item" onclick="window.openZoomModal('${imgUrl}')" alt="Product Image">`;
+                });
+                mediaHtml += '</div>';
+                sliderContainer.innerHTML = mediaHtml;
+            }
+        }
+
+        window.selectColor = (colorName, el) => {
+            selectedColor = colorName;
+            
+            const label = document.getElementById('colorLabel');
+            if (label) label.innerText = colorName;
+
+            if (el) {
+                const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
+                siblings.forEach(btn => btn.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            updateGalleryImages(colorName);
+        };
+
+        window.selectSize = (size, el) => {
+            selectedSize = size;
+            const label = document.getElementById('sizeLabel');
+            if (label) label.innerText = size;
+            const siblings = el.parentElement.querySelectorAll('.size-btn');
+            siblings.forEach(btn => btn.classList.remove('active'));
+            if(el) el.classList.add('active');
+        };
+
+        window.showProductDetail = (id) => {
+            const p = liveProducts.find(item => item.id === id);
+            if(!p) { window.showToast("Product unavailable!", "error"); return; }
+            
+            currentProduct = p;
+            pushNavState('detail');
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('detailView').style.display = 'block';
+
+            selectedSize = "";
+            selectedColor = "";
+            selectedColorImg = "";
+
+            let isLiked = watchlist.includes(p.id);
+            let heartIcon = isLiked ? '❤️' : '🤍';
+            let categoryTag = p.category || p.type || p.cat || 'General';
+            let detailSellingPrice = Number(p.price) || 0;
+            let detailMrpPrice = Number(p.mrp) || 0;
+            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
+
+            if (detailMrpPrice > detailSellingPrice) {
+                let offAmount = detailMrpPrice - detailSellingPrice;
+                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
+                detailPriceHtml = `
+                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
+                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
+                        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAVE ₹${offAmount} (${offPercent}% OFF)</span>
+                    </div>
+                `;
+            }
+
+            let variantHtml = '';
+            
+            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
+                let firstColorObj = p.colors[0];
+                selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
+                
+                variantHtml += `<div class="variant-section">
+                    <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
+                    <div class="color-options">`;
+
+                p.colors.forEach((c, idx) => {
+                    let cName = typeof c === 'object' ? c.name : c;
+                    let cImg = '';
+                    if (typeof c === 'object' && c.image) {
+                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
+                        cImg = formatMediaUrl(imgUrl);
+                    } else if (p.media && p.media.length > 0) {
+                        cImg = formatMediaUrl(p.media[0]);
+                    }
+
+                    let activeClass = (idx === 0) ? 'active' : '';
+                    if (cImg) {
+                        variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="${cName}">`;
+                    } else {
+                        variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${cName}', this)">${cName}</button>`;
+                    }
+                });
+
+                variantHtml += `</div></div>`;
+            }
+
+            if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
+                selectedSize = p.sizes[0];
+                variantHtml += `<div class="variant-section">
+                    <div class="variant-title">📏 Size: <span id="sizeLabel" style="color:#38bdf8">${selectedSize}</span></div>
+                    <div class="size-options">`;
+                p.sizes.forEach((s, idx) => {
+                    let activeClass = (idx === 0) ? 'active' : '';
+                    variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectSize('${s}', this)">${s}</button>`;
+                });
+                variantHtml += `</div></div>`;
+            }
+
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = `
+                <div id="detailSliderContainer"></div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div>
+                        <small style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">${categoryTag}</small>
+                        <h1 style="color: white; font-size: 22px; margin-top: 4px;">${p.name}</h1>
+                    </div>
+                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
+                </div>
+                ${detailPriceHtml}
+                ${variantHtml}
+                <div style="margin: 20px 0; background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
+                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available.'}</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1);" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
+                    <button class="pay-btn" style="flex: 1;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
+                </div>
+            `;
+
+            updateGalleryImages(selectedColor);
+            window.scrollTo(0, 0);
+        };
+
+        window.addToCartDirect = (id) => {
+            const p = liveProducts.find(item => item.id === id);
+            if (!p) return;
+
+            let cartItem = {
+                id: p.id,
+                name: p.name,
+                price: Number(p.price) || 0,
+                selectedColor: selectedColor || '',
+                selectedSize: selectedSize || '',
+                selectedImage: selectedImage || (p.media && p.media[0] ? p.media[0] : ''),
+                quantity: 1,
+                media: p.media || []
+            };
+
+            let existingIdx = cart.findIndex(ci => ci.id === p.id && ci.selectedColor === cartItem.selectedColor && ci.selectedSize === cartItem.selectedSize);
+            if (existingIdx > -1) {
+                cart[existingIdx].quantity += 1;
+            } else {
+                cart.push(cartItem);
+            }
+
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            window.showToast("Product Cart me add ho gaya hai! 🛒");
+        };
+
+        window.buyNowDirect = (id) => {
+            window.addToCartDirect(id);
+            window.toggleCart();
+        };
+
+        window.toggleCart = () => {
+            const modal = document.getElementById('cartModal');
+            const isOpen = modal.style.display === 'flex';
+            modal.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) {
+                renderCartUI();
+                pushNavState('cart');
+            } else if (history.state && history.state.appNav === 'cart') {
+                history.back();
+            }
+        };
+
+        function renderCartUI() {
+            const cartList = document.getElementById('cartList');
+            cartList.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
+                cartTotalAmount = 0;
+            } else {
+                cartTotalAmount = 0;
+                cart.forEach((item, index) => {
+                    let itemTotal = item.price * (item.quantity || 1);
+                    cartTotalAmount += itemTotal;
+                    
+                    let imgUrl = item.selectedImage ? formatMediaUrl(item.selectedImage) : (item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/50');
+                    
+                    let variantTxt = '';
+                    if (item.selectedColor || item.selectedSize) {
+                        variantTxt = `<div style="font-size: 11px; color: #cbd5e1;">${item.selectedColor ? 'Color: ' + item.selectedColor : ''} ${item.selectedSize ? ' | Size: ' + item.selectedSize : ''}</div>`;
+                    }
+
+                    cartList.innerHTML += `
+                        <div class="cart-item">
+                            <img src="${imgUrl}" class="cart-item-img" alt="Cart Product">
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                ${variantTxt}
+                                <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">-</button>
+                                <span style="font-weight: bold; font-size: 13px;">${item.quantity || 1}</span>
+                                <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">+</button>
+                                <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px; padding: 4px 8px;">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('qrTotal').innerText = cartTotalAmount;
+
+            const nameInput = document.getElementById('custName');
+            const phoneInput = document.getElementById('custPhone');
+            const addressSelectSection = document.getElementById('checkoutAddressSection');
+            const addressSelect = document.getElementById('checkoutAddressSelect');
+
+            if (currentUser) {
+                nameInput.value = currentUser.name || '';
+                phoneInput.value = currentUser.phone || '';
+                
+                if (currentUser.addresses && currentUser.addresses.length > 0) {
+                    addressSelectSection.style.display = 'block';
+                    addressSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
+                    currentUser.addresses.forEach((addr, idx) => {
+                        addressSelect.innerHTML += `<option value="${idx}">📍 ${addr}</option>`;
+                    });
+                } else {
+                    addressSelectSection.style.display = 'none';
+                }
+            } else {
+                nameInput.value = '';
+                phoneInput.value = '';
+                addressSelectSection.style.display = 'none';
+            }
+
+            window.handlePaymentMode();
+        }
+
+        window.updateCartQuantity = (index, change) => {
+            if (!cart[index]) return;
+            cart[index].quantity = (cart[index].quantity || 1) + change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            renderCartUI();
+        };
+
+        window.removeFromCart = (index) => {
+            if (!cart[index]) return;
+            cart.splice(index, 1);
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            renderCartUI();
+        };
+
+        window.handleCheckoutAddressSelect = () => {
+            const select = document.getElementById('checkoutAddressSelect');
+            const idx = select.value;
+            if (idx !== "" && currentUser && currentUser.addresses && currentUser.addresses[idx]) {
+                document.getElementById('custAddress').value = currentUser.addresses[idx];
+            }
+        };
+
+        window.handlePaymentMode = () => {
+            const mode = document.getElementById('paymentMode').value;
+            const onlineSec = document.getElementById('onlinePaymentSection');
+            if (mode === 'Online') {
+                onlineSec.style.display = 'block';
+                let total = cartTotalAmount;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(`upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${total}&cu=INR`)}`;
+                document.getElementById('directPayLink').href = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${total}&cu=INR`;
+            } else {
+                onlineSec.style.display = 'none';
+            }
+        };
+
+        // Submit Order Function connected to Excel & Telegram via GAS
+        window.submitOrder = () => {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const paymentMode = document.getElementById('paymentMode').value;
+            const utr = document.getElementById('utrNumber').value.trim();
+
+            if (!name || !phone || !address) {
+                window.showToast("Kripya apna naam, mobile number aur address bharein!", "error");
+                return;
+            }
+            if (phone.length !== 10) {
+                window.showToast("Kripya sahi 10-digit mobile number daalein!", "error");
+                return;
+            }
+            if (cart.length === 0) {
+                window.showToast("Aapka cart khaali hai!", "error");
+                return;
+            }
+            if (paymentMode === 'Online' && !utr) {
+                window.showToast("Online payment ke liye UTR / Transaction number daalna zaroori hai!", "error");
+                return;
+            }
+
+            let orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
+            let orderData = {
+                orderId: orderId,
+                date: new Date().toLocaleString(),
+                name: name,
+                phone: phone,
+                address: address,
+                items: [...cart],
+                total: cartTotalAmount,
+                paymentMode: paymentMode,
+                utr: utr || 'N/A',
+                status: 'Hi, your order is ready'
+            };
+
+            // Save to local storage for user orders
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            savedOrders.unshift(orderData);
+            localStorage.setItem(key, JSON.stringify(savedOrders));
+
+            // Send to Google Apps Script (Saves to Excel and forwards to Telegram)
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'new_order',
+                    ...orderData
+                })
+            }).catch(err => console.log("Order sync error:", err));
+
+            // Clear cart
+            cart = [];
+            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = '0';
+            document.getElementById('cartModal').style.display = 'none';
+
+            const successModal = document.getElementById('successModal');
+            successModal.style.display = 'flex';
+            setTimeout(() => {
+                successModal.style.display = 'none';
+                window.showMyOrders();
+            }, 2000);
+        };
+
+        // Initialize Firebase Products Listener on Load
+        listenToProducts();
+    </script>
 </body>
-</html>
+  </html>
