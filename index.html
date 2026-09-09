@@ -1396,7 +1396,7 @@
             });
         }
 
-        // RENDER ORDERS UI: Cancel button hidden when order is on the way, delivered, or cancelled
+        // RENDER ORDERS UI
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -1416,7 +1416,8 @@
                 let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
                 ord.items.forEach(it => {
                     let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
-                    if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
+                    if (it.selectedImage) imgUrl = it.selectedImage;
+                    else if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
                     
                     let variantTxt = '';
                     if (it.selectedColor || it.selectedSize) {
@@ -1433,7 +1434,7 @@
                                 <div>
                                     <div style="color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 3px;">${it.name}</div>
                                     ${variantTxt}
-                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold; margin-top:2px;">₹${it.price}</div>
+                                    <div style="color: #38bdf8; font-size: 13px; font-weight: bold; margin-top:2px;">₹${it.price} x ${it.quantity || 1}</div>
                                 </div>
                             </div>
                             <button style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;">Buy Again 🔄</button>
@@ -1450,7 +1451,6 @@
                 else if (lowerStatus.includes("delivered")) { badgeBg = '#22c55e'; }
                 else if (lowerStatus.includes("cancel")) { badgeBg = '#ef4444'; }
 
-                // Customer CANNOT cancel if order is on the way, delivered, or already cancelled
                 let cancelBtnHtml = '';
                 if (!lowerStatus.includes("on the way") && !lowerStatus.includes("delivered") && !lowerStatus.includes("cancel") && !lowerStatus.includes("dispatch")) {
                     cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
@@ -1485,7 +1485,7 @@
                 let ord = savedOrders[index];
                 let cleanId = ord.orderId.toString().replace('#', '').trim();
 
-                // Send cancellation message to Google Apps Script / Telegram Bot
+                // Send cancellation to Google Apps Script (Excel & Bot)
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
@@ -1519,7 +1519,6 @@
                         if (data && data.status) {
                             let fetchedStatus = data.status.toString().trim();
                             let lower = fetchedStatus.toLowerCase();
-                            // Do not overwrite local status if backend returns "Not Found"
                             if (lower !== 'not found' && lower !== 'order not found' && lower !== 'not_found' && fetchedStatus !== ord.status) {
                                 savedOrders[index].status = fetchedStatus;
                                 statusChanged = true;
@@ -1705,7 +1704,7 @@
                 price: Number(p.price) || 0,
                 selectedColor: selectedColor || '',
                 selectedSize: selectedSize || '',
-                selectedImage: selectedImage || (p.media && p.media[0] ? p.media[0] : ''),
+                selectedImage: selectedImage || (p.media && p.media[0] ? formatMediaUrl(p.media[0]) : ''),
                 quantity: 1,
                 media: p.media || []
             };
@@ -1803,139 +1802,149 @@
             }
 
             if (cart.length === 0) {
-                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
+                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
                 cartTotalAmount = 0;
-            } else {
-                cartTotalAmount = 0;
-                cart.forEach((item, index) => {
-                    let itemTotal = item.price * (item.quantity || 1);
-                    cartTotalAmount += itemTotal;
-                    
-                    let imgUrl = item.selectedImage ? formatMediaUrl(item.selectedImage) : (item.media && item.media.length > 0 ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/50');
-                    
-                    let variantTxt = '';
-                    if (item.selectedColor || item.selectedSize) {
-                        variantTxt = `<div style="font-size: 11px; color: #cbd5e1;">${item.selectedColor ? 'Color: ' + item.selectedColor : ''} ${item.selectedSize ? ' | Size: ' + item.selectedSize : ''}</div>`;
-                    }
-
-                    cartList.innerHTML += `
-                        <div class="cart-item">
-                            <img src="${imgUrl}" class="cart-item-img" alt="Cart Product">
-                            <div class="cart-item-info">
-                                <h4>${item.name}</h4>
-                                ${variantTxt}
-                                <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">-</button>
-                                <span style="font-weight: bold; font-size: 13px;">${item.quantity || 1}</span>
-                                <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">+</button>
-                                <button class="remove-btn" onclick="window.removeFromCart(${index})" style="padding: 4px 8px; font-size: 11px;">✕</button>
-                            </div>
-                        </div>
-                    `;
-                });
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').style.opacity = '0.5';
+                window.handlePaymentMode();
+                return;
             }
+
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').style.opacity = '1';
+
+            cartTotalAmount = 0;
+            cart.forEach((item, index) => {
+                let itemTotal = (Number(item.price) || 0) * (item.quantity || 1);
+                cartTotalAmount += itemTotal;
+                let imgUrl = item.selectedImage || (item.media && item.media[0] ? formatMediaUrl(item.media[0]) : 'https://via.placeholder.com/55');
+
+                let variantTxt = '';
+                if (item.selectedColor || item.selectedSize) {
+                    variantTxt = `<div style="font-size: 11px; color: #cbd5e1; margin-top:2px;">`;
+                    if (item.selectedColor) variantTxt += `🎨 ${item.selectedColor} `;
+                    if (item.selectedSize) variantTxt += `📏 ${item.selectedSize}`;
+                    variantTxt += `</div>`;
+                }
+
+                cartList.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            ${variantTxt}
+                            <p>₹${item.price} x ${item.quantity || 1} = ₹${itemTotal}</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer;">-</button>
+                            <span style="font-weight: bold; font-size: 14px;">${item.quantity || 1}</span>
+                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer;">+</button>
+                            <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px;">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+
             window.handlePaymentMode();
         }
 
+        // SUBMIT ORDER TO EXCEL SHEET & TELEGRAM BOT
         window.submitOrder = () => {
             if (cart.length === 0) {
-                window.showToast("Aapka Cart khaali hai!", "error");
+                window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
 
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            const mode = document.getElementById('paymentMode').value;
+            const paymentMode = document.getElementById('paymentMode').value;
             const utr = document.getElementById('utrNumber').value.trim();
 
             if (!name || !phone || phone.length !== 10 || !address) {
-                window.showToast("Kripya Naam, 10-digit Phone aur Address Sahi bharein!", "error");
+                window.showToast("Kripya Naam, 10-Digit Mobile Number aur Address sahi se bharein!", "error");
                 return;
             }
 
-            if (mode === 'Online' && !utr) {
-                window.showToast("Kripya 12-Digit UTR Number zaroor bharein!", "error");
+            if (paymentMode === 'Online' && !utr) {
+                window.showToast("Online Payment ke liye 12-Digit UTR Number daalna zaroori hai!", "error");
                 return;
             }
 
-            let orderIdNum = 'ORD' + Math.floor(100000 + Math.random() * 900000);
-            let orderDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "Order Place Ho Raha Hai...";
+            submitBtn.disabled = true;
 
-            let newOrder = {
-                orderId: orderIdNum,
-                date: orderDate,
+            const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+            const newOrder = {
+                orderId: orderId,
+                date: dateStr,
                 items: [...cart],
                 total: cartTotalAmount,
-                status: "Hi, your order is ready",
                 custName: name,
                 custPhone: phone,
                 custAddress: address,
-                paymentMode: mode,
-                utrNumber: utr
+                paymentMode: paymentMode,
+                utrNumber: utr || 'N/A',
+                status: "Hi, your order is ready"
             };
 
-            // Save to LocalStorage
-            let key = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(newOrder);
-            localStorage.setItem(key, JSON.stringify(savedOrders));
-
-            // Send Order Notification to Google Apps Script / Telegram Bot
-            let orderPayload = {
-                action: 'create_order',
-                orderId: orderIdNum,
-                cleanId: orderIdNum,
+            // 1. Send Order to Google Apps Script (Excel Sheet & Telegram Bot Sync)
+            const payload = {
+                action: 'place_order',
+                orderId: orderId,
+                cleanId: orderId,
                 custName: name,
                 custPhone: phone,
                 custAddress: address,
-                paymentMode: mode,
-                utrNumber: utr,
-                totalAmount: cartTotalAmount,
-                items: cart.map(i => `${i.name} (${i.selectedColor || ''} ${i.selectedSize || ''}) x${i.quantity || 1}`).join(', '),
+                paymentMode: paymentMode,
+                utrNumber: utr || 'N/A',
+                total: cartTotalAmount,
+                items: cart.map(i => `${i.name} (${i.selectedColor ? 'Color: ' + i.selectedColor : ''} ${i.selectedSize ? 'Size: ' + i.selectedSize : ''}) x ${i.quantity || 1} = ₹${(i.price || 0) * (i.quantity || 1)}`).join('\n'),
                 status: "Hi, your order is ready",
-                date: orderDate
+                date: dateStr
             };
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderPayload)
-            }).catch(e => console.log("Order POST Error:", e));
+                body: JSON.stringify(payload)
+            }).then(() => {
+                console.log("Order synced to Excel & Bot");
+            }).catch(err => {
+                console.error("Order sync error:", err);
+            });
 
-            // Clear Cart
+            // 2. Save order locally for user history
+            let ordersKey = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(ordersKey)) || [];
+            savedOrders.unshift(newOrder);
+            localStorage.setItem(ordersKey, JSON.stringify(savedOrders));
+
+            // 3. Clear cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
 
-            // Show Success Modal
-            window.toggleCart();
-            const succModal = document.getElementById('successModal');
-            succModal.style.display = 'flex';
+            // 4. Update UI & Show Success Modal
+            submitBtn.innerText = "Confirm & Place Order";
+            submitBtn.disabled = false;
             
+            document.getElementById('cartModal').style.display = 'none';
+            const successModal = document.getElementById('successModal');
+            successModal.style.display = 'flex';
+
             setTimeout(() => {
-                succModal.style.display = 'none';
+                successModal.style.display = 'none';
                 window.showMyOrders();
-            }, 2200);
+            }, 2000);
         };
 
-        window.checkSharedLink = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const pId = urlParams.get('id');
-            if (pId) {
-                window.showProductDetail(pId);
-            }
-        };
-
-        // EXPOSE TO GLOBAL WINDOW SCOPE
-        window.listenToProducts = listenToProducts;
-        window.renderOrdersUI = renderOrdersUI;
-        window.fetchLiveStatusForAllOrders = fetchLiveStatusForAllOrders;
-
-        // INITIALIZE APP
+        // START APP LISTENERS
         listenToProducts();
     </script>
 </body>
