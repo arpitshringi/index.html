@@ -540,7 +540,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Updated Google Apps Script URL
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
 
@@ -548,11 +547,9 @@
         let productsUnsubscribe = null;
         let currentProduct = null;
         
-        // AUTHENTICATION & USER PROFILE STATE
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
-        let authMode = 'login'; // 'login' or 'signup'
+        let authMode = 'login';
 
-        // USER SPECIFIC KEYS & STATE
         function getUserOrdersKey() {
             return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
         }
@@ -575,7 +572,6 @@
         let selectedSize = "";
         let selectedImage = "";
 
-        // LIGHTBOX & ZOOM VARIABLES
         let zoomScale = 1;
         let zoomLastScale = 1;
         let zoomStartDistance = 0;
@@ -589,11 +585,9 @@
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
 
-        // INITIAL UI UPDATE
         document.getElementById('cartCount').innerText = cart.length;
         updateAuthUI();
 
-        // HANDLE GOOGLE REDIRECT LOGIN RESULT
         getRedirectResult(auth).then((result) => {
             if (result && result.user) {
                 handleSuccessfulAuthUser(result.user);
@@ -602,7 +596,6 @@
             console.error("Google Redirect Error:", error);
         });
 
-        // CHECK EMAIL LINK LOGIN ON LOAD
         if (isSignInWithEmailLink(auth, window.location.href)) {
             let email = window.localStorage.getItem('emailForSignIn');
             if (!email) {
@@ -619,7 +612,6 @@
                 });
         }
 
-        // APP REFRESH FUNCTION
         window.refreshAppData = () => {
             window.showToast("App data refresh ho raha hai... 🔄");
             listenToProducts();
@@ -635,7 +627,6 @@
             }
         }, 6000);
 
-        // AUTHENTICATION & PROFILE FUNCTIONS
         window.toggleAuthModal = () => {
             const modal = document.getElementById('authModal');
             const isOpen = modal.style.display === 'flex';
@@ -706,7 +697,6 @@
             window.showToast("Login Successful! 🎉");
         }
 
-        // Mobile + Password Authentication
         window.submitAuth = () => {
             const phone = document.getElementById('authPhone').value.trim();
             const password = document.getElementById('authPassword').value.trim();
@@ -759,16 +749,13 @@
             }
         };
 
-        // Firebase Google Login
         window.handleGoogleLogin = async () => {
             const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
-            
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             try {
                 await signInWithRedirect(auth, provider);
             } catch (error) {
-                console.warn("Popup blocked or failed, switching to redirect mode:", error);
                 if (error.code === 'auth/disallowed-useragent' || isWebView) {
                     window.showToast("App me Google Login restricted hai. Mobile Number se Sign Up karein!", "error");
                     window.switchAuthTab('signup');
@@ -784,7 +771,6 @@
             }
         };
 
-        // Firebase Gmail Link / OTP Login
         window.handleEmailLinkLogin = async () => {
             const email = document.getElementById('authEmail').value.trim();
             if (!email || !email.includes('@')) {
@@ -1396,7 +1382,6 @@
             });
         }
 
-        // RENDER ORDERS UI
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -1485,7 +1470,6 @@
                 let ord = savedOrders[index];
                 let cleanId = ord.orderId.toString().replace('#', '').trim();
 
-                // Send cancellation to Google Apps Script (Excel & Bot)
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
@@ -1868,81 +1852,73 @@
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
-            const payMode = document.getElementById('paymentMode').value;
+            const paymentMode = document.getElementById('paymentMode').value;
             const utr = document.getElementById('utrNumber').value.trim();
+
+            if (!name || !phone || phone.length !== 10 || !address) {
+                window.showToast("Kripya apna naam, sahi 10-digit mobile number aur address bharein!", "error");
+                return;
+            }
 
             if (cart.length === 0) {
                 window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
 
-            if (!name || !phone || phone.length !== 10 || !address) {
-                window.showToast("Kripya Naam, 10-digit Mobile Number aur Address sahi se bharein!", "error");
+            if (paymentMode === 'Online' && !utr) {
+                window.showToast("Online payment ke liye UTR / Transaction number daalna anivarya hai!", "error");
                 return;
             }
 
-            if (payMode === 'Online' && (!utr || utr.length < 6)) {
-                window.showToast("Online payment ke liye valid UTR / Transaction number daalein!", "error");
-                return;
-            }
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Processing Order...";
-
-            const newOrderId = Math.floor(100000 + Math.random() * 900000);
-            const orderDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-
-            const orderPayload = {
-                orderId: newOrderId,
-                date: orderDate,
+            const orderId = 'ARP-' + Math.floor(100000 + Math.random() * 900000);
+            const orderData = {
+                orderId: orderId,
                 custName: name,
                 custPhone: phone,
-                address: address,
+                custAddress: address,
+                paymentMode: paymentMode,
+                utrNumber: utr || 'COD',
                 items: [...cart],
                 total: cartTotalAmount,
-                paymentMode: payMode,
-                utrNumber: payMode === 'Online' ? utr : 'COD',
-                status: "Hi, your order is ready"
+                date: new Date().toLocaleString(),
+                status: 'Hi, your order is ready'
             };
 
-            // Save locally
-            let key = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(orderPayload);
-            localStorage.setItem(key, JSON.stringify(savedOrders));
+            let orderKey = currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
+            let myOrders = JSON.parse(localStorage.getItem(orderKey)) || [];
+            myOrders.unshift(orderData);
+            localStorage.setItem(orderKey, JSON.stringify(myOrders));
 
-            // Sync to Google Sheet / Script
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'place_order',
-                    ...orderPayload
-                })
-            }).catch(e => console.log("Order sync error:", e));
+            if (navigator.onLine) {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'new_order',
+                        orderId: orderId,
+                        custName: name,
+                        custPhone: phone,
+                        custAddress: address,
+                        paymentMode: paymentMode,
+                        utrNumber: utr || 'COD',
+                        items: cart.map(i => `${i.name} (Qty: ${i.quantity || 1}, Color: ${i.selectedColor || 'N/A'}, Size: ${i.selectedSize || 'N/A'})`).join(', '),
+                        total: cartTotalAmount,
+                        status: 'Hi, your order is ready'
+                    })
+                }).catch(err => console.log("Order sync error:", err));
+            }
 
-            // Reset Cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
-
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Confirm & Place Order";
-
-            // Close Cart Modal & Show Success Modal
             document.getElementById('cartModal').style.display = 'none';
-            const successModal = document.getElementById('successModal');
-            successModal.style.display = 'flex';
-
+            document.getElementById('successModal').style.display = 'flex';
             setTimeout(() => {
-                successModal.style.display = 'none';
+                document.getElementById('successModal').style.display = 'none';
                 window.showMyOrders();
             }, 2500);
         };
 
-        // Start App
         listenToProducts();
     </script>
 </body>
