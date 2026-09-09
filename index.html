@@ -470,10 +470,9 @@
 
     <!-- Firebase & Core Engine Module -->
     <script type="module">
-               import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-               import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-               import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -1451,7 +1450,6 @@
                 else if (currentStatus === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
                 else if (currentStatus === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
 
-                // Customer cannot cancel if product is on the way, delivered, or already cancelled
                 let cancelBtnHtml = '';
                 if (currentStatus !== "Your order on the way" && currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
                     cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
@@ -1483,7 +1481,6 @@
                 savedOrders[index].status = "Cancel your order";
                 localStorage.setItem(key, JSON.stringify(savedOrders));
                 
-                // Send cancellation update to Google script / Telegram
                 let ord = savedOrders[index];
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
@@ -1865,50 +1862,48 @@
 
             let orderId = 'ARP' + Math.floor(100000 + Math.random() * 900000);
             let orderData = {
+                action: 'order',
                 orderId: orderId,
-                date: new Date().toLocaleString(),
                 name: name,
                 phone: phone,
                 address: address,
-                items: [...cart],
-                total: cartTotalAmount,
                 paymentMode: paymentMode,
-                utr: utr || 'N/A',
-                status: 'Hi, your order is ready'
+                utr: utr,
+                total: cartTotalAmount,
+                items: cart,
+                date: new Date().toLocaleString()
             };
 
-            // Save to local storage for user orders
-            let key = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
-            savedOrders.unshift(orderData);
-            localStorage.setItem(key, JSON.stringify(savedOrders));
+            let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
+            savedOrders.unshift({
+                orderId: orderId,
+                items: cart,
+                total: cartTotalAmount,
+                status: 'Hi, your order is ready',
+                date: new Date().toLocaleString()
+            });
+            localStorage.setItem(getUserOrdersKey(), JSON.stringify(savedOrders));
 
-            // Send to Google Apps Script (Saves to Excel and forwards to Telegram)
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'new_order',
-                    ...orderData
-                })
-            }).catch(err => console.log("Order sync error:", err));
+            if (navigator.onLine) {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                }).catch(err => console.log("Order sync error:", err));
+            }
 
-            // Clear cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
             document.getElementById('cartModal').style.display = 'none';
-
-            const successModal = document.getElementById('successModal');
-            successModal.style.display = 'flex';
+            document.getElementById('successModal').style.display = 'flex';
             setTimeout(() => {
-                successModal.style.display = 'none';
+                document.getElementById('successModal').style.display = 'none';
                 window.showMyOrders();
-            }, 2000);
+            }, 2500);
         };
 
-        // Initialize Firebase Products Listener on Load
+        // Initialize App on Load
         listenToProducts();
     </script>
 </body>
