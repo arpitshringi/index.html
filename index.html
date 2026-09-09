@@ -472,7 +472,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
@@ -763,19 +763,10 @@
         window.handleGoogleLogin = async () => {
             const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
             
-            if (isWebView) {
-                window.showToast("App WebView me Google login Google dwara restricted hai. Kripya Mobile & Password se Sign Up/Login karein!", "error");
-                window.switchAuthTab('signup');
-                return;
-            }
-
-            const provider = new GoogleAuthProvider();
+           const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             try {
-                const result = await signInWithPopup(auth, provider);
-                if (result && result.user) {
-                    handleSuccessfulAuthUser(result.user);
-                }
+                await signInWithRedirect(auth, provider);
             } catch (error) {
                 console.warn("Popup blocked or failed, switching to redirect mode:", error);
                 if (error.code === 'auth/disallowed-useragent' || isWebView) {
@@ -1405,7 +1396,7 @@
             });
         }
 
-        // RENDER ORDERS UI: Customer app view with Cancel button restriction when on the way or delivered
+        // RENDER ORDERS UI: Cancel button hidden when order is on the way, delivered, or cancelled
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -1451,17 +1442,17 @@
                 });
                 itemsListHtml += '</ul>';
 
-                let subText = "Hi, your order is ready";
                 let badgeBg = '#0284c7';
                 let currentStatus = ord.status || "Hi, your order is ready";
+                let lowerStatus = currentStatus.toLowerCase();
                 
-                if (currentStatus === "Your order on the way") { badgeBg = '#eab308'; subText = "Order on the way! 🚚"; }
-                else if (currentStatus === "Your order is delivered") { badgeBg = '#22c55e'; subText = "Delivered Successfully ✅"; }
-                else if (currentStatus === "Cancel your order") { badgeBg = '#ef4444'; subText = "Order Cancelled ❌"; }
+                if (lowerStatus.includes("on the way")) { badgeBg = '#eab308'; }
+                else if (lowerStatus.includes("delivered")) { badgeBg = '#22c55e'; }
+                else if (lowerStatus.includes("cancel")) { badgeBg = '#ef4444'; }
 
-                // Customer cannot cancel if product is on the way, delivered, or already cancelled
+                // Customer CANNOT cancel if order is on the way, delivered, or already cancelled
                 let cancelBtnHtml = '';
-                if (currentStatus !== "Your order on the way" && currentStatus !== "Your order is delivered" && currentStatus !== "Cancel your order") {
+                if (!lowerStatus.includes("on the way") && !lowerStatus.includes("delivered") && !lowerStatus.includes("cancel") && !lowerStatus.includes("dispatch")) {
                     cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
                 }
 
@@ -1491,17 +1482,22 @@
                 savedOrders[index].status = "Cancel your order";
                 localStorage.setItem(key, JSON.stringify(savedOrders));
                 
-                // Send cancellation update to Google script / Telegram
                 let ord = savedOrders[index];
+                let cleanId = ord.orderId.toString().replace('#', '').trim();
+
+                // Send cancellation message to Google Apps Script / Telegram Bot
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        action: 'update_status',
-                        orderId: ord.orderId,
-                        status: 'Cancel your order'
+                        action: 'cancel_order',
+                        orderId: cleanId,
+                        cleanId: cleanId,
+                        status: 'Cancel your order',
+                        custName: ord.custName || (currentUser ? currentUser.name : ''),
+                        custPhone: ord.custPhone || (currentUser ? currentUser.phone : '')
                     })
-                }).catch(e => console.log(e));
+                }).catch(e => console.log("Cancel sync error:", e));
 
                 window.showToast("Order cancelled successfully!", "error");
                 renderOrdersUI();
@@ -1520,9 +1516,14 @@
                 return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
                     .then(res => res.json())
                     .then(data => {
-                        if (data && data.status && data.status !== ord.status) {
-                            savedOrders[index].status = data.status;
-                            statusChanged = true;
+                        if (data && data.status) {
+                            let fetchedStatus = data.status.toString().trim();
+                            let lower = fetchedStatus.toLowerCase();
+                            // Do not overwrite local status if backend returns "Not Found"
+                            if (lower !== 'not found' && lower !== 'order not found' && lower !== 'not_found' && fetchedStatus !== ord.status) {
+                                savedOrders[index].status = fetchedStatus;
+                                statusChanged = true;
+                            }
                         }
                     }).catch(err => console.log("Status error:", err));
             });
@@ -1738,10 +1739,69 @@
             }
         };
 
+        window.updateCartQuantity = (index, delta) => {
+            if (cart[index]) {
+                cart[index].quantity = (cart[index].quantity || 1) + delta;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+                document.getElementById('cartCount').innerText = cart.length;
+                renderCartUI();
+            }
+        };
+
+        window.removeFromCart = (index) => {
+            if (cart[index]) {
+                cart.splice(index, 1);
+                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+                document.getElementById('cartCount').innerText = cart.length;
+                renderCartUI();
+                window.showToast("Item cart se hata diya gaya.");
+            }
+        };
+
+        window.handleCheckoutAddressSelect = () => {
+            const select = document.getElementById('checkoutAddressSelect');
+            if (select && select.value) {
+                document.getElementById('custAddress').value = select.value;
+            }
+        };
+
+        window.handlePaymentMode = () => {
+            const mode = document.getElementById('paymentMode').value;
+            const onlineSec = document.getElementById('onlinePaymentSection');
+            if (mode === 'Online') {
+                onlineSec.style.display = 'block';
+                document.getElementById('qrTotal').innerText = cartTotalAmount;
+                const upiLink = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiLink;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
+            } else {
+                onlineSec.style.display = 'none';
+            }
+        };
+
         function renderCartUI() {
             const cartList = document.getElementById('cartList');
             cartList.innerHTML = '';
             
+            if (currentUser) {
+                document.getElementById('custName').value = currentUser.name || '';
+                document.getElementById('custPhone').value = currentUser.phone || '';
+                
+                const addrSelect = document.getElementById('checkoutAddressSelect');
+                if (currentUser.addresses && currentUser.addresses.length > 0) {
+                    document.getElementById('checkoutAddressSection').style.display = 'block';
+                    addrSelect.innerHTML = '<option value="">-- Choose Saved Address --</option>';
+                    currentUser.addresses.forEach(a => {
+                        addrSelect.innerHTML += `<option value="${a}">${a}</option>`;
+                    });
+                } else {
+                    document.getElementById('checkoutAddressSection').style.display = 'none';
+                }
+            }
+
             if (cart.length === 0) {
                 cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khaali hai!</p>';
                 cartTotalAmount = 0;
@@ -1770,96 +1830,18 @@
                                 <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">-</button>
                                 <span style="font-weight: bold; font-size: 13px;">${item.quantity || 1}</span>
                                 <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; width: 26px; height: 26px; font-weight: bold; cursor: pointer;">+</button>
-                                <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px; padding: 4px 8px;">✕</button>
+                                <button class="remove-btn" onclick="window.removeFromCart(${index})" style="padding: 4px 8px; font-size: 11px;">✕</button>
                             </div>
                         </div>
                     `;
                 });
             }
-
-            document.getElementById('qrTotal').innerText = cartTotalAmount;
-
-            const nameInput = document.getElementById('custName');
-            const phoneInput = document.getElementById('custPhone');
-            const addressSelectSection = document.getElementById('checkoutAddressSection');
-            const addressSelect = document.getElementById('checkoutAddressSelect');
-            const addressInput = document.getElementById('custAddress');
-
-            if (currentUser) {
-                if (nameInput) nameInput.value = currentUser.name || '';
-                if (phoneInput) phoneInput.value = currentUser.phone || '';
-                
-                if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    if (addressSelectSection) addressSelectSection.style.display = 'block';
-                    if (addressSelect) {
-                        addressSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
-                        currentUser.addresses.forEach((addr, idx) => {
-                            addressSelect.innerHTML += `<option value="${idx}">📍 ${addr}</option>`;
-                        });
-                    }
-                } else {
-                    if (addressSelectSection) addressSelectSection.style.display = 'none';
-                }
-            } else {
-                if (addressSelectSection) addressSelectSection.style.display = 'none';
-            }
-
             window.handlePaymentMode();
         }
 
-        window.updateCartQuantity = (index, delta) => {
-            if (cart[index]) {
-                cart[index].quantity = (cart[index].quantity || 1) + delta;
-                if (cart[index].quantity <= 0) {
-                    cart.splice(index, 1);
-                }
-                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-                document.getElementById('cartCount').innerText = cart.length;
-                renderCartUI();
-            }
-        };
-
-        window.removeFromCart = (index) => {
-            cart.splice(index, 1);
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-            document.getElementById('cartCount').innerText = cart.length;
-            renderCartUI();
-            window.showToast("Product removed from cart!");
-        };
-
-        window.handleCheckoutAddressSelect = () => {
-            const select = document.getElementById('checkoutAddressSelect');
-            const addressInput = document.getElementById('custAddress');
-            if (select && addressInput && currentUser && currentUser.addresses) {
-                const val = select.value;
-                if (val !== '' && currentUser.addresses[val]) {
-                    addressInput.value = currentUser.addresses[val];
-                }
-            }
-        };
-
-        window.handlePaymentMode = () => {
-            const mode = document.getElementById('paymentMode').value;
-            const onlineSec = document.getElementById('onlinePaymentSection');
-            const qrTotalSpan = document.getElementById('qrTotal');
-            const directPayLink = document.getElementById('directPayLink');
-            const qrCodeImg = document.getElementById('qrCodeImg');
-
-            if (qrTotalSpan) qrTotalSpan.innerText = cartTotalAmount;
-
-            if (mode === 'Online') {
-                if (onlineSec) onlineSec.style.display = 'block';
-                const upiString = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
-                if (directPayLink) directPayLink.href = upiString;
-                if (qrCodeImg) qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
-            } else {
-                if (onlineSec) onlineSec.style.display = 'none';
-            }
-        };
-
         window.submitOrder = () => {
             if (cart.length === 0) {
-                window.showToast("Cart is empty!", "error");
+                window.showToast("Aapka Cart khaali hai!", "error");
                 return;
             }
 
@@ -1867,99 +1849,93 @@
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const mode = document.getElementById('paymentMode').value;
-            const utr = document.getElementById('utrNumber') ? document.getElementById('utrNumber').value.trim() : '';
+            const utr = document.getElementById('utrNumber').value.trim();
 
             if (!name || !phone || phone.length !== 10 || !address) {
-                window.showToast("Kripya Naam, 10-digit Phone, aur Delivery Address sahi bharein!", "error");
+                window.showToast("Kripya Naam, 10-digit Phone aur Address Sahi bharein!", "error");
                 return;
             }
 
             if (mode === 'Online' && !utr) {
-                window.showToast("Online payment ke liye 12-Digit UTR Number zaroori hai!", "error");
+                window.showToast("Kripya 12-Digit UTR Number zaroor bharein!", "error");
                 return;
             }
 
-            const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "Placing Order...";
-            }
+            let orderIdNum = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            let orderDate = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-            const orderId = "ORD" + Math.floor(100000 + Math.random() * 900000);
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-IN') + ' ' + now.toLocaleTimeString('en-IN');
-
-            const newOrder = {
-                orderId: orderId,
-                date: dateStr,
+            let newOrder = {
+                orderId: orderIdNum,
+                date: orderDate,
                 items: [...cart],
                 total: cartTotalAmount,
+                status: "Hi, your order is ready",
+                custName: name,
+                custPhone: phone,
+                custAddress: address,
                 paymentMode: mode,
-                utr: utr,
-                customerName: name,
-                customerPhone: phone,
-                customerAddress: address,
-                status: "Hi, your order is ready"
+                utrNumber: utr
             };
 
-            // Save locally
-            let orderKey = getUserOrdersKey();
-            let savedOrders = JSON.parse(localStorage.getItem(orderKey)) || [];
+            // Save to LocalStorage
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
             savedOrders.unshift(newOrder);
-            localStorage.setItem(orderKey, JSON.stringify(savedOrders));
+            localStorage.setItem(key, JSON.stringify(savedOrders));
 
-            // Sync to Excel / Telegram
-            if (navigator.onLine) {
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'create_order',
-                        ...newOrder
-                    })
-                }).catch(err => console.log("Order sync error:", err));
-            }
+            // Send Order Notification to Google Apps Script / Telegram Bot
+            let orderPayload = {
+                action: 'create_order',
+                orderId: orderIdNum,
+                cleanId: orderIdNum,
+                custName: name,
+                custPhone: phone,
+                custAddress: address,
+                paymentMode: mode,
+                utrNumber: utr,
+                totalAmount: cartTotalAmount,
+                items: cart.map(i => `${i.name} (${i.selectedColor || ''} ${i.selectedSize || ''}) x${i.quantity || 1}`).join(', '),
+                status: "Hi, your order is ready",
+                date: orderDate
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderPayload)
+            }).catch(e => console.log("Order POST Error:", e));
 
             // Clear Cart
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
 
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Confirm & Place Order";
-            }
-
-            window.toggleCart();
-
             // Show Success Modal
-            const successModal = document.getElementById('successModal');
-            if (successModal) {
-                successModal.style.display = 'flex';
-                setTimeout(() => {
-                    successModal.style.display = 'none';
-                    window.showMyOrders();
-                }, 2000);
-            }
+            window.toggleCart();
+            const succModal = document.getElementById('successModal');
+            succModal.style.display = 'flex';
+            
+            setTimeout(() => {
+                succModal.style.display = 'none';
+                window.showMyOrders();
+            }, 2200);
         };
 
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const sharedId = urlParams.get('id');
-            if (sharedId) {
-                const found = liveProducts.find(p => p.id === sharedId);
-                if (found) {
-                    window.showProductDetail(sharedId);
-                } else {
-                    window.applyFiltersAndRender();
-                }
-            } else {
-                window.applyFiltersAndRender();
+            const pId = urlParams.get('id');
+            if (pId) {
+                window.showProductDetail(pId);
             }
         };
 
-        // Initialize listener
+        // EXPOSE TO GLOBAL WINDOW SCOPE
+        window.listenToProducts = listenToProducts;
+        window.renderOrdersUI = renderOrdersUI;
+        window.fetchLiveStatusForAllOrders = fetchLiveStatusForAllOrders;
+
+        // INITIALIZE APP
         listenToProducts();
     </script>
 </body>
