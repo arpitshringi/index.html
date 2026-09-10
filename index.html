@@ -1849,13 +1849,13 @@
         };
 
         window.submitOrder = () => {
-            const name = document.getElementById('custName').value.trim();
+            const customer = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const paymentMode = document.getElementById('paymentMode').value;
             const utr = document.getElementById('utrNumber').value.trim();
 
-            if (!name || !phone || phone.length !== 10 || !address) {
+            if (!customer || !phone || phone.length !== 10 || !address) {
                 window.showToast("Kripya apna naam, sahi 10-digit mobile number aur address bharein!", "error");
                 return;
             }
@@ -1873,7 +1873,7 @@
             const orderId = 'ARP-' + Math.floor(100000 + Math.random() * 900000);
             const orderData = {
                 orderId: orderId,
-                custName: name,
+                custCustomer: customer,
                 custPhone: phone,
                 custAddress: address,
                 paymentMode: paymentMode,
