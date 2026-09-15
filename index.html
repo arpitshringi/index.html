@@ -750,27 +750,22 @@
         };
 
         window.handleGoogleLogin = async () => {
-            const isWebView = /wv|Android.*Version\/[0-9]\.[0-9]/i.test(navigator.userAgent);
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            try {
-                await signInWithRedirect(auth, provider);
-            } catch (error) {
-                if (error.code === 'auth/disallowed-useragent' || isWebView) {
-                    window.showToast("App me Google Login restricted hai. Mobile Number se Sign Up karein!", "error");
-                    window.switchAuthTab('signup');
-                } else if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
-                    try {
-                        await signInWithPopup(auth, provider);
-                    } catch (redirectError) {
-                        window.showToast("Google Login Error: " + redirectError.message, "error");
-                    }
-                } else {
-                    window.showToast("Google Login failed: " + error.message, "error");
-                }
-            }
-        };
+    // Check if app is inside Flutter InAppWebView
+    if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
+        window.flutter_inappwebview.callHandler('nativeGoogleSignIn');
+        return;
+    }
 
+    // Fallback for regular browsers/web
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    try {
+        await signInWithRedirect(auth, provider);
+    } catch (error) {
+        window.showToast("Google Login Error: " + error.message, "error");
+    }
+};
+        
         window.handleEmailLinkLogin = async () => {
             const email = document.getElementById('authEmail').value.trim();
             if (!email || !email.includes('@')) {
