@@ -765,7 +765,27 @@
         window.showToast("Google Login Error: " + error.message, "error");
     }
 };
-        
+        window.onNativeGoogleLoginSuccess = function(userData) {
+    if (typeof userData === 'string') {
+        try { userData = JSON.parse(userData); } catch(e) {}
+    }
+    
+    // Set local storage and authenticate user
+    localStorage.setItem('userToken', userData.token || '');
+    localStorage.setItem('userEmail', userData.email || '');
+    localStorage.setItem('userName', userData.displayName || 'Google User');
+    
+    if (typeof handleSuccessfulAuthUser === 'function') {
+        handleSuccessfulAuthUser({
+            displayName: userData.displayName,
+            email: userData.email,
+            uid: userData.uid
+        });
+    } else {
+        window.location.reload();
+    }
+};
+
         window.handleEmailLinkLogin = async () => {
             const email = document.getElementById('authEmail').value.trim();
             if (!email || !email.includes('@')) {
