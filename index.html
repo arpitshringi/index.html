@@ -588,6 +588,7 @@
         document.getElementById('cartCount').innerText = cart.length;
         updateAuthUI();
 
+        // Check Google Redirect Result
         getRedirectResult(auth).then((result) => {
             if (result && result.user) {
                 handleSuccessfulAuthUser(result.user);
@@ -596,20 +597,23 @@
             console.error("Google Redirect Error:", error);
         });
 
+        // Check Email Link Login Result
         if (isSignInWithEmailLink(auth, window.location.href)) {
             let email = window.localStorage.getItem('emailForSignIn');
             if (!email) {
-                email = window.prompt('Please provide your Gmail address for confirmation:');
+                email = window.prompt('Please confirm your Gmail address to complete sign in:');
             }
-            signInWithEmailLink(auth, email, window.location.href)
-                .then((result) => {
-                    window.localStorage.removeItem('emailForSignIn');
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    handleSuccessfulAuthUser(result.user);
-                })
-                .catch((error) => {
-                    window.showToast("Email link login failed: " + error.message, "error");
-                });
+            if (email) {
+                signInWithEmailLink(auth, email, window.location.href)
+                    .then((result) => {
+                        window.localStorage.removeItem('emailForSignIn');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        handleSuccessfulAuthUser(result.user);
+                    })
+                    .catch((error) => {
+                        window.showToast("Email link login failed: " + error.message, "error");
+                    });
+            }
         }
 
         window.refreshAppData = () => {
@@ -666,7 +670,7 @@
         }
 
         function handleSuccessfulAuthUser(user) {
-            let phone = prompt("Enter your 10-digit Mobile Number for order notifications:", "9876543210");
+            let phone = prompt("Enter your 10-digit Mobile Number for order updates:", "9876543210");
             if (!phone || phone.length !== 10) phone = "9999999999";
 
             currentUser = {
@@ -750,41 +754,49 @@
         };
 
         window.handleGoogleLogin = async () => {
-    // Check if app is inside Flutter InAppWebView
-    if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
-        window.flutter_inappwebview.callHandler('nativeGoogleSignIn');
-        return;
-    }
+            if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
+                window.flutter_inappwebview.callHandler('nativeGoogleSignIn');
+                return;
+            }
 
-    // Fallback for regular browsers/web
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    try {
-        await signInWithRedirect(auth, provider);
-    } catch (error) {
-        window.showToast("Google Login Error: " + error.message, "error");
-    }
-};
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            
+            try {
+                // Try Popup Login First for smooth browser experience
+                const result = await signInWithPopup(auth, provider);
+                if (result && result.user) {
+                    handleSuccessfulAuthUser(result.user);
+                }
+            } catch (error) {
+                // Fallback to Redirect Login if popup is blocked
+                try {
+                    await signInWithRedirect(auth, provider);
+                } catch (err) {
+                    window.showToast("Google Login Error: " + err.message, "error");
+                }
+            }
+        };
+
         window.onNativeGoogleLoginSuccess = function(userData) {
-    if (typeof userData === 'string') {
-        try { userData = JSON.parse(userData); } catch(e) {}
-    }
-    
-    // Set local storage and authenticate user
-    localStorage.setItem('userToken', userData.token || '');
-    localStorage.setItem('userEmail', userData.email || '');
-    localStorage.setItem('userName', userData.displayName || 'Google User');
-    
-    if (typeof handleSuccessfulAuthUser === 'function') {
-        handleSuccessfulAuthUser({
-            displayName: userData.displayName,
-            email: userData.email,
-            uid: userData.uid
-        });
-    } else {
-        window.location.reload();
-    }
-};
+            if (typeof userData === 'string') {
+                try { userData = JSON.parse(userData); } catch(e) {}
+            }
+            
+            localStorage.setItem('userToken', userData.token || '');
+            localStorage.setItem('userEmail', userData.email || '');
+            localStorage.setItem('userName', userData.displayName || 'Google User');
+            
+            if (typeof handleSuccessfulAuthUser === 'function') {
+                handleSuccessfulAuthUser({
+                    displayName: userData.displayName,
+                    email: userData.email,
+                    uid: userData.uid
+                });
+            } else {
+                window.location.reload();
+            }
+        };
 
         window.handleEmailLinkLogin = async () => {
             const email = document.getElementById('authEmail').value.trim();
@@ -1594,135 +1606,152 @@
 
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
-            if(!p) { window.showToast("Product unavailable!", "error"); return; }
+            if (!p) { window.showToast("Product unavailable!", "error"); return; }
             
             currentProduct = p;
+            selectedColor = "";
+            selectedColorImg = "";
+            selectedSize = "";
+            selectedImage = "";
+
             pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
 
-            selectedSize = "";
-            selectedColor = "";
-            selectedColorImg = "";
-
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
-            let categoryTag = p.category || p.type || p.cat || 'General';
-            let detailSellingPrice = Number(p.price) || 0;
-            let detailMrpPrice = Number(p.mrp) || 0;
-            let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
 
-            if (detailMrpPrice > detailSellingPrice) {
-                let offAmount = detailMrpPrice - detailSellingPrice;
-                let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
-                detailPriceHtml = `
-                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${detailSellingPrice}</span>
-                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${detailMrpPrice}</span>
-                        <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAVE ₹${offAmount} (${offPercent}% OFF)</span>
+            let categoryTag = p.category || p.type || p.cat || 'General';
+            let sellingPrice = Number(p.price) || 0;
+            let mrpPrice = Number(p.mrp) || 0;
+
+            let priceDetailHtml = `<h2 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${sellingPrice}</h2>`;
+            if (mrpPrice > sellingPrice) {
+                let offAmount = mrpPrice - sellingPrice;
+                let offPercent = Math.round((offAmount / mrpPrice) * 100);
+                priceDetailHtml = `
+                    <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                        <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${sellingPrice}</span>
+                        <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${mrpPrice}</span>
+                        <span style="background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 8px;">${offPercent}% OFF</span>
                     </div>
                 `;
             }
 
-            let variantHtml = '';
-            
+            let colorsHtml = '';
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-                let firstColorObj = p.colors[0];
-                selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
-                
-                variantHtml += `<div class="variant-section">
-                    <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
-                    <div class="color-options">`;
+                colorsHtml = `
+                    <div class="variant-section">
+                        <div class="variant-title">🎨 Selected Color: <span id="colorLabel" style="color: #38bdf8;">Select Color</span></div>
+                        <div class="color-options">
+                `;
+                p.colors.forEach((c, i) => {
+                    let colorName = typeof c === 'object' ? c.name : c;
+                    let colorImg = typeof c === 'object' && c.image ? (Array.isArray(c.image) ? c.image[0] : c.image) : '';
+                    colorImg = formatMediaUrl(colorImg);
 
-                p.colors.forEach((c, idx) => {
-                    let cName = typeof c === 'object' ? c.name : c;
-                    let cImg = '';
-                    if (typeof c === 'object' && c.image) {
-                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
-                        cImg = formatMediaUrl(imgUrl);
-                    } else if (p.media && p.media.length > 0) {
-                        cImg = formatMediaUrl(p.media[0]);
-                    }
-
-                    let activeClass = (idx === 0) ? 'active' : '';
-                    if (cImg) {
-                        variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="${cName}">`;
+                    if (colorImg) {
+                        colorsHtml += `<img src="${colorImg}" class="color-thumb ${i===0?'active':''}" onclick="window.selectColor('${colorName}', this)" title="${colorName}" alt="${colorName}">`;
                     } else {
-                        variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${cName}', this)">${cName}</button>`;
+                        colorsHtml += `<button class="size-btn ${i===0?'active':''}" onclick="window.selectColor('${colorName}', this)">${colorName}</button>`;
                     }
                 });
-
-                variantHtml += `</div></div>`;
+                colorsHtml += `</div></div>`;
             }
 
+            let sizesHtml = '';
             if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
-                selectedSize = p.sizes[0];
-                variantHtml += `<div class="variant-section">
-                    <div class="variant-title">📏 Size: <span id="sizeLabel" style="color:#38bdf8">${selectedSize}</span></div>
-                    <div class="size-options">`;
-                p.sizes.forEach((s, idx) => {
-                    let activeClass = (idx === 0) ? 'active' : '';
-                    variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectSize('${s}', this)">${s}</button>`;
+                sizesHtml = `
+                    <div class="variant-section">
+                        <div class="variant-title">📏 Selected Size: <span id="sizeLabel" style="color: #38bdf8;">Select Size</span></div>
+                        <div class="size-options">
+                `;
+                p.sizes.forEach((s, i) => {
+                    sizesHtml += `<button class="size-btn ${i===0?'active':''}" onclick="window.selectSize('${s}', this)">${s}</button>`;
                 });
-                variantHtml += `</div></div>`;
+                sizesHtml += `</div></div>`;
             }
 
-            const detailContent = document.getElementById('detailContent');
-            detailContent.innerHTML = `
+            const shareUrl = `${window.location.origin}${window.location.pathname}?id=${p.id}`;
+
+            document.getElementById('detailContent').innerHTML = `
                 <div id="detailSliderContainer"></div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 15px;">
                     <div>
-                        <small style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">${categoryTag}</small>
-                        <h1 style="color: white; font-size: 22px; margin-top: 4px;">${p.name}</h1>
+                        <small style="color: #94a3b8; text-transform: uppercase; font-weight: bold;">${categoryTag}</small>
+                        <h1 style="color: white; font-size: 22px; margin-top: 4px; margin-bottom: 10px;">${p.name}</h1>
                     </div>
-                    <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
+                    <div style="display:flex; gap:10px;">
+                        <button id="detailLikeBtn" class="detail-like-btn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
+                    </div>
                 </div>
-                ${detailPriceHtml}
-                ${variantHtml}
-                <div style="margin: 20px 0; background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                    <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
-                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available.'}</p>
+
+                ${priceDetailHtml}
+                ${colorsHtml}
+                ${sizesHtml}
+
+                <div style="margin: 20px 0;">
+                    <h3 style="color: white; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
+                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available for this product.'}</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1);" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
-                    <button class="pay-btn" style="flex: 1;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="add-btn" onclick="window.addToCartFromDetail('${p.id}', false)" style="flex: 1; padding: 14px; font-size: 15px;">🛒 Add to Cart</button>
+                    <button class="pay-btn" onclick="window.addToCartFromDetail('${p.id}', true)" style="flex: 1; margin-top: 0; padding: 14px; font-size: 15px;">⚡ Buy Now</button>
+                </div>
+
+                <div style="margin-top: 15px; text-align: center;">
+                    <button onclick="navigator.clipboard.writeText('${shareUrl}'); window.showToast('Product link copied!');" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 13px;">🔗 Share Product Link</button>
                 </div>
             `;
 
-            updateGalleryImages(selectedColor);
+            if (p.colors && p.colors.length > 0) {
+                let firstColor = typeof p.colors[0] === 'object' ? p.colors[0].name : p.colors[0];
+                window.selectColor(firstColor, null);
+            } else {
+                updateGalleryImages('');
+            }
+
+            if (p.sizes && p.sizes.length > 0) {
+                window.selectSize(p.sizes[0], null);
+            }
+
             window.scrollTo(0, 0);
         };
 
-        window.addToCartDirect = (id) => {
+        window.addToCartFromDetail = (id, buyNow = false) => {
             const p = liveProducts.find(item => item.id === id);
             if (!p) return;
+
+            if (p.colors && p.colors.length > 0 && !selectedColor) {
+                window.showToast("Kripya color select karein!", "error");
+                return;
+            }
+            if (p.sizes && p.sizes.length > 0 && !selectedSize) {
+                window.showToast("Kripya size select karein!", "error");
+                return;
+            }
 
             let cartItem = {
                 id: p.id,
                 name: p.name,
                 price: Number(p.price) || 0,
-                selectedColor: selectedColor || '',
-                selectedSize: selectedSize || '',
+                selectedColor: selectedColor,
+                selectedSize: selectedSize,
                 selectedImage: selectedImage || (p.media && p.media[0] ? formatMediaUrl(p.media[0]) : ''),
-                quantity: 1,
-                media: p.media || []
+                quantity: 1
             };
 
-            let existingIdx = cart.findIndex(ci => ci.id === p.id && ci.selectedColor === cartItem.selectedColor && ci.selectedSize === cartItem.selectedSize);
-            if (existingIdx > -1) {
-                cart[existingIdx].quantity += 1;
-            } else {
-                cart.push(cartItem);
-            }
-
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            let key = getUserCartKey();
+            cart.push(cartItem);
+            localStorage.setItem(key, JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
-            window.showToast("Product Cart me add ho gaya hai! 🛒");
-        };
 
-        window.buyNowDirect = (id) => {
-            window.addToCartDirect(id);
-            window.toggleCart();
+            if (buyNow) {
+                window.toggleCart();
+            } else {
+                window.showToast("Added to Cart! 🛒");
+            }
         };
 
         window.toggleCart = () => {
@@ -1737,33 +1766,77 @@
             }
         };
 
-        window.updateCartQuantity = (index, delta) => {
-            if (cart[index]) {
-                cart[index].quantity = (cart[index].quantity || 1) + delta;
-                if (cart[index].quantity <= 0) {
-                    cart.splice(index, 1);
-                }
-                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-                document.getElementById('cartCount').innerText = cart.length;
-                renderCartUI();
+        function renderCartUI() {
+            const list = document.getElementById('cartList');
+            list.innerHTML = '';
+            cartTotalAmount = 0;
+
+            if (cart.length === 0) {
+                list.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka Cart khali hai!</p>';
+                document.getElementById('submitBtn').style.display = 'none';
+            } else {
+                document.getElementById('submitBtn').style.display = 'block';
+                cart.forEach((item, index) => {
+                    cartTotalAmount += Number(item.price) * (item.quantity || 1);
+                    let variantTxt = '';
+                    if (item.selectedColor || item.selectedSize) {
+                        variantTxt = `<div style="font-size:11px; color:#94a3b8;">${item.selectedColor ? 'Color: '+item.selectedColor : ''} ${item.selectedSize ? '| Size: '+item.selectedSize : ''}</div>`;
+                    }
+                    list.innerHTML += `
+                        <div class="cart-item">
+                            <img src="${item.selectedImage || 'https://via.placeholder.com/55'}" class="cart-item-img">
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                ${variantTxt}
+                                <p>₹${item.price}</p>
+                            </div>
+                            <button class="remove-btn" onclick="window.removeFromCart(${index})">Remove</button>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('qrTotal').innerText = cartTotalAmount;
+
+            if (currentUser) {
+                document.getElementById('custName').value = currentUser.name || '';
+                document.getElementById('custPhone').value = currentUser.phone || '';
+                populateCheckoutAddresses();
+            } else {
+                document.getElementById('checkoutAddressSection').style.display = 'none';
+            }
+
+            window.handlePaymentMode();
+        }
+
+        function populateCheckoutAddresses() {
+            const sec = document.getElementById('checkoutAddressSection');
+            const sel = document.getElementById('checkoutAddressSelect');
+            if (currentUser && currentUser.addresses && currentUser.addresses.length > 0) {
+                sec.style.display = 'block';
+                sel.innerHTML = '<option value="">-- Select Saved Address --</option>';
+                currentUser.addresses.forEach((addr) => {
+                    sel.innerHTML += `<option value="${addr}">${addr}</option>`;
+                });
+            } else {
+                sec.style.display = 'none';
+            }
+        }
+
+        window.handleCheckoutAddressSelect = () => {
+            const sel = document.getElementById('checkoutAddressSelect');
+            if (sel && sel.value) {
+                document.getElementById('custAddress').value = sel.value;
             }
         };
 
         window.removeFromCart = (index) => {
-            if (cart[index]) {
-                cart.splice(index, 1);
-                localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
-                document.getElementById('cartCount').innerText = cart.length;
-                renderCartUI();
-                window.showToast("Item cart se hata diya gaya.");
-            }
-        };
-
-        window.handleCheckoutAddressSelect = () => {
-            const select = document.getElementById('checkoutAddressSelect');
-            if (select && select.value) {
-                document.getElementById('custAddress').value = select.value;
-            }
+            cart.splice(index, 1);
+            let key = getUserCartKey();
+            localStorage.setItem(key, JSON.stringify(cart));
+            document.getElementById('cartCount').innerText = cart.length;
+            renderCartUI();
+            window.showToast("Item removed from cart");
         };
 
         window.handlePaymentMode = () => {
@@ -1771,99 +1844,20 @@
             const onlineSec = document.getElementById('onlinePaymentSection');
             if (mode === 'Online') {
                 onlineSec.style.display = 'block';
-                document.getElementById('qrTotal').innerText = cartTotalAmount;
-                const upiLink = `upi://pay?pa=${UPI_ID}&pn=Arpit%20Store&am=${cartTotalAmount}&cu=INR`;
-                document.getElementById('directPayLink').href = upiLink;
-                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiLink)}`;
+                const upiUrl = `upi://pay?pa=${UPI_ID}&pn=ArpitStore&am=${cartTotalAmount}&cu=INR`;
+                document.getElementById('directPayLink').href = upiUrl;
+                document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
             } else {
                 onlineSec.style.display = 'none';
             }
         };
 
-        function renderCartUI() {
-            const cartList = document.getElementById('cartList');
-            cartList.innerHTML = '';
-            
-            if (currentUser) {
-                document.getElementById('custName').value = currentUser.name || '';
-                document.getElementById('custPhone').value = currentUser.phone || '';
-                
-                const addrSelect = document.getElementById('checkoutAddressSelect');
-                if (currentUser.addresses && currentUser.addresses.length > 0) {
-                    addrSelect.parentElement.style.display = 'block';
-                    addrSelect.innerHTML = '<option value="">-- Select Saved Address --</option>';
-                    currentUser.addresses.forEach(addr => {
-                        addrSelect.innerHTML += `<option value="${addr}">${addr}</option>`;
-                    });
-                } else {
-                    addrSelect.parentElement.style.display = 'none';
-                }
-            } else {
-                const addrSelect = document.getElementById('checkoutAddressSelect');
-                if (addrSelect && addrSelect.parentElement) {
-                    addrSelect.parentElement.style.display = 'none';
-                }
-            }
-
+        window.submitOrder = () => {
             if (cart.length === 0) {
-                cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
-                cartTotalAmount = 0;
-                handlePaymentMode();
+                window.showToast("Cart khali hai!", "error");
                 return;
             }
 
-            cartTotalAmount = 0;
-            cart.forEach((item, index) => {
-                let itemTotal = item.price * (item.quantity || 1);
-                cartTotalAmount += itemTotal;
-
-                let variantText = '';
-                if (item.selectedColor || item.selectedSize) {
-                    variantText = `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">`;
-                    if (item.selectedColor) variantText += `Color: ${item.selectedColor} `;
-                    if (item.selectedSize) variantText += `Size: ${item.selectedSize}`;
-                    variantText += `</div>`;
-                }
-
-                let imgUrl = item.selectedImage || 'https://via.placeholder.com/55?text=No+Img';
-
-                cartList.innerHTML += `
-                    <div class="cart-item">
-                        <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            ${variantText}
-                            <p>₹${item.price} x ${item.quantity || 1}</p>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <button onclick="window.updateCartQuantity(${index}, -1)" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 6px; font-weight: bold; cursor: pointer;">-</button>
-                            <span style="color: white; font-weight: bold; font-size: 14px; min-width: 18px; text-align: center;">${item.quantity || 1}</span>
-                            <button onclick="window.updateCartQuantity(${index}, 1)" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); width: 28px; height: 28px; border-radius: 6px; font-weight: bold; cursor: pointer;">+</button>
-                            <button class="remove-btn" onclick="window.removeFromCart(${index})" style="margin-left: 4px; padding: 4px 8px;">✕</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            cartList.innerHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; font-weight: bold;">
-                    <span style="color: #cbd5e1; font-size: 15px;">Total Amount:</span>
-                    <span style="color: #38bdf8; font-size: 20px;">₹${cartTotalAmount}</span>
-                </div>
-            `;
-
-            handlePaymentMode();
-        }
-
-        window.checkSharedLink = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const prodId = urlParams.get('id');
-            if (prodId && liveProducts.length > 0) {
-                window.showProductDetail(prodId);
-            }
-        };
-
-        window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
@@ -1871,67 +1865,83 @@
             const utr = document.getElementById('utrNumber').value.trim();
 
             if (!name || !phone || phone.length !== 10 || !address) {
-                window.showToast("Kripya apna naam, sahi 10-digit mobile number aur address bharein!", "error");
+                window.showToast("Kripya saari jankari sahi se bharein (10-digit mobile number)!", "error");
                 return;
             }
 
-            if (cart.length === 0) {
-                window.showToast("Aapka cart khaali hai!", "error");
+            if (paymentMode === 'Online' && (!utr || utr.length < 6)) {
+                window.showToast("Kripya valid UTR / Transaction number daalein!", "error");
                 return;
             }
 
-            if (paymentMode === 'Online' && !utr) {
-                window.showToast("Online payment ke liye UTR / Transaction number daalna anivarya hai!", "error");
-                return;
-            }
+            const orderId = 'ORD' + Math.floor(100000 + Math.random() * 900000);
+            const dateStr = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
-            const orderId = 'ARP-' + Math.floor(100000 + Math.random() * 900000);
-            const orderData = {
+            const orderObj = {
                 orderId: orderId,
+                date: dateStr,
                 custName: name,
                 custPhone: phone,
                 custAddress: address,
                 paymentMode: paymentMode,
-                utrNumber: utr || 'COD',
-                items: [...cart],
+                utr: paymentMode === 'Online' ? utr : 'COD',
+                items: cart,
                 total: cartTotalAmount,
-                date: new Date().toLocaleString(),
-                status: 'Hi, your order is ready'
+                status: "Hi, your order is ready"
             };
 
-            let orderKey = currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
-            let myOrders = JSON.parse(localStorage.getItem(orderKey)) || [];
-            myOrders.unshift(orderData);
-            localStorage.setItem(orderKey, JSON.stringify(myOrders));
+            let key = getUserOrdersKey();
+            let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
+            savedOrders.unshift(orderObj);
+            localStorage.setItem(key, JSON.stringify(savedOrders));
 
             if (navigator.onLine) {
                 fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
+                    method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        action: 'new_order',
+                        action: 'place_order',
                         orderId: orderId,
                         custName: name,
                         custPhone: phone,
                         custAddress: address,
                         paymentMode: paymentMode,
-                        utrNumber: utr || 'COD',
-                        items: cart.map(i => `${i.name} (Qty: ${i.quantity || 1}, Color: ${i.selectedColor || 'N/A'}, Size: ${i.selectedSize || 'N/A'})`).join(', '),
+                        utr: paymentMode === 'Online' ? utr : 'COD',
+                        items: cart.map(i => `${i.name} (Qty:${i.quantity||1}${i.selectedColor?', Color:'+i.selectedColor:''}${i.selectedSize?', Size:'+i.selectedSize:''})`).join(', '),
                         total: cartTotalAmount,
-                        status: 'Hi, your order is ready'
+                        status: "Hi, your order is ready"
                     })
-                }).catch(err => console.log("Order sync error:", err));
+                }).catch(e => console.log("Order excel sync error:", e));
+            }
+
+            if (currentUser && (!currentUser.addresses || !currentUser.addresses.includes(address))) {
+                if (!currentUser.addresses) currentUser.addresses = [];
+                currentUser.addresses.push(address);
+                updateUserDataInStorage();
             }
 
             cart = [];
-            localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
+            localStorage.removeItem(getUserCartKey());
             document.getElementById('cartCount').innerText = '0';
             document.getElementById('cartModal').style.display = 'none';
-            document.getElementById('successModal').style.display = 'flex';
+
+            const successModal = document.getElementById('successModal');
+            successModal.style.display = 'flex';
             setTimeout(() => {
-                document.getElementById('successModal').style.display = 'none';
+                successModal.style.display = 'none';
                 window.showMyOrders();
             }, 2500);
+        };
+
+        window.checkSharedLink = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            if (productId) {
+                setTimeout(() => {
+                    window.showProductDetail(productId);
+                }, 500);
+            }
         };
 
         listenToProducts();
