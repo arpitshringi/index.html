@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Arpit Store - Live Premium v3.0</title>
+    <title>Arpit Store – Live Premium v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -28,7 +28,6 @@
             min-height: 100vh; 
             padding-bottom: 60px; 
         }
-
         input, textarea, select {
             user-select: text;
             -webkit-user-select: text;
@@ -59,10 +58,8 @@
             border: 1px solid rgba(56, 189, 248, 0.3);
             backdrop-filter: blur(5px);
         }
-
         /* Top Announcement Bar */
         .announcement-bar { background: linear-gradient(135deg, #0284c7, #6366f1); color: white; text-align: center; padding: 8px 15px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
-
         /* Header Elements */
         header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
         .header-left { display: flex; align-items: center; gap: 15px; }
@@ -72,11 +69,9 @@
         .header-right { display: flex; align-items: center; gap: 10px; }
         .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
         .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
-
         /* Highlighted Guest Sign-Up Button */
         .auth-highlight-btn { background: linear-gradient(135deg, #f43f5e, #fb7185); color: white; padding: 8px 14px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; animation: pulseGlow 2s infinite; }
         @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
-
         /* Drawer & Overlay */
         .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; overflow-y: auto; }
         .drawer.open { left: 0 !important; }
@@ -86,11 +81,9 @@
         
         .user-profile-brief { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .user-avatar-small { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; background: #38bdf8; color: #0f172a; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; }
-
         .drawer-item { padding: 12px 15px; color: #f1f5f9; font-weight: 600; border-radius: 10px; cursor: pointer; margin-bottom: 8px; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
         .drawer-item:hover { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding-left: 20px; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 250; }
-
         .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
         
         /* Search Bar */
@@ -99,23 +92,19 @@
         .search-input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.25); background: rgba(30, 41, 59, 0.95); }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
         .clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; }
-
         /* Filters & Sort */
         .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
         .filter-badge { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
         .filter-badge span { cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; }
         .filter-badge span:hover { color: #f8fafc; }
-
         .filter-sort-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .category-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; width: 100%; }
         .category-tabs::-webkit-scrollbar { display: none; }
         .tab-btn { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
         .tab-btn:hover { background: rgba(56, 189, 248, 0.1); color: #f8fafc; }
         .tab-btn.active { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; border-color: transparent; }
-
         .sort-select { padding: 10px 14px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; color: #f8fafc; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(8px); transition: 0.2s; }
         .sort-select option { background: #1e293b; color: white; }
-
         .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
         
         /* Banner */
@@ -125,7 +114,6 @@
         .offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
         .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
         .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
-
         /* Color & Size Variant Styling */
         .variant-section { margin: 15px 0; background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
@@ -133,20 +121,16 @@
         .color-options::-webkit-scrollbar { display: none; }
         .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
         .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
-
         .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
         .size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
-
         /* Order Re-buy Items */
         .order-item-clickable { cursor: pointer; transition: 0.2s; }
         .order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
-
         /* Loader */
         .loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(56, 189, 248, 0.2); border-top: 4px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         /* Product Grid */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
         .card { position: relative; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.3s ease; }
@@ -163,7 +147,9 @@
         .card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 6px; }
         .add-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 9px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
         .add-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
-
+        /* WhatsApp Share Button on Card */
+        .whatsapp-share-card-btn { background: #22c55e; color: white; border: none; padding: 7px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.3s; }
+        .whatsapp-share-card-btn:hover { background: #16a34a; }
         /* Detail View */
         #detailView { display: none; }
         .detail-container { background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
@@ -177,7 +163,6 @@
         
         .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
         .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
-
         /* Modal & Cart */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 350; }
         .modal-content { background: #1e293b; padding: 22px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
@@ -191,7 +176,6 @@
         .pay-btn:hover { background: linear-gradient(135deg, #16a34a, #15803d); transform: translateY(-2px); }
         .remove-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; transition: 0.2s;}
         .remove-btn:hover { background: #ef4444; color: white; }
-
         #onlinePaymentSection { display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
         
         .cart-item { background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); gap: 10px; }
@@ -199,10 +183,8 @@
         .cart-item-info { flex: 1; }
         .cart-item-info h4 { font-size: 14px; color: white; margin-bottom: 3px; }
         .cart-item-info p { font-size: 14px; color: #38bdf8; font-weight: bold; }
-
         .order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; }
         .order-status-badge { background: #0284c7; color: white; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; transition: 0.3s; }
-
         /* Toast Notifications */
         .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { background: rgba(15, 23, 42, 0.95); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease-out forwards, fadeOut 0.3s ease-in forwards 2.7s; }
@@ -210,13 +192,11 @@
         .toast.success { border-left: 4px solid #22c55e; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
-
         /* Image Lightbox Modal Zoom & Drag Fix */
         .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
         .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; will-change: transform; transition: transform 0.05s ease-out; cursor: grab; touch-action: none; }
         .zoom-img:active { cursor: grabbing; }
         .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; }
-
         /* Auth & Profile Modal Specifics */
         .auth-tab-header { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         .auth-tab { background: none; border: none; color: #94a3b8; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 5px; }
@@ -227,15 +207,12 @@
     </style>
 </head>
 <body>
-
     <!-- Pull to Refresh Indicator -->
     <div class="ptr-container" id="ptrContainer">
         <span class="ptr-text" id="ptrText">Pull down to refresh ↓</span>
     </div>
-
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="toast-container"></div>
-
     <!-- Offline Connection Warning Modal -->
     <div class="modal" id="offlineModal" style="display: none; z-index: 10000;">
         <div class="modal-content" style="text-align: center; border: 2px solid #ef4444; background: #1e293b;">
@@ -245,13 +222,11 @@
             <button onclick="window.checkNetworkStatus()" style="background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px;">Retry Connection 🔄</button>
         </div>
     </div>
-
     <!-- Image Lightbox Zoom Modal -->
     <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal(false)">
         <span class="zoom-close" onclick="window.closeZoomModal(true)">&times;</span>
         <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation()">
     </div>
-
     <!-- Auth / Login / Signup Modal -->
     <div class="modal" id="authModal">
         <div class="modal-content">
@@ -260,21 +235,18 @@
                 <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
                 <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
             </div>
-
             <!-- Google Login Option -->
             <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
                 <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
                 Continue with Google
             </button>
             <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR Mobile Number & Password se Login karein</div>
-
             <div id="authFormContainer">
                 <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
                 <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
                 <input type="password" id="authPassword" class="input-box" placeholder="Password">
                 <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
             </div>
-
             <!-- Firebase Gmail Link / OTP Login Section -->
             <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📧 Or Login with Gmail Link</div>
@@ -283,7 +255,6 @@
             </div>
         </div>
     </div>
-
     <!-- Customer Profile Modal -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
@@ -294,28 +265,30 @@
                 <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
                 <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
                 <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">-</p>
+                <div style="margin-top: 10px; text-align: left;">
+                    <label style="font-size: 12px; color: #94a3b8;">Mobile Number (Edit & Update):</label>
+                    <div style="display: flex; gap: 8px; margin-top: 4px;">
+                        <input type="tel" id="profilePhoneInput" class="input-box" placeholder="Enter Mobile Number" maxlength="10" style="margin-bottom: 0;">
+                        <button onclick="window.updateProfilePhone()" class="add-btn" style="width: auto; padding: 0 14px; white-space: nowrap;">Update</button>
+                    </div>
+                </div>
             </div>
-
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses:</h4>
                 <div id="savedAddressesList"></div>
-
                 <div style="margin-top: 15px; background: rgba(15,23,42,0.5); padding: 12px; border-radius: 10px;">
                     <h5 style="color: #38bdf8; margin-bottom: 8px;">Add New Address</h5>
-                    <textarea id="newAddressInput" class="input-box" placeholder="Enter full address here..." rows="2" style="margin-bottom: 10px;"></textarea>
+                    <textarea id="newAddressInput" class="input-box" placeholder="Enter full address here…" rows="2" style="margin-bottom: 10px;"></textarea>
                     <button class="add-btn" onclick="window.saveNewAddress()">Save Address</button>
                 </div>
             </div>
-
             <button onclick="window.logoutUser()" class="remove-btn" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 14px;">Logout 🚪</button>
         </div>
     </div>
-
     <!-- Top Announcement Bar -->
     <div class="announcement-bar">
-        ⚡ Cash on Delivery Available • Fast Shipping - FREE
+        ⚡ Cash on Delivery Available • Fast Shipping – FREE
     </div>
-
     <!-- Drawer Menu Overlay -->
     <div class="overlay" id="overlay" onclick="window.toggleDrawer()"></div>
     
@@ -325,9 +298,7 @@
             <span>Menu</span>
             <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
         </div>
-
         <div id="drawerUserSection"></div>
-
         <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
         <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
         <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
@@ -335,7 +306,6 @@
         <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
         <div class="drawer-item" onclick="window.refreshAppData()" style="color: #38bdf8;">🔄 Refresh App</div>
     </div>
-
     <!-- Header -->
     <header>
         <div class="header-left">
@@ -347,19 +317,16 @@
             <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
         </div>
     </header>
-
     <div class="container">
         <!-- Home / Main View -->
         <div id="homeView">
             
             <div class="search-container">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords..." oninput="window.handleSearch(this.value)">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords…" oninput="window.handleSearch(this.value)">
                 <button id="clearSearchBtn" class="clear-search" onclick="window.clearSearchBox()">✕</button>
             </div>
-
             <div id="activeFilters" class="active-filters"></div>
-
             <!-- Filter & Category Bar -->
             <div class="filter-sort-bar">
                 <div class="category-tabs">
@@ -371,7 +338,6 @@
                     
                     <button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">🎛️ Filter</button>
                 </div>
-
                 <div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
                     <select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
                         <option value="featured">✨ Featured</option>
@@ -381,7 +347,6 @@
                     </select>
                 </div>
             </div>
-
             <div id="sareeOfferBanner" class="saree-offer-banner">
                 <span class="offer-badge">🔥 Mega Saree Special Offer</span>
                 <div class="offer-title">🥻 5 Saree Combo Trial Offer (COD Available)</div>
@@ -394,7 +359,6 @@
                     <span>✨ No Question Asked Return</span>
                 </div>
             </div>
-
             <div class="section-title">
                 <span id="pageTitle">All Products</span>
             </div>
@@ -402,26 +366,22 @@
             <!-- Loading Spinner -->
             <div id="loader" class="loader-container">
                 <div class="spinner"></div>
-                <p style="color: #38bdf8; font-weight: 600;">Products load ho rahe hain...</p>
+                <p style="color: #38bdf8; font-weight: 600;">Products load ho rahe hain…</p>
             </div>
-
             <div class="product-grid" id="productGrid"></div>
         </div>
-
         <!-- Product Detail View -->
         <div id="detailView">
             <div class="back-link" onclick="window.goHome()">← Back to Store</div>
             <div class="detail-container" id="detailContent"></div>
         </div>
     </div>
-
     <!-- Cart Modal -->
     <div class="modal" id="cartModal">
         <div class="modal-content">
             <button class="close-btn" onclick="window.toggleCart()">&times;</button>
             <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Your Cart</h2>
             <div id="cartList" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
-
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
                 <input type="text" id="custName" class="input-box" placeholder="Full Name">
@@ -431,14 +391,12 @@
                     <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
                     <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
                 </div>
-                <textarea id="custAddress" class="input-box" placeholder="Delivery Address..." rows="2"></textarea>
-
+                <textarea id="custAddress" class="input-box" placeholder="Delivery Address…" rows="2"></textarea>
                 <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
                 <select id="paymentMode" class="input-box" onchange="window.handlePaymentMode()">
                     <option value="COD">Cash on Delivery</option>
                     <option value="Online">Online Payment (UPI / QR)</option>
                 </select>
-
                 <div id="onlinePaymentSection">
                     <h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
                     
@@ -453,12 +411,10 @@
                     <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment hone ke baad apna UTR / Transaction Number niche zaroor daalein 👇</p>
                     <input type="text" id="utrNumber" class="input-box" placeholder="Daalein 12-Digit UTR Number *" style="border-color: #ef4444;">
                 </div>
-
                 <button class="pay-btn" id="submitBtn" onclick="window.submitOrder()">Confirm & Place Order</button>
             </div>
         </div>
     </div>
-
     <!-- Success Modal -->
     <div class="modal" id="successModal">
         <div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
@@ -467,26 +423,23 @@
             <p style="color: #94a3b8; font-size: 15px;">Aapka order successfully place ho gaya hai!</p>
         </div>
     </div>
-
     <!-- Firebase & Core Engine Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
+        
         // PULL TO REFRESH LOGIC
         let ptrStart = 0;
         let ptrCurrent = 0;
         let isPtrPulling = false;
-
-        document.addEventListener('touchstart', (e) => {
+        document.addEventListener('touchstart', e => {
             if (window.scrollY === 0) {
                 ptrStart = e.touches[0].clientY;
                 isPtrPulling = true;
             }
         }, { passive: true });
-
-        document.addEventListener('touchmove', (e) => {
+        document.addEventListener('touchmove', e => {
             if (!isPtrPulling) return;
             ptrCurrent = e.touches[0].clientY;
             let distance = ptrCurrent - ptrStart;
@@ -510,8 +463,7 @@
                 }
             }
         }, { passive: false });
-
-        document.addEventListener('touchend', (e) => {
+        document.addEventListener('touchend', e => {
             if (!isPtrPulling) return;
             isPtrPulling = false;
             let distance = ptrCurrent - ptrStart;
@@ -524,7 +476,7 @@
             }
             document.getElementById('ptrText').innerText = "Pull down to refresh ↓";
         });
-
+        
         // FIREBASE CONFIG & INITIALIZATION
         const firebaseConfig = {
             apiKey: "AIzaSyAV0AtJXt-ELhRtJfOgJ2u4IntOfp2TJGQ",
@@ -535,21 +487,18 @@
             appId: "1:607228237560:web:e46bedda26ae89d3940d0d",
             measurementId: "G-9T9Q26ZC9M"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWFCQbiR_mBcJzGcjPrpI2fmYv09RuFqz376plq_HWAj2NwK5vfQiT74e15pVFkB0XFQ/exec";
         const UPI_ID = "7665913393@ptsbi";
-
         let liveProducts = [];
         let productsUnsubscribe = null;
         let currentProduct = null;
         
         let currentUser = JSON.parse(localStorage.getItem('arpit_current_user')) || null;
         let authMode = 'login';
-
+        
         function getUserOrdersKey() {
             return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
         }
@@ -559,19 +508,15 @@
         function getUserWatchlistKey() {
             return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
         }
-
         let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
         let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
-
         let currentCategory = 'All';
         let searchQuery = '';
         let cartTotalAmount = 0;
-
         let selectedColor = "";
         let selectedColorImg = "";
         let selectedSize = "";
         let selectedImage = "";
-
         let zoomScale = 1;
         let zoomLastScale = 1;
         let zoomStartDistance = 0;
@@ -584,10 +529,10 @@
         let justPinched = false;
         const MIN_ZOOM = 1;
         const MAX_ZOOM = 4;
-
+        
         document.getElementById('cartCount').innerText = cart.length;
         updateAuthUI();
-
+        
         // Handle Google Redirect Login Callback
         getRedirectResult(auth).then((result) => {
             if (result && result.user) {
@@ -596,7 +541,7 @@
         }).catch((error) => {
             console.error("Google Redirect Error:", error);
         });
-
+        
         // Handle Gmail Link Login Callback
         if (isSignInWithEmailLink(auth, window.location.href)) {
             let email = window.localStorage.getItem('emailForSignIn');
@@ -615,22 +560,21 @@
                     });
             }
         }
-
+        
         window.refreshAppData = () => {
-            window.showToast("App data refresh ho raha hai... 🔄");
+            window.showToast("App data refresh ho raha hai… 🔄");
             listenToProducts();
             if (currentUser) {
                 fetchLiveStatusForAllOrders();
             }
             window.applyFiltersAndRender();
         };
-
         setInterval(() => {
             if (currentUser && currentCategory === 'MyOrders') {
                 fetchLiveStatusForAllOrders();
             }
         }, 6000);
-
+        
         window.toggleAuthModal = () => {
             const modal = document.getElementById('authModal');
             const isOpen = modal.style.display === 'flex';
@@ -641,14 +585,13 @@
                 history.back();
             }
         };
-
+        
         window.switchAuthTab = (mode) => {
             authMode = mode;
             const loginBtn = document.getElementById('tabLoginBtn');
             const signupBtn = document.getElementById('tabSignupBtn');
             const nameInput = document.getElementById('authName');
             const submitBtn = document.getElementById('authSubmitBtn');
-
             if (mode === 'login') {
                 loginBtn.classList.add('active');
                 signupBtn.classList.remove('active');
@@ -661,18 +604,17 @@
                 submitBtn.innerText = 'Sign Up';
             }
         };
-
+        
         function reloadUserSpecificState() {
             cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
             watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
             document.getElementById('cartCount').innerText = cart.length;
             fetchLiveStatusForAllOrders();
         }
-
+        
+        // FIXED GOOGLE LOGIN USER HANDLER (DOES NOT AUTO-FILL 9999999999)
         function handleSuccessfulAuthUser(user) {
-            let phone = prompt("Enter your 10-digit Mobile Number for order updates:", "9876543210");
-            if (!phone || phone.length !== 10) phone = "9999999999";
-
+            let phone = ""; // Blank by default so customer can add it themselves later
             currentUser = {
                 name: user.displayName || (user.email ? user.email.split('@')[0] : "Google User"),
                 phone: phone,
@@ -680,7 +622,6 @@
                 password: 'google_auth_user',
                 addresses: []
             };
-
             let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
             let existing = registeredUsers.find(u => u.phone === phone || (u.email && user.email && u.email === user.email));
             if (!existing) {
@@ -690,7 +631,6 @@
                 currentUser = existing;
                 if (!currentUser.email && user.email) currentUser.email = user.email;
             }
-
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
             syncUserToExcel({ action: 'google_login', name: currentUser.name, phone: currentUser.phone, password: 'google_auth_user', email: currentUser.email });
             
@@ -700,22 +640,19 @@
             }
             updateAuthUI();
             reloadUserSpecificState();
-            window.showToast("Login Successful! 🎉");
+            window.showToast("Login Successful! 🎉 Kripya profile me apna mobile number update karein.");
         }
-
+        
         // HYBRID LOGIN HANDLER (Mobile App + Web + Google Sheet Verification)
         window.submitAuth = async () => {
             const phone = document.getElementById('authPhone').value.trim();
             const password = document.getElementById('authPassword').value.trim();
             const name = document.getElementById('authName').value.trim();
-
             if (!phone || phone.length !== 10 || !password) {
                 window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
                 return;
             }
-
             let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-
             if (authMode === 'signup') {
                 if (!name) {
                     window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
@@ -727,22 +664,17 @@
                     window.switchAuthTab('login');
                     return;
                 }
-
                 let newUser = { name, phone, password, addresses: [] };
                 registeredUsers.push(newUser);
                 localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-
                 syncUserToExcel({ action: 'signup', name, phone, password, email: '' });
-
                 currentUser = newUser;
                 localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
                 window.toggleAuthModal();
                 updateAuthUI();
                 reloadUserSpecificState();
                 window.showToast("Sign up successful! Welcome.");
-
             } else {
-                // First check local storage
                 let user = registeredUsers.find(u => u.phone === phone && u.password === password);
                 if (user) {
                     currentUser = user;
@@ -753,13 +685,10 @@
                     window.showToast("Login successful!");
                     return;
                 }
-
-                // If not found in Local Storage (e.g., inside App WebView), verify from Google Sheet
-                window.showToast("Verifying login details... ⏳");
+                window.showToast("Verifying login details… ⏳");
                 try {
                     let response = await fetch(GOOGLE_SCRIPT_URL + "?action=login&phone=" + encodeURIComponent(phone) + "&password=" + encodeURIComponent(password));
                     let resData = await response.json();
-
                     if (resData && resData.result === "success" && resData.user) {
                         let remoteUser = {
                             name: resData.user.name || "User",
@@ -770,7 +699,6 @@
                         };
                         registeredUsers.push(remoteUser);
                         localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
-
                         currentUser = remoteUser;
                         localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
                         window.toggleAuthModal();
@@ -785,14 +713,13 @@
                 }
             }
         };
-
+        
         // GOOGLE LOGIN HANDLER (Popup with Redirect Fallback for App & Web)
         window.handleGoogleLogin = async () => {
             if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
                 window.flutter_inappwebview.callHandler('nativeGoogleSignIn');
                 return;
             }
-
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             
@@ -809,7 +736,7 @@
                 }
             }
         };
-
+        
         window.onNativeGoogleLoginSuccess = function(userData) {
             if (typeof userData === 'string') {
                 try { userData = JSON.parse(userData); } catch(e) {}
@@ -829,7 +756,7 @@
                 window.location.reload();
             }
         };
-
+        
         window.handleEmailLinkLogin = async () => {
             const email = document.getElementById('authEmail').value.trim();
             if (!email || !email.includes('@')) {
@@ -848,7 +775,7 @@
                 window.showToast("Error sending email link: " + error.message, "error");
             }
         };
-
+        
         function syncUserToExcel(payloadData) {
             if (!navigator.onLine) return;
             fetch(GOOGLE_SCRIPT_URL, {
@@ -857,11 +784,10 @@
                 body: JSON.stringify(payloadData)
             }).catch(err => console.log("Excel user sync error:", err));
         }
-
+        
         function updateAuthUI() {
             const headerAuthArea = document.getElementById('headerAuthArea');
             const drawerUserSection = document.getElementById('drawerUserSection');
-
             if (currentUser) {
                 headerAuthArea.innerHTML = `
                     <button onclick="window.toggleProfileModal()" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;">
@@ -873,7 +799,7 @@
                         <div class="user-avatar-small">${currentUser.name.charAt(0).toUpperCase()}</div>
                         <div>
                             <div style="font-weight: 700; color: white; font-size: 14px;">${currentUser.name}</div>
-                            <div style="font-size: 12px; color: #38bdf8;">${currentUser.phone} (View Profile)</div>
+                            <div style="font-size: 12px; color: #38bdf8;">${currentUser.phone ? currentUser.phone : 'Add Phone Number'} (View Profile)</div>
                         </div>
                     </div>
                 `;
@@ -888,7 +814,7 @@
                 `;
             }
         }
-
+        
         window.toggleProfileModal = () => {
             if (!currentUser) {
                 window.toggleAuthModal();
@@ -900,14 +826,29 @@
             if (!isOpen) {
                 document.getElementById('profileAvatarDisplay').innerText = currentUser.name.charAt(0).toUpperCase();
                 document.getElementById('profileNameDisplay').innerText = currentUser.name;
-                document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
+                document.getElementById('profilePhoneDisplay').innerText = currentUser.phone ? currentUser.phone : 'No Phone Number Added';
+                document.getElementById('profilePhoneInput').value = currentUser.phone && currentUser.phone !== '9999999999' ? currentUser.phone : '';
                 renderSavedAddresses();
                 pushNavState('profile');
             } else if (history.state && history.state.appNav === 'profile') {
                 history.back();
             }
         };
-
+        
+        // UPDATE MOBILE NUMBER FROM PROFILE
+        window.updateProfilePhone = () => {
+            const newPhone = document.getElementById('profilePhoneInput').value.trim();
+            if (!newPhone || newPhone.length !== 10) {
+                window.showToast("Kripya sahi 10-digit mobile number daalein!", "error");
+                return;
+            }
+            currentUser.phone = newPhone;
+            updateUserDataInStorage();
+            document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
+            updateAuthUI();
+            window.showToast("Mobile number successfully updated! 🎉");
+        };
+        
         function renderSavedAddresses() {
             const listDiv = document.getElementById('savedAddressesList');
             if (!currentUser.addresses || currentUser.addresses.length === 0) {
@@ -924,7 +865,7 @@
                 `;
             });
         }
-
+        
         window.saveNewAddress = () => {
             const newAddr = document.getElementById('newAddressInput').value.trim();
             if (!newAddr) {
@@ -939,21 +880,21 @@
             renderSavedAddresses();
             window.showToast("Address saved successfully!");
         };
-
+        
         window.deleteAddress = (idx) => {
             currentUser.addresses.splice(idx, 1);
             updateUserDataInStorage();
             renderSavedAddresses();
             window.showToast("Address removed.");
         };
-
+        
         function updateUserDataInStorage() {
             let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-            registeredUsers = registeredUsers.map(u => u.phone === currentUser.phone ? currentUser : u);
+            registeredUsers = registeredUsers.map(u => u.email === currentUser.email ? currentUser : u);
             localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
         }
-
+        
         window.logoutUser = () => {
             currentUser = null;
             localStorage.removeItem('arpit_current_user');
@@ -965,7 +906,7 @@
             window.goHome();
             window.showToast("Logged out successfully!", "success");
         };
-
+        
         window.checkNetworkStatus = () => {
             const offlineModal = document.getElementById('offlineModal');
             if (!navigator.onLine) {
@@ -976,12 +917,12 @@
         };
         window.addEventListener('online', window.checkNetworkStatus);
         window.addEventListener('offline', window.checkNetworkStatus);
-
+        
         function pushNavState(type) {
             history.pushState({ appNav: type }, '');
         }
-
-        window.addEventListener('popstate', (e) => {
+        
+        window.addEventListener('popstate', e => {
             const zoomModal = document.getElementById('imageZoomModal');
             if (zoomModal && zoomModal.style.display === 'flex') {
                 if (zoomScale > 1) {
@@ -993,25 +934,21 @@
                 resetZoom();
                 return;
             }
-
             const cartModal = document.getElementById('cartModal');
             if (cartModal && cartModal.style.display === 'flex') {
                 cartModal.style.display = 'none';
                 return;
             }
-
             const authModal = document.getElementById('authModal');
             if (authModal && authModal.style.display === 'flex') {
                 authModal.style.display = 'none';
                 return;
             }
-
             const profileModal = document.getElementById('profileModal');
             if (profileModal && profileModal.style.display === 'flex') {
                 profileModal.style.display = 'none';
                 return;
             }
-
             const drawer = document.getElementById('drawer');
             if (drawer && drawer.classList.contains('open')) {
                 drawer.classList.remove('open');
@@ -1019,33 +956,31 @@
                 if(overlay) overlay.style.display = 'none';
                 return;
             }
-
             const detailView = document.getElementById('detailView');
             if (detailView && detailView.style.display === 'block') {
                 document.getElementById('detailView').style.display = 'none';
                 document.getElementById('homeView').style.display = 'block';
                 return;
             }
-
             if (currentCategory !== 'All') {
                 window.goHomeSilently();
                 return;
             }
         });
-
+        
         function getDistance(touches) {
             const dx = touches[0].clientX - touches[1].clientX;
             const dy = touches[0].clientY - touches[1].clientY;
             return Math.hypot(dx, dy);
         }
-
+        
         function applyZoomTransform() {
             const zoomedImg = document.getElementById('zoomedImg');
             if (zoomedImg) {
                 zoomedImg.style.transform = `translate(${zoomPosX}px, ${zoomPosY}px) scale(${zoomScale})`;
             }
         }
-
+        
         function resetZoom() {
             zoomScale = 1;
             zoomLastScale = 1;
@@ -1056,7 +991,7 @@
             isPinching = false;
             applyZoomTransform();
         }
-
+        
         window.openZoomModal = (imgUrl) => {
             const modal = document.getElementById('imageZoomModal');
             const zoomedImg = document.getElementById('zoomedImg');
@@ -1067,7 +1002,7 @@
                 pushNavState('zoom');
             }
         };
-
+        
         window.closeZoomModal = (force = false) => {
             if (!force && (preventClick || justPinched || zoomScale > 1)) return;
             const modal = document.getElementById('imageZoomModal');
@@ -1079,10 +1014,10 @@
                 }
             }
         };
-
+        
         const zoomContainer = document.getElementById('imageZoomModal');
         if (zoomContainer) {
-            zoomContainer.addEventListener('touchstart', (e) => {
+            zoomContainer.addEventListener('touchstart', e => {
                 if (e.touches.length === 2) {
                     isPinching = true;
                     isDragging = false;
@@ -1112,8 +1047,8 @@
                     zoomLastTap = currentTime;
                 }
             }, { passive: false });
-
-            zoomContainer.addEventListener('touchmove', (e) => {
+            
+            zoomContainer.addEventListener('touchmove', e => {
                 if (e.touches.length === 2 && isPinching) {
                     e.preventDefault();
                     const currentDistance = getDistance(e.touches);
@@ -1130,8 +1065,8 @@
                     applyZoomTransform();
                 }
             }, { passive: false });
-
-            zoomContainer.addEventListener('touchend', (e) => {
+            
+            zoomContainer.addEventListener('touchend', e => {
                 if (isPinching) {
                     justPinched = true;
                     setTimeout(() => { justPinched = false; }, 400);
@@ -1153,11 +1088,11 @@
                 setTimeout(() => { preventClick = false; }, 300);
             });
         }
-
+        
         function saveActiveTab(tabName) {
             sessionStorage.setItem('active_store_tab', tabName);
         }
-
+        
         window.showToast = (message, type = "success") => {
             const container = document.getElementById("toastContainer");
             const toast = document.createElement("div");
@@ -1166,7 +1101,7 @@
             container.appendChild(toast);
             setTimeout(() => { if(container.contains(toast)) container.removeChild(toast); }, 3000);
         };
-
+        
         function formatMediaUrl(url) {
             if(!url) return '';
             if (url.includes('drive.google.com') || url.includes('googleusercontent.com')) {
@@ -1177,13 +1112,19 @@
             }
             return url;
         }
-
+        
+        window.shareOnWhatsApp = (id, name, price, event) => {
+            if(event) event.stopPropagation();
+            const productLink = window.location.origin + window.location.pathname + '?id=' + id;
+            const message = `Check out this amazing product on Arpit Store!\n\n*${name}*\nPrice: ₹${price}\n🔗 Link: ${productLink}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        };
+        
         function listenToProducts() {
             window.checkNetworkStatus();
             fetchLiveStatusForAllOrders();
-
             if (productsUnsubscribe) productsUnsubscribe();
-
             const productsRef = collection(db, "products");
             productsUnsubscribe = onSnapshot(productsRef, (snapshot) => {
                 if(!snapshot.empty) {
@@ -1201,7 +1142,7 @@
                 }
             }, (error) => { window.checkNetworkStatus(); });
         }
-
+        
         function restoreSavedTab() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('id')) { window.checkSharedLink(); return; }
@@ -1212,7 +1153,7 @@
                 else window.filterCategory(savedTab);
             } else { window.applyFiltersAndRender(); }
         }
-
+        
         window.toggleFilterSortMenu = () => {
             const menu = document.getElementById('filterSortDropdown');
             const isHidden = menu.style.display === 'none';
@@ -1220,7 +1161,7 @@
             const btn = document.getElementById('filterToggleBtn');
             if (btn) btn.style.background = isHidden ? 'rgba(56, 189, 248, 0.25)' : 'rgba(30, 41, 59, 0.8)';
         };
-
+        
         window.toggleDrawer = () => {
             const drawer = document.getElementById('drawer');
             const overlay = document.getElementById('overlay');
@@ -1236,7 +1177,7 @@
                 pushNavState('drawer');
             }
         };
-
+        
         window.goHome = () => {
             saveActiveTab('All');
             document.getElementById('detailView').style.display = 'none';
@@ -1245,7 +1186,7 @@
             window.filterCategory('All');
             window.scrollTo(0, 0);
         };
-
+        
         window.goHomeSilently = () => {
             saveActiveTab('All');
             currentCategory = 'All';
@@ -1258,7 +1199,7 @@
             document.getElementById('sareeOfferBanner').style.display = 'none';
             window.applyFiltersAndRender();
         };
-
+        
         window.toggleLike = (id, event) => {
             if(event) event.stopPropagation(); 
             let isAdding = false;
@@ -1275,7 +1216,7 @@
             if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
             if(isAdding) window.showToast("Saved to Watchlist!");
         };
-
+        
         window.showWatchlist = () => {
             saveActiveTab('Watchlist');
             currentCategory = 'Watchlist';
@@ -1290,7 +1231,7 @@
             pushNavState('watchlist');
             window.applyFiltersAndRender();
         };
-
+        
         window.showMyOrders = () => {
             saveActiveTab('MyOrders');
             currentCategory = 'MyOrders';
@@ -1306,7 +1247,7 @@
             fetchLiveStatusForAllOrders();
             renderOrdersUI();
         };
-
+        
         window.filterCategory = (cat) => {
             saveActiveTab(cat);
             if(cat === 'Watchlist') { window.showWatchlist(); return; }
@@ -1316,7 +1257,6 @@
             
             document.getElementById('detailView').style.display = 'none';
             document.getElementById('homeView').style.display = 'block';
-
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const activeTab = document.getElementById('tab-' + cat);
             if(activeTab) activeTab.classList.add('active');
@@ -1326,21 +1266,21 @@
             if(cat !== 'All') pushNavState('category');
             window.applyFiltersAndRender();
         };
-
+        
         window.handleSearch = (val) => {
             searchQuery = val.trim().toLowerCase();
             const clearBtn = document.getElementById('clearSearchBtn');
             clearBtn.style.display = searchQuery.length > 0 ? 'block' : 'none';
             window.applyFiltersAndRender();
         };
-
+        
         window.clearSearchBox = () => {
             document.getElementById('searchInput').value = '';
             searchQuery = '';
             document.getElementById('clearSearchBtn').style.display = 'none';
             window.applyFiltersAndRender();
         };
-
+        
         window.applyFiltersAndRender = () => {
             if (currentCategory === 'MyOrders') { renderOrdersUI(); return; }
             let filtered = [];
@@ -1365,11 +1305,10 @@
             if (sortVal === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
             else if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
             else if (sortVal === 'name') filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-
             updateActiveFiltersUI();
             renderProductsUI(filtered);
         };
-
+        
         function updateActiveFiltersUI() {
             const badgeContainer = document.getElementById('activeFilters');
             badgeContainer.innerHTML = '';
@@ -1382,17 +1321,16 @@
             }
             badgeContainer.innerHTML = badgesHtml;
         }
-
+        
         function renderProductsUI(items) {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
             if(items.length === 0) {
                 if(currentCategory === 'Watchlist') grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">💔</div><p style="color: #94a3b8; font-size:16px;">Aapki Watchlist khaali hai.<br>Products par ❤️ dabayein!</p></div>';
-                else if(searchQuery !== '') grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for "<b>${searchQuery}</b>"</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding:10px 20px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
+                else if(searchQuery !== '') grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:40px; margin-bottom:10px;">🔍</div><p style="color: #94a3b8; font-size:16px;">No products found for “<b>${searchQuery}</b>”</p><button onclick="window.clearSearchBox()" style="margin-top:12px; padding:10px 20px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Reset Search</button></div>`;
                 else grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me abhi koi product nahi hai!</p>';
                 return;
             }
-
             items.forEach(p => {
                 let isLiked = watchlist.includes(p.id);
                 let heartIcon = isLiked ? '❤️' : '🤍';
@@ -1400,7 +1338,6 @@
                 let sellingPrice = Number(p.price) || 0;
                 let mrpPrice = Number(p.mrp) || 0;
                 let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
-
                 if (mrpPrice > sellingPrice) {
                     let offAmount = mrpPrice - sellingPrice;
                     let offPercent = Math.round((offAmount / mrpPrice) * 100);
@@ -1414,7 +1351,6 @@
                         </div>
                     `;
                 }
-
                 let mediaHtml = '<div class="media-slider">';
                 if (p.media && p.media.length > 0) {
                     p.media.forEach(rawLink => {
@@ -1425,7 +1361,6 @@
                     mediaHtml += `<img src="https://via.placeholder.com/300x180?text=No+Image" class="slide-item">`;
                 }
                 mediaHtml += '</div>';
-
                 grid.innerHTML += `
                     <div class="card" onclick="window.showProductDetail('${p.id}')">
                         <div class="like-badge" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</div>
@@ -1436,11 +1371,12 @@
                             ${priceHtml}
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); window.showProductDetail('${p.id}')">Select Options</button>
+                        <button class="whatsapp-share-card-btn" onclick="window.shareOnWhatsApp('${p.id}', '${p.name}', '${sellingPrice}', event)">Share on WhatsApp 📱</button>
                     </div>
                 `;
             });
         }
-
+        
         function renderOrdersUI() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = '';
@@ -1449,13 +1385,11 @@
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up 🚀</button></div>';
                 return;
             }
-
             let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
             if(savedOrders.length === 0) {
                 grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
                 return;
             }
-
             savedOrders.forEach((ord, ordIndex) => {
                 let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
                 ord.items.forEach(it => {
@@ -1486,7 +1420,6 @@
                     `;
                 });
                 itemsListHtml += '</ul>';
-
                 let badgeBg = '#0284c7';
                 let currentStatus = ord.status || "Hi, your order is ready";
                 let lowerStatus = currentStatus.toLowerCase();
@@ -1494,12 +1427,10 @@
                 if (lowerStatus.includes("on the way")) { badgeBg = '#eab308'; }
                 else if (lowerStatus.includes("delivered")) { badgeBg = '#22c55e'; }
                 else if (lowerStatus.includes("cancel")) { badgeBg = '#ef4444'; }
-
                 let cancelBtnHtml = '';
                 if (!lowerStatus.includes("on the way") && !lowerStatus.includes("delivered") && !lowerStatus.includes("cancel") && !lowerStatus.includes("dispatch")) {
                     cancelBtnHtml = `<button onclick="window.cancelCustomerOrder(${ordIndex})" class="remove-btn" style="padding: 6px 14px; font-size: 12px;">Cancel Order ❌</button>`;
                 }
-
                 grid.innerHTML += `
                     <div class="order-card" style="grid-column: 1/-1;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1517,7 +1448,7 @@
                 `;
             });
         }
-
+        
         window.cancelCustomerOrder = (index) => {
             if (!confirm("Kya aap apna order cancel karna chahte hain?")) return;
             let key = getUserOrdersKey();
@@ -1528,7 +1459,6 @@
                 
                 let ord = savedOrders[index];
                 let cleanId = ord.orderId.toString().replace('#', '').trim();
-
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
@@ -1541,12 +1471,11 @@
                         custPhone: ord.custPhone || (currentUser ? currentUser.phone : '')
                     })
                 }).catch(e => console.log("Cancel sync error:", e));
-
                 window.showToast("Order cancelled successfully!", "error");
                 renderOrdersUI();
             }
         };
-
+        
         function fetchLiveStatusForAllOrders() {
             if (!navigator.onLine || !currentUser) return;
             let key = getUserOrdersKey();
@@ -1577,29 +1506,24 @@
                 }
             });
         }
-
+        
         function updateGalleryImages(colorName) {
             if (!currentProduct) return;
-
             let currentImages = [];
             const selectedColorData = (currentProduct.colors && Array.isArray(currentProduct.colors)) 
                 ? currentProduct.colors.find(c => (typeof c === 'object' ? c.name : c) === colorName) 
                 : null;
-
             if (selectedColorData && typeof selectedColorData === 'object' && selectedColorData.image) {
                 let imgs = Array.isArray(selectedColorData.image) ? selectedColorData.image : [selectedColorData.image];
                 currentImages = imgs.map(url => formatMediaUrl(url)).filter(url => url);
             } else if (currentProduct.media && Array.isArray(currentProduct.media) && currentProduct.media.length > 0) {
                 currentImages = currentProduct.media.map(url => formatMediaUrl(url)).filter(url => url);
             }
-
             if (currentImages.length === 0) {
                 currentImages = ['https://via.placeholder.com/400x300?text=No+Image'];
             }
-
             selectedImage = currentImages[0];
             selectedColorImg = currentImages[0];
-
             const sliderContainer = document.getElementById('detailSliderContainer');
             if (sliderContainer) {
                 let mediaHtml = '<div class="detail-slider">';
@@ -1611,22 +1535,19 @@
                 sliderContainer.innerHTML = mediaHtml;
             }
         }
-
+        
         window.selectColor = (colorName, el) => {
             selectedColor = colorName;
-            
             const label = document.getElementById('colorLabel');
             if (label) label.innerText = colorName;
-
             if (el) {
                 const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
                 siblings.forEach(btn => btn.classList.remove('active'));
                 el.classList.add('active');
             }
-
             updateGalleryImages(colorName);
         };
-
+        
         window.selectSize = (size, el) => {
             selectedSize = size;
             const label = document.getElementById('sizeLabel');
@@ -1635,7 +1556,7 @@
             siblings.forEach(btn => btn.classList.remove('active'));
             if(el) el.classList.add('active');
         };
-
+        
         window.showProductDetail = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if(!p) { window.showToast("Product unavailable!", "error"); return; }
@@ -1644,18 +1565,15 @@
             pushNavState('detail');
             document.getElementById('homeView').style.display = 'none';
             document.getElementById('detailView').style.display = 'block';
-
             selectedSize = "";
             selectedColor = "";
             selectedColorImg = "";
-
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
             let detailSellingPrice = Number(p.price) || 0;
             let detailMrpPrice = Number(p.mrp) || 0;
             let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
-
             if (detailMrpPrice > detailSellingPrice) {
                 let offAmount = detailMrpPrice - detailSellingPrice;
                 let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
@@ -1667,7 +1585,6 @@
                     </div>
                 `;
             }
-
             let variantHtml = '';
             
             if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
@@ -1677,7 +1594,6 @@
                 variantHtml += `<div class="variant-section">
                     <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
                     <div class="color-options">`;
-
                 p.colors.forEach((c, idx) => {
                     let cName = typeof c === 'object' ? c.name : c;
                     let cImg = '';
@@ -1687,7 +1603,6 @@
                     } else if (p.media && p.media.length > 0) {
                         cImg = formatMediaUrl(p.media[0]);
                     }
-
                     let activeClass = (idx === 0) ? 'active' : '';
                     if (cImg) {
                         variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="${cName}">`;
@@ -1695,10 +1610,8 @@
                         variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${cName}', this)">${cName}</button>`;
                     }
                 });
-
                 variantHtml += `</div></div>`;
             }
-
             if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
                 selectedSize = p.sizes[0];
                 variantHtml += `<div class="variant-section">
@@ -1710,7 +1623,6 @@
                 });
                 variantHtml += `</div></div>`;
             }
-
             const detailContent = document.getElementById('detailContent');
             detailContent.innerHTML = `
                 <div id="detailSliderContainer"></div>
@@ -1727,20 +1639,19 @@
                     <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
                     <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available.'}</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1);" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
-                    <button class="pay-btn" style="flex: 1;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1); margin-top:0;" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
+                    <button class="pay-btn" style="flex: 1; margin-top:0;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
                 </div>
+                <button class="pay-btn" style="background: #22c55e; margin-top:0;" onclick="window.shareOnWhatsApp('${p.id}', '${p.name}', '${detailSellingPrice}')">Share on WhatsApp 📱</button>
             `;
-
             updateGalleryImages(selectedColor);
             window.scrollTo(0, 0);
         };
-
+        
         window.addToCartDirect = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if (!p) return;
-
             let cartItem = {
                 id: p.id,
                 name: p.name,
@@ -1751,24 +1662,22 @@
                 quantity: 1,
                 media: p.media || []
             };
-
             let existingIdx = cart.findIndex(ci => ci.id === p.id && ci.selectedColor === cartItem.selectedColor && ci.selectedSize === cartItem.selectedSize);
             if (existingIdx > -1) {
                 cart[existingIdx].quantity += 1;
             } else {
                 cart.push(cartItem);
             }
-
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = cart.length;
             window.showToast("Product Cart me add ho gaya hai! 🛒");
         };
-
+        
         window.buyNowDirect = (id) => {
             window.addToCartDirect(id);
             window.toggleCart();
         };
-
+        
         window.toggleCart = () => {
             const modal = document.getElementById('cartModal');
             const isOpen = modal.style.display === 'flex';
@@ -1780,7 +1689,7 @@
                 history.back();
             }
         };
-
+        
         window.updateCartQuantity = (index, delta) => {
             if (cart[index]) {
                 cart[index].quantity = (cart[index].quantity || 1) + delta;
@@ -1792,7 +1701,7 @@
                 renderCartUI();
             }
         };
-
+        
         window.removeFromCart = (index) => {
             if (cart[index]) {
                 cart.splice(index, 1);
@@ -1802,14 +1711,14 @@
                 window.showToast("Item cart se hata diya gaya.");
             }
         };
-
+        
         window.handleCheckoutAddressSelect = () => {
             const select = document.getElementById('checkoutAddressSelect');
             if (select && select.value) {
                 document.getElementById('custAddress').value = select.value;
             }
         };
-
+        
         window.handlePaymentMode = () => {
             const mode = document.getElementById('paymentMode').value;
             const onlineSec = document.getElementById('onlinePaymentSection');
@@ -1823,14 +1732,14 @@
                 onlineSec.style.display = 'none';
             }
         };
-
+        
         function renderCartUI() {
             const cartList = document.getElementById('cartList');
             cartList.innerHTML = '';
             
             if (currentUser) {
                 document.getElementById('custName').value = currentUser.name || '';
-                document.getElementById('custPhone').value = currentUser.phone || '';
+                document.getElementById('custPhone').value = currentUser.phone && currentUser.phone !== '9999999999' ? currentUser.phone : '';
                 
                 const addrSelect = document.getElementById('checkoutAddressSelect');
                 if (currentUser.addresses && currentUser.addresses.length > 0) {
@@ -1848,19 +1757,16 @@
                     addrSelect.parentElement.style.display = 'none';
                 }
             }
-
             if (cart.length === 0) {
                 cartList.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">Aapka cart khaali hai!</p>';
                 cartTotalAmount = 0;
                 handlePaymentMode();
                 return;
             }
-
             cartTotalAmount = 0;
             cart.forEach((item, index) => {
                 let itemTotal = item.price * (item.quantity || 1);
                 cartTotalAmount += itemTotal;
-
                 let variantText = '';
                 if (item.selectedColor || item.selectedSize) {
                     variantText = `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">`;
@@ -1868,9 +1774,7 @@
                     if (item.selectedSize) variantText += `Size: ${item.selectedSize}`;
                     variantText += `</div>`;
                 }
-
                 let imgUrl = item.selectedImage || 'https://via.placeholder.com/55?text=No+Img';
-
                 cartList.innerHTML += `
                     <div class="cart-item">
                         <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
@@ -1888,17 +1792,15 @@
                     </div>
                 `;
             });
-
             cartList.innerHTML += `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; font-weight: bold;">
                     <span style="color: #cbd5e1; font-size: 15px;">Total Amount:</span>
                     <span style="color: #38bdf8; font-size: 20px;">₹${cartTotalAmount}</span>
                 </div>
             `;
-
             handlePaymentMode();
         }
-
+        
         window.checkSharedLink = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const prodId = urlParams.get('id');
@@ -1906,30 +1808,26 @@
                 window.showProductDetail(prodId);
             }
         };
-
-        // SUBMIT ORDER HANDLER (EXACTLY PRESERVED FOR TELEGRAM BOT NOTIFICATIONS)
+        
+        // SUBMIT ORDER HANDLER (PRESERVED FOR TELEGRAM BOT NOTIFICATIONS WITH ALL ITEM DETAILS)
         window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
             const address = document.getElementById('custAddress').value.trim();
             const paymentMode = document.getElementById('paymentMode').value;
             const utr = document.getElementById('utrNumber').value.trim();
-
             if (!name || !phone || phone.length !== 10 || !address) {
                 window.showToast("Kripya apna naam, sahi 10-digit mobile number aur address bharein!", "error");
                 return;
             }
-
             if (cart.length === 0) {
                 window.showToast("Aapka cart khaali hai!", "error");
                 return;
             }
-
             if (paymentMode === 'Online' && !utr) {
                 window.showToast("Online payment ke liye UTR / Transaction number daalna anivarya hai!", "error");
                 return;
             }
-
             const orderId = 'ARP-' + Math.floor(100000 + Math.random() * 900000);
             const orderData = {
                 orderId: orderId,
@@ -1943,12 +1841,11 @@
                 date: new Date().toLocaleString(),
                 status: 'Hi, your order is ready'
             };
-
             let orderKey = currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
             let myOrders = JSON.parse(localStorage.getItem(orderKey)) || [];
             myOrders.unshift(orderData);
             localStorage.setItem(orderKey, JSON.stringify(myOrders));
-
+            
             if (navigator.onLine) {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
@@ -1967,7 +1864,6 @@
                     })
                 }).catch(err => console.log("Order sync error:", err));
             }
-
             cart = [];
             localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
             document.getElementById('cartCount').innerText = '0';
@@ -1978,7 +1874,7 @@
                 window.showMyOrders();
             }, 2500);
         };
-
+        
         listenToProducts();
     </script>
 </body>
