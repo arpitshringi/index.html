@@ -147,9 +147,6 @@
         .card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 6px; }
         .add-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 9px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
         .add-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
-        /* WhatsApp Share Button on Card */
-        .whatsapp-share-card-btn { background: #22c55e; color: white; border: none; padding: 7px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 6px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.3s; }
-        .whatsapp-share-card-btn:hover { background: #16a34a; }
         /* Detail View */
         #detailView { display: none; }
         .detail-container { background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
@@ -264,15 +261,17 @@
             <div style="text-align: center; margin-bottom: 15px;">
                 <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
                 <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
-                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px;">-</p>
-                <div style="margin-top: 10px; text-align: left;">
-                    <label style="font-size: 12px; color: #94a3b8;">Mobile Number (Edit & Update):</label>
-                    <div style="display: flex; gap: 8px; margin-top: 4px;">
-                        <input type="tel" id="profilePhoneInput" class="input-box" placeholder="Enter Mobile Number" maxlength="10" style="margin-bottom: 0;">
-                        <button onclick="window.updateProfilePhone()" class="add-btn" style="width: auto; padding: 0 14px; white-space: nowrap;">Update</button>
-                    </div>
-                </div>
+                <p id="profileEmailDisplay" style="color: #94a3b8; font-size: 13px; margin-top: 2px;">-</p>
+                <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px; margin-top: 4px; font-weight: bold;">-</p>
             </div>
+
+            <!-- Alag se Mobile Number add/update karne ka box -->
+            <div style="background: rgba(15, 23, 42, 0.6); padding: 14px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.2); margin-bottom: 15px;">
+                <h4 style="color: #38bdf8; margin-bottom: 8px; font-size: 14px;">Add / Update Mobile Number</h4>
+                <input type="tel" id="profilePhoneInput" class="input-box" placeholder="Enter 10-digit mobile number" maxlength="10" style="margin-bottom: 8px;">
+                <button class="add-btn" onclick="window.updateProfilePhone()" style="background: #38bdf8; color: #0f172a; font-weight: bold;">Save Mobile Number 📱</button>
+            </div>
+
             <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 <h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses:</h4>
                 <div id="savedAddressesList"></div>
@@ -500,13 +499,13 @@
         let authMode = 'login';
         
         function getUserOrdersKey() {
-            return currentUser ? 'arpit_my_orders_' + currentUser.phone : 'arpit_my_orders_guest';
+            return currentUser ? 'arpit_my_orders_' + (currentUser.phone || currentUser.email) : 'arpit_my_orders_guest';
         }
         function getUserCartKey() {
-            return currentUser ? 'arpit_cart_' + currentUser.phone : 'arpit_cart_guest';
+            return currentUser ? 'arpit_cart_' + (currentUser.phone || currentUser.email) : 'arpit_cart_guest';
         }
         function getUserWatchlistKey() {
-            return currentUser ? 'arpit_watchlist_' + currentUser.phone : 'arpit_watchlist_guest';
+            return currentUser ? 'arpit_watchlist_' + (currentUser.phone || currentUser.email) : 'arpit_watchlist_guest';
         }
         let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
         let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
@@ -612,9 +611,9 @@
             fetchLiveStatusForAllOrders();
         }
         
-        // FIXED GOOGLE LOGIN USER HANDLER (DOES NOT AUTO-FILL 9999999999)
+        // FIXED GOOGLE LOGIN USER HANDLER (NO 9999999999 AUTO-FILL)
         function handleSuccessfulAuthUser(user) {
-            let phone = ""; // Blank by default so customer can add it themselves later
+            let phone = ""; // Blank by default, user can enter manually in profile
             currentUser = {
                 name: user.displayName || (user.email ? user.email.split('@')[0] : "Google User"),
                 phone: phone,
@@ -623,7 +622,7 @@
                 addresses: []
             };
             let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-            let existing = registeredUsers.find(u => u.phone === phone || (u.email && user.email && u.email === user.email));
+            let existing = registeredUsers.find(u => (u.email && user.email && u.email === u.email) || (u.email && user.email && u.email === user.email));
             if (!existing) {
                 registeredUsers.push(currentUser);
                 localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
@@ -639,11 +638,15 @@
                 modal.style.display = 'none';
             }
             updateAuthUI();
+            reloadUserSuccess();
+        }
+
+        function reloadUserSuccess() {
             reloadUserSpecificState();
             window.showToast("Login Successful! 🎉 Kripya profile me apna mobile number update karein.");
         }
         
-        // HYBRID LOGIN HANDLER (Mobile App + Web + Google Sheet Verification)
+        // HYBRID LOGIN HANDLER
         window.submitAuth = async () => {
             const phone = document.getElementById('authPhone').value.trim();
             const password = document.getElementById('authPassword').value.trim();
@@ -714,7 +717,7 @@
             }
         };
         
-        // GOOGLE LOGIN HANDLER (Popup with Redirect Fallback for App & Web)
+        // GOOGLE LOGIN HANDLER
         window.handleGoogleLogin = async () => {
             if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
                 window.flutter_inappwebview.callHandler('nativeGoogleSignIn');
@@ -826,8 +829,9 @@
             if (!isOpen) {
                 document.getElementById('profileAvatarDisplay').innerText = currentUser.name.charAt(0).toUpperCase();
                 document.getElementById('profileNameDisplay').innerText = currentUser.name;
-                document.getElementById('profilePhoneDisplay').innerText = currentUser.phone ? currentUser.phone : 'No Phone Number Added';
-                document.getElementById('profilePhoneInput').value = currentUser.phone && currentUser.phone !== '9999999999' ? currentUser.phone : '';
+                document.getElementById('profileEmailDisplay').innerText = currentUser.email ? currentUser.email : 'Google User';
+                document.getElementById('profilePhoneDisplay').innerText = currentUser.phone ? 'Phone: ' + currentUser.phone : 'Phone: Not Added Yet';
+                document.getElementById('profilePhoneInput').value = currentUser.phone ? currentUser.phone : '';
                 renderSavedAddresses();
                 pushNavState('profile');
             } else if (history.state && history.state.appNav === 'profile') {
@@ -844,9 +848,9 @@
             }
             currentUser.phone = newPhone;
             updateUserDataInStorage();
-            document.getElementById('profilePhoneDisplay').innerText = currentUser.phone;
+            document.getElementById('profilePhoneDisplay').innerText = 'Phone: ' + currentUser.phone;
             updateAuthUI();
-            window.showToast("Mobile number successfully updated! 🎉");
+            window.showToast("Mobile number successfully saved! 🎉");
         };
         
         function renderSavedAddresses() {
@@ -890,7 +894,7 @@
         
         function updateUserDataInStorage() {
             let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
-            registeredUsers = registeredUsers.map(u => u.email === currentUser.email ? currentUser : u);
+            registeredUsers = registeredUsers.map(u => (u.email && currentUser.email && u.email === currentUser.email) || u.phone === currentUser.phone ? currentUser : u);
             localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
             localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
         }
@@ -1371,7 +1375,6 @@
                             ${priceHtml}
                         </div>
                         <button class="add-btn" onclick="event.stopPropagation(); window.showProductDetail('${p.id}')">Select Options</button>
-                        <button class="whatsapp-share-card-btn" onclick="window.shareOnWhatsApp('${p.id}', '${p.name}', '${sellingPrice}', event)">Share on WhatsApp 📱</button>
                     </div>
                 `;
             });
@@ -1739,7 +1742,7 @@
             
             if (currentUser) {
                 document.getElementById('custName').value = currentUser.name || '';
-                document.getElementById('custPhone').value = currentUser.phone && currentUser.phone !== '9999999999' ? currentUser.phone : '';
+                document.getElementById('custPhone').value = currentUser.phone || '';
                 
                 const addrSelect = document.getElementById('checkoutAddressSelect');
                 if (currentUser.addresses && currentUser.addresses.length > 0) {
@@ -1809,7 +1812,7 @@
             }
         };
         
-        // SUBMIT ORDER HANDLER (PRESERVED FOR TELEGRAM BOT NOTIFICATIONS WITH ALL ITEM DETAILS)
+        // SUBMIT ORDER HANDLER (EXACTLY PRESERVED FOR TELEGRAM BOT NOTIFICATIONS)
         window.submitOrder = () => {
             const name = document.getElementById('custName').value.trim();
             const phone = document.getElementById('custPhone').value.trim();
