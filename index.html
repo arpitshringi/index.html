@@ -1090,12 +1090,13 @@
             return url;
         }
         
-        window.shareOnWhatsApp = (id, name, price) => {
-            const productLink = window.location.origin + window.location.pathname + '?id=' + id;
-            const message = `Check out this amazing product on Arpit Store!\n\n*${name}*\nPrice: ₹${price}\n🔗 Link: ${productLink}`;
-            const whatsappUrl = `https://wa.me/?text=` + encodeURIComponent(message);
-            window.open(whatsappUrl, '_blank');
-        };
+window.shareOnWhatsApp = (id, name, price) => {
+    const productLink = window.location.origin + window.location.pathname + '?id=' + id;
+    const message = `Check out this amazing product on Arpit Store!\n\n*${name}*\nPrice: ₹${price}\n\nLink: ${productLink}`;
+    
+    window.location.href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+};
+
 
         window.checkSharedLink = async () => {
             const urlParams = new URLSearchParams(window.location.search);
