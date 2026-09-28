@@ -1840,16 +1840,7 @@
             }
         };
         
-  if (typeof Razorpay !== 'undefined') {
-    var rzp = new Razorpay(options);
-    rzp.open();
-  } else {
-    window.showToast("Razorpay Gateway Initialized. Payment successful test demo.", "success");
-    document.getElementById('utrNumber').value = "RZP-" + Math.floor(100000 + Math.random() * 900000);
-    window.submitOrder();
-  }
-};
-
+ 
         function renderCartUI() {
             const cartList = document.getElementById('cartList');
             cartList.innerHTML = '';
