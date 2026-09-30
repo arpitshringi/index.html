@@ -1599,15 +1599,41 @@
             }
         }
         
-        window.selectColor = (colorName, el) => {
+        // FULLY DYNAMIC VARIANT / COLOR SELECTOR WITH DYNAMIC PRICE & TITLE
+        window.selectColor = (index, el) => {
+            if (!currentProduct || !currentProduct.colors || !currentProduct.colors[index]) return;
+            let cData = currentProduct.colors[index];
+            let colorName = typeof cData === 'object' ? cData.name : cData;
             selectedColor = colorName;
+
             const label = document.getElementById('colorLabel');
             if (label) label.innerText = colorName;
+
             if (el) {
                 const siblings = el.parentElement.querySelectorAll('.size-btn, .color-thumb');
                 siblings.forEach(btn => btn.classList.remove('active'));
                 el.classList.add('active');
             }
+
+            let selPrice = (typeof cData === 'object' && cData.price) ? Number(cData.price) : (Number(currentProduct.price) || 0);
+            let selMrp = (typeof cData === 'object' && cData.mrp) ? Number(cData.mrp) : (Number(currentProduct.mrp) || 0);
+
+            let priceContainer = document.getElementById('detailPriceContainer');
+            if (priceContainer) {
+                if (selMrp > selPrice) {
+                    let offAmt = selMrp - selPrice;
+                    let offPct = Math.round((offAmt / selMrp) * 100);
+                    priceContainer.innerHTML = `
+                        <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <span style="color: #38bdf8; font-size: 26px; font-weight: 800;">₹${selPrice}</span>
+                            <span style="color: #94a3b8; font-size: 16px; text-decoration: line-through;">₹${selMrp}</span>
+                            <span style="background: #22c55e; color: #0f172a; font-size: 12px; font-weight: 800; padding: 4px 8px; border-radius: 6px;">SAVE ₹${offAmt} (${offPct}% OFF)</span>
+                        </div>`;
+                } else {
+                    priceContainer.innerHTML = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${selPrice}</h3>`;
+                }
+            }
+
             updateGalleryImages(colorName);
         };
         
@@ -1634,8 +1660,61 @@
             let isLiked = watchlist.includes(p.id);
             let heartIcon = isLiked ? '❤️' : '🤍';
             let categoryTag = p.category || p.type || p.cat || 'General';
+            
             let detailSellingPrice = Number(p.price) || 0;
             let detailMrpPrice = Number(p.mrp) || 0;
+            let variantHtml = '';
+            
+            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
+                let firstColorObj = p.colors[0];
+                selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
+                
+                if (typeof firstColorObj === 'object' && firstColorObj.price) {
+                    detailSellingPrice = Number(firstColorObj.price);
+                }
+                if (typeof firstColorObj === 'object' && firstColorObj.mrp) {
+                    detailMrpPrice = Number(firstColorObj.mrp);
+                }
+
+                let catLower = (p.category || p.type || p.cat || '').toString().toLowerCase();
+                let firstName = selectedColor.toString().toLowerCase();
+                let pName = (p.name || '').toString().toLowerCase();
+
+                let isWeightOrQty = catLower.includes('beauty') || 
+                                    catLower.includes('grocery') || 
+                                    catLower.includes('food') || 
+                                    catLower.includes('face wash') || 
+                                    catLower.includes('facewash') || 
+                                    catLower.includes('care') || 
+                                    /\d+\s*(g|gm|gram|grams|ml|l|kg|pack|pc|pcs)\b/i.test(firstName) || 
+                                    /\d+\s*(g|gm|gram|grams|ml|l|kg|pack|pc|pcs)\b/i.test(pName) || 
+                                    /pack\s*of/i.test(firstName) || 
+                                    /pack\s*of/i.test(pName);
+
+                let variantTitle = isWeightOrQty ? "Weight / Quantity" : "Color";
+                
+                variantHtml += `<div class="variant-section">
+                    <div class="variant-title"> ${variantTitle}: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
+                    <div class="color-options">`;
+                p.colors.forEach((c, idx) => {
+                    let cName = typeof c === 'object' ? c.name : c;
+                    let cImg = '';
+                    if (typeof c === 'object' && c.image) {
+                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
+                        cImg = formatMediaUrl(imgUrl);
+                    } else if (p.media && p.media.length > 0) {
+                        cImg = formatMediaUrl(p.media[0]);
+                    }
+                    let activeClass = (idx === 0) ? 'active' : '';
+                    if (cImg && (catLower.includes('saree') || catLower.includes('cloth') || catLower.includes('apparel') || catLower.includes('wear'))) {
+                        variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor(${idx}, this)" title="${cName}" alt="${cName}">`;
+                    } else {
+                        variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor(${idx}, this)">${cName}</button>`;
+                    }
+                });
+                variantHtml += `</div></div>`;
+            }
+
             let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
             if (detailMrpPrice > detailSellingPrice) {
                 let offAmount = detailMrpPrice - detailSellingPrice;
@@ -1648,33 +1727,7 @@
                     </div>
                 `;
             }
-            let variantHtml = '';
-            
-            if (p.colors && Array.isArray(p.colors) && p.colors.length > 0) {
-                let firstColorObj = p.colors[0];
-                selectedColor = typeof firstColorObj === 'object' ? firstColorObj.name : firstColorObj;
-                
-                variantHtml += `<div class="variant-section">
-                    <div class="variant-title">🎨 Color: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
-                    <div class="color-options">`;
-                p.colors.forEach((c, idx) => {
-                    let cName = typeof c === 'object' ? c.name : c;
-                    let cImg = '';
-                    if (typeof c === 'object' && c.image) {
-                        let imgUrl = Array.isArray(c.image) ? c.image[0] : c.image;
-                        cImg = formatMediaUrl(imgUrl);
-                    } else if (p.media && p.media.length > 0) {
-                        cImg = formatMediaUrl(p.media[0]);
-                    }
-                    let activeClass = (idx === 0) ? 'active' : '';
-                    if (cImg) {
-                        variantHtml += `<img src="${cImg}" class="color-thumb ${activeClass}" onclick="window.selectColor('${cName}', this)" title="${cName}" alt="${cName}">`;
-                    } else {
-                        variantHtml += `<button class="size-btn ${activeClass}" onclick="window.selectColor('${cName}', this)">${cName}</button>`;
-                    }
-                });
-                variantHtml += `</div></div>`;
-            }
+
             if (p.sizes && Array.isArray(p.sizes) && p.sizes.length > 0) {
                 selectedSize = p.sizes[0];
                 variantHtml += `<div class="variant-section">
@@ -1696,7 +1749,7 @@
                     </div>
                     <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
                 </div>
-                ${detailPriceHtml}
+                <div id="detailPriceContainer">${detailPriceHtml}</div>
                 ${variantHtml}
                 <div style="margin: 20px 0; background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
                     <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
@@ -1715,10 +1768,19 @@
         window.addToCartDirect = (id) => {
             const p = liveProducts.find(item => item.id === id);
             if (!p) return;
+
+            let activePrice = Number(p.price) || 0;
+            if (p.colors && selectedColor) {
+                let cData = p.colors.find(c => (typeof c === 'object' ? c.name : c) === selectedColor);
+                if (cData && typeof cData === 'object' && cData.price) {
+                    activePrice = Number(cData.price);
+                }
+            }
+
             let cartItem = {
                 id: p.id,
                 name: p.name,
-                price: Number(p.price) || 0,
+                price: activePrice,
                 selectedColor: selectedColor || '',
                 selectedSize: selectedSize || '',
                 selectedImage: selectedImage || (p.media && p.media[0] ? formatMediaUrl(p.media[0]) : ''),
