@@ -325,7 +325,7 @@ Continue with Google
 <div id="drawerUserSection"></div>
 <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
 <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
-<div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️ My Watchlist</div>
+<div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤️️ My Watchlist</div>
 <div class="drawer-item" onclick="window.filterCategory('Saree')">👗 Sarees</div>
 <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
 <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -470,7 +470,7 @@ We want you to be completely satisfied with your purchase. If you receive a dama
 <button class="close-btn" onclick="window.toggleCart()">&times;</button>
 <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Your Cart & Checkout</h2>
 <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; color: #38bdf8; line-height: 1.4;">
-📍 <b>Delivery Area Notice:</b> We deliver orders exclusively within <b>Kota & Bundi, Rajasthan</b>. Please fetch GPS location or pick location on map below.
+📍 <b>Delivery Area Notice:</b> We deliver orders exclusively within <b>Kota & Bundi, Rajasthan</b>. Please fetch GPS location or pick location on map below to validate your address.
 </div>
 <div id="cartList" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
 <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -1706,7 +1706,7 @@ window.showProductDetail = (id) => {
   selectedColor = "";
   selectedColorImg = "";
   let isLiked = watchlist.includes(p.id);
-  let heartIcon = isLiked ? '❤️' : '🤍';
+  let heartIcon = isLiked ? '❤️️' : '🤍';
   let categoryTag = p.category || p.type || p.cat || 'General';
   let detailSellingPrice = Number(p.price) || 0;
   let detailMrpPrice = Number(p.mrp) || 0;
@@ -1906,83 +1906,78 @@ window.handlePaymentMode = () => {
   }
 };
 
+// INDUS COMPLIANT GPS FETCH & REVERSE GEOCODING LOGIC
 window.fetchAndValidateGPS = () => {
   const statusDiv = document.getElementById('locationStatus');
   const citySelect = document.getElementById('custCity');
   const pincodeInput = document.getElementById('custPincode');
   const streetEl = document.getElementById('custStreetHouse');
   const areaEl = document.getElementById('custArea');
+  
   statusDiv.style.display = 'block';
   statusDiv.innerText = "Fetching current GPS location & validating delivery zone… 📶";
+
   if (!navigator.geolocation) {
-    citySelect.value = "Kota";
-    pincodeInput.value = "324001";
-    if (streetEl) streetEl.value = "Kota Main Location (Fallback)";
-    if (areaEl) areaEl.value = "Kota";
-    verifiedGPSData = { lat: 25.18, lng: 75.83, city: "Kota", pincode: "324001" };
-    statusDiv.innerHTML = `⚠️ GPS not supported. Reviewer Fallback Enabled: <b>Kota</b> selected automatically.`;
-    window.showToast("Reviewer Fallback Mode: Kota selected automatically!");
+    verifiedGPSData = null;
+    statusDiv.innerHTML = `<span style="color:#ef4444; font-weight:bold;">❌ GPS Error:</span> Browser or device does not support geolocation. Please use OpenStreetMap location picker.`;
+    window.showToast("GPS not supported! OpenStreetMap button use karein.", "error");
     return;
   }
+
   navigator.geolocation.getCurrentPosition(
     (position) => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
+      
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
         .then(res => res.json())
         .then(data => {
-          let detectedCity = "Kota";
-          let pincode = "324001";
-          let street = "Live GPS Location";
-          let area = "";
           if (data && data.address) {
             let addr = data.address;
-            detectedCity = addr.city || addr.town || addr.village || addr.state_district || (lng < 75.75 ? "Bundi" : "Kota");
-            pincode = addr.postcode || (detectedCity.toLowerCase().includes("bundi") ? "323001" : "324001");
-            street = addr.road || addr.suburb || addr.neighbourhood || data.display_name || "Live GPS Location";
-            area = addr.suburb || addr.neighbourhood || "";
-          } else {
-            if ((lat >= 25.3 && lat <= 25.7 && lng >= 75.4 && lng <= 75.8) || lng < 75.75) {
-              detectedCity = "Bundi";
-              pincode = "323001";
-            } else {
-              detectedCity = "Kota";
-              pincode = "324001";
+            let detectedCity = addr.city || addr.town || addr.village || addr.state_district || "";
+            let pincode = addr.postcode || "";
+            let street = addr.road || addr.suburb || addr.neighbourhood || data.display_name || "";
+            let area = addr.suburb || addr.neighbourhood || "";
+            
+            let lowerCity = detectedCity.toLowerCase();
+            let isPermitted = PERMITTED_CITIES.some(pc => lowerCity.includes(pc));
+
+            if (!isPermitted) {
+              verifiedGPSData = null;
+              citySelect.value = "";
+              pincodeInput.value = "";
+              statusDiv.innerHTML = `<span style="color:#ef4444; font-weight:bold;">⚠️ Delivery Unavailable:</span> Detected city <b>${detectedCity || 'Unknown'}</b>. We deliver exclusively in Kota & Bundi (Rajasthan).`;
+              window.showToast("Delivery strictly Kota & Bundi mein hi available hai!", "error");
+              return;
             }
+
+            let finalCity = lowerCity.includes("bundi") ? "Bundi" : "Kota";
+            citySelect.value = finalCity;
+            pincodeInput.value = pincode || (finalCity === "Bundi" ? "323001" : "324001");
+            if (streetEl) streetEl.value = street;
+            if (areaEl) areaEl.value = area;
+
+            verifiedGPSData = { lat, lng, city: finalCity, pincode: pincodeInput.value, isVerified: true };
+            statusDiv.innerHTML = `✅ <b>Location Verified!</b> City: <b>${finalCity}</b>, Pincode: <b>${pincodeInput.value}</b><br><small>Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}</small>`;
+            window.showToast("GPS Verified! City: " + finalCity + " 📍");
+          } else {
+            verifiedGPSData = null;
+            statusDiv.innerHTML = `<span style="color:#ef4444; font-weight:bold;">❌ Validation Failed:</span> Coordinates could not be resolved. Please pin location on Map.`;
+            window.showToast("Location resolve nahi ho payi. Map button use karein!", "error");
           }
-          let lowerCity = detectedCity.toLowerCase();
-          let isPermitted = PERMITTED_CITIES.some(pc => lowerCity.includes(pc));
-          if (!isPermitted) {
-            detectedCity = "Kota";
-            pincode = "324001";
-          }
-          citySelect.value = detectedCity.toLowerCase().includes("bundi") ? "Bundi" : "Kota";
-          pincodeInput.value = pincode;
-          if (streetEl) streetEl.value = street;
-          if (areaEl) areaEl.value = area;
-          verifiedGPSData = { lat, lng, city: citySelect.value, pincode: pincodeInput.value };
-          statusDiv.innerHTML = `✅ Location Validated! Verified City: <b>${citySelect.value}</b>;<br>Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-          window.showToast("GPS validated! City: " + citySelect.value + " 📍");
         })
         .catch(err => {
-          let detectedCity = ((lat >= 25.3 && lat <= 25.7 && lng >= 75.4 && lng <= 75.8) || lng < 75.75) ? "Bundi" : "Kota";
-          citySelect.value = detectedCity;
-          pincodeInput.value = detectedCity === "Bundi" ? "323001" : "324001";
-          if (streetEl) streetEl.value = `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-          verifiedGPSData = { lat, lng, city: detectedCity, pincode: pincodeInput.value };
-          statusDiv.innerHTML = `✅ Location Validated! Verified City: <b>${detectedCity}</b>;<br>Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
-          window.showToast("GPS validated! City: " + detectedCity + " 📍");
+          verifiedGPSData = null;
+          statusDiv.innerHTML = `<span style="color:#ef4444; font-weight:bold;">❌ Reverse Geocoding Error:</span> Please pick exact location on Map.`;
+          window.showToast("Reverse geocoding error. Map use karein!", "error");
         });
     },
     (error) => {
-      citySelect.value = "Kota";
-      pincodeInput.value = "324001";
-      if (streetEl) streetEl.value = "Kota Main Road (Fallback)";
-      verifiedGPSData = { lat: 25.18, lng: 75.83, city: "Kota", pincode: "324001" };
-      statusDiv.innerHTML = `💡 GPS Unavailable (${error.message}). Reviewer Fallback Activated: <b>Kota, Rajasthan</b> set automatically for testing.`;
-      window.showToast("Reviewer Fallback: Kota set for testing!");
+      verifiedGPSData = null;
+      statusDiv.innerHTML = `<span style="color:#ef4444; font-weight:bold;">❌ GPS Permission Denied / Error:</span> ${error.message}. Please enable location permissions or use Map picker.`;
+      window.showToast("GPS permission denied ya disabled hai! Map picker use karein.", "error");
     },
-    { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 };
 
@@ -2020,6 +2015,7 @@ window.confirmSelectedMapLocation = () => {
   const detectedCity = (resolvedAddressObj.city || '').toLowerCase();
   const isPermitted = PERMITTED_CITIES.some(pc => detectedCity.includes(pc));
   if (!isPermitted) {
+    verifiedGPSData = null;
     window.showToast("Delivery is strictly available only in Kota & Bundi (all tehsils), Rajasthan", "error");
     return;
   }
@@ -2036,14 +2032,23 @@ window.confirmSelectedMapLocation = () => {
     const landmarkEl = document.getElementById('custLandmark');
     const pincodeEl = document.getElementById('custPincode');
     const citySelect = document.getElementById('custCity');
+    
+    let finalCity = detectedCity.includes('bundi') ? 'Bundi' : 'Kota';
     if (streetEl) streetEl.value = resolvedAddressObj.street || resolvedAddressObj.fullAddress || '';
     if (areaEl) areaEl.value = resolvedAddressObj.area || '';
     if (landmarkEl) landmarkEl.value = resolvedAddressObj.landmark || '';
-    if (pincodeEl) pincodeEl.value = resolvedAddressObj.pincode || '324001';
-    if (citySelect) citySelect.value = detectedCity.includes('bundi') ? 'Bundi' : 'Kota';
-    verifiedGPSData = { lat: resolvedAddressObj.lat, lng: resolvedAddressObj.lng, city: citySelect.value, pincode: pincodeEl.value };
+    if (pincodeEl) pincodeEl.value = resolvedAddressObj.pincode || (finalCity === 'Bundi' ? '323001' : '324001');
+    if (citySelect) citySelect.value = finalCity;
+    
+    verifiedGPSData = { lat: resolvedAddressObj.lat, lng: resolvedAddressObj.lng, city: finalCity, pincode: pincodeEl.value, isVerified: true };
     window.closeMapPicker();
-    window.showToast("Address populated from Map! 📍");
+    window.showToast("Map Location Verified! 📍");
+    
+    const statusDiv = document.getElementById('locationStatus');
+    if (statusDiv) {
+      statusDiv.style.display = 'block';
+      statusDiv.innerHTML = `✅ <b>Map Location Verified!</b> City: <b>${finalCity}</b>, Pincode: <b>${pincodeEl.value}</b>`;
+    }
   }
 };
 
@@ -2053,11 +2058,16 @@ window.payWithRazorpay = () => {
     window.toggleAuthModal();
     return;
   }
+  if (!verifiedGPSData || !verifiedGPSData.isVerified) {
+    window.showToast("Order Blocked: Kripya pehle GPS ya Map dwara apni live location verify karein!", "error");
+    return;
+  }
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const city = document.getElementById('custCity').value.trim().toLowerCase();
   const streetHouse = document.getElementById('custStreetHouse').value.trim();
   const pincode = document.getElementById('custPincode').value.trim();
+  
   let isPermittedCity = PERMITTED_CITIES.some(pc => city.includes(pc));
   if (!isPermittedCity || !city) {
     window.showToast("Delivery is strictly available only in Kota & Bundi, Rajasthan!", "error");
@@ -2176,6 +2186,12 @@ window.submitOrder = (isRazorpaySuccess = false) => {
     window.toggleAuthModal();
     return;
   }
+  // STRICT COMPLIANCE CHECK: Block order if location is not verified via GPS or Map
+  if (!verifiedGPSData || !verifiedGPSData.isVerified) {
+    window.showToast("Order Blocked: Kripya pehle GPS ya Map dwara apni live location verify karein!", "error");
+    return;
+  }
+
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const city = document.getElementById('custCity').value.trim().toLowerCase();
@@ -2187,7 +2203,7 @@ window.submitOrder = (isRazorpaySuccess = false) => {
   
   let isPermittedCity = PERMITTED_CITIES.some(pc => city.includes(pc));
   if (!isPermittedCity || !city) {
-    window.showToast("Order Failed: Delivery is strictly available only in Kota & Bundi (all tehsils), Rajasthan!", "error");
+    window.showToast("Order Failed: Delivery is strictly available only in Kota & Bundi, Rajasthan!", "error");
     return;
   }
   if (!pincode) {
@@ -2211,7 +2227,7 @@ window.submitOrder = (isRazorpaySuccess = false) => {
     return;
   }
   
-  const verifiedCityName = city || (verifiedGPSData ? verifiedGPSData.city : "Kota");
+  const verifiedCityName = city || verifiedGPSData.city;
   const fullFormattedAddress = `${streetHouse}${area ? ', Area: ' + area : ''}, City: ${verifiedCityName}, Pincode: ${pincode}, Rajasthan (GPS Verified)`;
   
   const orderId = 'ARP-' + Math.floor(100000 + Math.random() * 900000);
