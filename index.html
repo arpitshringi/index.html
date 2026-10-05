@@ -8,59 +8,64 @@
 <meta http-equiv="Expires" content="0">
 <title>Arpit Store – Live Premium v3.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
 <!-- Payment Gateway Integration Script for Indus Appstore Compliance -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <!-- Leaflet CSS & JS for Free OpenStreetMap (No API Key Required) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
 * {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: 'Plus Jakarta Sans', sans-serif;
--webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 html, body {
-overscroll-behavior-y: none !important;
-overscroll-behavior-x: none !important;
-touch-action: manipulation;
-user-select: none;
--webkit-user-select: none;
-background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-color: #f8fafc;
-min-height: 100vh;
-padding-bottom: 60px;
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: none !important;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  color: #f8fafc;
+  min-height: 100vh;
+  padding-bottom: 60px;
 }
 input, textarea, select {
-user-select: text;
--webkit-user-select: text;
+  user-select: text;
+  -webkit-user-select: text;
 }
+
 /* Pull To Refresh CSS */
 .ptr-container {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 60px;
-display: flex;
-justify-content: center;
-align-items: center;
-transform: translateY(-100%);
-z-index: 150;
-background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, transparent 100%);
-pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-100%);
+  z-index: 150;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, transparent 100%);
+  pointer-events: none;
 }
 .ptr-text {
-color: #38bdf8;
-font-size: 13px;
-font-weight: 700;
-padding: 8px 16px;
-background: rgba(15, 23, 42, 0.8);
-border-radius: 20px;
-border: 1px solid rgba(56, 189, 248, 0.3);
-backdrop-filter: blur(5px);
+  color: #38bdf8;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  backdrop-filter: blur(5px);
 }
+
 /* Map Modal Styles */
 .map-modal-content { width: 95%; max-width: 600px; height: 85vh; display: flex; flex-direction: column; padding: 15px; position: relative; }
 .map-wrapper { position: relative; flex: 1; width: 100%; min-height: 300px; border-radius: 12px; overflow: hidden; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
@@ -70,8 +75,10 @@ backdrop-filter: blur(5px);
 .map-controls { display: flex; gap: 8px; margin-bottom: 8px; }
 .map-btn { flex: 1; background: linear-gradient(135deg, #0284c7, #38bdf8); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
 .location-info-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px; font-size: 12px; color: #cbd5e1; max-height: 100px; overflow-y: auto; margin-bottom: 10px; }
+
 /* Top Announcement Bar */
 .announcement-bar { background: linear-gradient(135deg, #0284c7, #6366f1); color: white; text-align: center; padding: 8px 15px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+
 /* Header Elements */
 header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 .header-left { display: flex; align-items: center; gap: 15px; }
@@ -80,9 +87,11 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .header-right { display: flex; align-items: center; gap: 10px; }
 .cart-btn { background: linear-gradient(135deg, #38bdf8, #6366f1); color: white; padding: 8px 16px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
 .cart-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(99, 102, 241, 0.5); }
+
 /* Highlighted Guest Sign-Up Button */
 .auth-highlight-btn { background: linear-gradient(135deg, #f43f5e, #fb7185); color: white; padding: 8px 14px; border: none; border-radius: 25px; font-weight: 700; font-size: 13px; cursor: pointer; animation: pulseGlow 2s infinite; }
 @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
+
 /* Drawer & Overlay */
 .drawer { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #1e293b; z-index: 300; transition: 0.3s ease; box-shadow: 5px 0 15px rgba(0,0,0,0.5); padding: 20px; overflow-y: auto; }
 .drawer.open { left: 0 !important; }
@@ -95,12 +104,14 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .drawer-item:hover { background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding-left: 20px; }
 .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 250; }
 .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
+
 /* Search Bar */
 .search-container { position: relative; margin-bottom: 18px; }
 .search-input { width: 100%; padding: 12px 16px 12px 45px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; color: white; font-size: 15px; backdrop-filter: blur(8px); transition: 0.3s; }
 .search-input:focus { outline: none; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.25); background: rgba(30, 41, 59, 0.95); }
 .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
 .clear-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; font-size: 16px; cursor: pointer; display: none; }
+
 /* Filters & Sort */
 .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
 .filter-badge { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
@@ -115,6 +126,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .sort-select { padding: 10px 14px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; color: #f8fafc; font-size: 13px; font-weight: 600; outline: none; cursor: pointer; backdrop-filter: blur(8px); transition: 0.2s; }
 .sort-select option { background: #1e293b; color: white; }
 .section-title { font-size: 20px; margin-bottom: 15px; color: #38bdf8; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+
 /* Banner */
 .saree-offer-banner { display: none; background: linear-gradient(135deg, #4c1d95 0%, #831843 50%, #9f1239 100%); border: 2px dashed #f43f5e; border-radius: 20px; padding: 22px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25); position: relative; overflow: hidden; }
 .saree-offer-banner::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; }
@@ -122,6 +134,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .offer-title { font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.3; }
 .offer-desc { font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px; }
 .offer-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; font-size: 13px; color: #fb7185; font-weight: 700; }
+
 /* Store Policies Section */
 .store-policies-section { margin-top: 40px; padding: 20px; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; }
 .store-policies-section h3 { color: #38bdf8; font-size: 18px; margin-bottom: 15px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; }
@@ -130,6 +143,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .policy-header:hover { background: rgba(56, 189, 248, 0.1); color: #38bdf8; }
 .policy-body { padding: 0 18px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; color: #94a3b8; font-size: 14px; line-height: 1.6; }
 .policy-accordion.active .policy-body { padding: 14px 18px; max-height: 500px; border-top: 1px solid rgba(255,255,255,0.05); }
+
 /* Color & Size Variant Styling */
 .variant-section { margin: 15px 0; background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
 .variant-title { font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
@@ -140,13 +154,16 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
 .size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
+
 /* Order Re-buy Items */
 .order-item-clickable { cursor: pointer; transition: 0.2s; }
 .order-item-clickable:hover { background: rgba(56, 189, 248, 0.15) !important; border-color: #38bdf8 !important; }
+
 /* Loader */
 .loader-container { display: flex; justify-content: center; align-items: center; margin-top: 50px; flex-direction: column; gap: 15px; }
 .spinner { width: 40px; height: 40px; border: 4px solid rgba(56, 189, 248, 0.2); border-top: 4px solid #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 /* Product Grid */
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
 .card { position: relative; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.3s ease; }
@@ -160,6 +177,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .card h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 6px; }
 .add-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); padding: 9px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.3s; }
 .add-btn:hover { background: #38bdf8; color: #0f172a; border-color: #38bdf8; }
+
 /* Detail View */
 #detailView { display: none; }
 .detail-container { background: rgba(30, 41, 59, 0.8); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
@@ -170,6 +188,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .detail-slide-item { flex: 0 0 100%; width: 100%; max-height: 350px; object-fit: contain; border-radius: 15px; scroll-snap-align: start; background: #0f172a; cursor: zoom-in; }
 .detail-like-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 50px; transition: 0.2s;}
 .detail-like-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.05); }
+
 /* Modal & Cart */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 350; }
 .modal-content { background: #1e293b; padding: 22px; border-radius: 20px; width: 90%; max-width: 450px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
@@ -190,6 +209,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .cart-item-info p { font-size: 14px; color: #38bdf8; font-weight: bold; }
 .order-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 15px; }
 .order-status-badge { background: #0284c7; color: white; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; transition: 0.3s; }
+
 /* Toast Notifications */
 .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .toast { background: rgba(15, 23, 42, 0.95); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s ease-out forwards, fadeOut 0.3s ease-in forwards 2.7s; }
@@ -197,10 +217,12 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .toast.success { border-left: 4px solid #22c55e; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(20px); } }
+
 /* Image Lightbox Modal Zoom Fix */
 .zoom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 500; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
 .zoom-img { max-width: 95%; max-height: 85vh; object-fit: contain; border-radius: 10px; transform-origin: center center; transition: transform 0.2s ease; cursor: zoom-in; }
 .zoom-close { position: absolute; top: 20px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 510; background: rgba(0,0,0,0.5); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2); }
+
 /* Auth & Profile Modal Specifics */
 .auth-tab-header { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
 .auth-tab { background: none; border: none; color: #94a3b8; font-size: 16px; font-weight: 700; cursor: pointer; padding-bottom: 5px; }
@@ -214,7 +236,7 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 
 <!-- Pull to Refresh Indicator -->
 <div class="ptr-container" id="ptrContainer">
-<span class="ptr-text" id="ptrText">Pull down to refresh ↓</span>
+  <span class="ptr-text" id="ptrText">Pull down to refresh ↓</span>
 </div>
 
 <!-- Toast Notifications Container -->
@@ -222,114 +244,112 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 
 <!-- Offline Connection Warning Modal -->
 <div class="modal" id="offlineModal" style="display: none; z-index: 10000;">
-<div class="modal-content" style="text-align: center; border: 2px solid #ef4444; background: #1e293b;">
-<div style="font-size: 50px; margin-bottom: 10px;">📶</div>
-<h2 style="color: #ef4444; margin-bottom: 10px; font-size: 22px;">Network Issue!</h2>
-<p style="color: #cbd5e1; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Aapka Internet connection chalu nahi hai. Kripya apna Net connect karein!</p>
-<button onclick="window.checkNetworkStatus()" style="background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px;">Retry Connection 🔄</button>
-</div>
+  <div class="modal-content" style="text-align: center; border: 2px solid #ef4444; background: #1e293b;">
+    <div style="font-size: 50px; margin-bottom: 10px;">📶</div>
+    <h2 style="color: #ef4444; margin-bottom: 10px; font-size: 22px;">Network Issue!</h2>
+    <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 20px; line-height: 1.5;">Aapka Internet connection chalu nahi hai. Kripya apna Net connect karein!</p>
+    <button onclick="window.checkNetworkStatus()" style="background: #38bdf8; color: #0f172a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px;">Retry Connection 🔄</button>
+  </div>
 </div>
 
 <!-- Leaflet Map Location Picker Modal (No API Key Required) -->
 <div class="modal" id="mapPickerModal" style="display: none; z-index: 400;">
-<div class="modal-content map-modal-content">
-<div style="display: flex; justify-content: space-between; align-items: center;">
-<h3 style="color: #38bdf8; font-size: 16px; margin: 0;">📍 Place pin on exact location (Kota / Bundi)</h3>
-<button class="close-btn" onclick="window.closeMapPicker()">&times;</button>
-</div>
-<input type="text" id="mapSearchInput" class="map-search-box" placeholder="Search area or landmark & press Enter…" style="margin-top: 10px;" onkeypress="if(event.key==='Enter') window.searchMapLocation(this.value)">
-<div class="map-controls">
-<button type="button" class="map-btn" onclick="window.useCurrentLocationOnMap()">🎯 Use Current Location</button>
-</div>
-<div class="map-wrapper">
-<div id="map"></div>
-<div class="center-pin" title="Place pin on exact location">📍</div>
-</div>
-<div class="location-info-card" id="mapLocationInfo">Drag map to select location…</div>
-<button type="button" class="pay-btn" id="confirmLocationBtn" onclick="window.confirmSelectedMapLocation()" style="margin-top: 0;">Confirm Location & Set Address</button>
-</div>
+  <div class="modal-content map-modal-content">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="color: #38bdf8; font-size: 16px; margin: 0;">📍 Place pin on exact location (Kota / Bundi)</h3>
+      <button class="close-btn" onclick="window.closeMapPicker()">&times;</button>
+    </div>
+    <input type="text" id="mapSearchInput" class="map-search-box" placeholder="Search area or landmark & press Enter…" style="margin-top: 10px;" onkeypress="if(event.key==='Enter') window.searchMapLocation(this.value)">
+    <div class="map-controls">
+      <button type="button" class="map-btn" onclick="window.useCurrentLocationOnMap()">🎯 Use Current Location</button>
+    </div>
+    <div class="map-wrapper">
+      <div id="map"></div>
+      <div class="center-pin" title="Place pin on exact location">📍</div>
+    </div>
+    <div class="location-info-card" id="mapLocationInfo">Drag map to select location…</div>
+    <button type="button" class="pay-btn" id="confirmLocationBtn" onclick="window.confirmSelectedMapLocation()" style="margin-top: 0;">Confirm Location & Set Address</button>
+  </div>
 </div>
 
 <!-- Image Lightbox Zoom Modal -->
 <div class="zoom-modal" id="imageZoomModal" onclick="window.closeZoomModal()">
-<span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
-<img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation(); window.toggleImageZoom(this);">
+  <span class="zoom-close" onclick="window.closeZoomModal()">&times;</span>
+  <img id="zoomedImg" class="zoom-img" src="" alt="Zoomed Product View" onclick="event.stopPropagation(); window.toggleImageZoom(this);">
 </div>
 
 <!-- Auth / Login / Signup Modal -->
 <div class="modal" id="authModal">
-<div class="modal-content">
-<button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
-<div class="auth-tab-header">
-<button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
-<button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
-</div>
+  <div class="modal-content">
+    <button class="close-btn" onclick="window.toggleAuthModal()">&times;</button>
+    <div class="auth-tab-header">
+      <button class="auth-tab active" id="tabLoginBtn" onclick="window.switchAuthTab('login')">Login</button>
+      <button class="auth-tab" id="tabSignupBtn" onclick="window.switchAuthTab('signup')">Sign Up</button>
+    </div>
+    
+    <!-- Google Login Option -->
+    <button class="google-auth-btn" onclick="window.handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
+      Continue with Google
+    </button>
+    <div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR Mobile Number & Password se Login karein</div>
 
-<!-- Google Login Option -->
-<button class="google-auth-btn" onclick="window.handleGoogleLogin()">
-<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84c-.21 1.12-.86 2.07-1.83 2.71v2.26h2.96c1.73-1.59 2.87-3.94 2.87-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.96-2.26c-.82.55-1.85.88-3 .88-2.32 0-4.29-1.57-5-3.68H.9v2.33C2.39 15.98 5.43 18 9 18z"/><path fill="#FBBC05" d="M4 10.76c-.19-.55-.3-1.14-.3-1.76s.11-1.21.3-1.76V4.91H.9C.33 6.05 0 7.34 0 8.76s.33 2.71.9 3.85l3.1-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.43 0 2.39 2.02.9 4.91l3.1 2.33c.71-2.11 2.68-3.66 5-3.66z"/></svg>
-Continue with Google
-</button>
+    <div id="authFormContainer">
+      <input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
+      <input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
+      <input type="password" id="authPassword" class="input-box" placeholder="Password">
+      <button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
+    </div>
 
-<div style="text-align: center; color: #94a3b8; font-size: 13px; margin-bottom: 15px;">OR Mobile Number & Password se Login karein</div>
-
-<div id="authFormContainer">
-<input type="text" id="authName" class="input-box" placeholder="Full Name (Sign Up only)" style="display:none;">
-<input type="tel" id="authPhone" class="input-box" placeholder="10 Digit Mobile Number">
-<input type="password" id="authPassword" class="input-box" placeholder="Password">
-<button class="pay-btn" id="authSubmitBtn" onclick="window.submitAuth()">Login</button>
-</div>
-
-<!-- Firebase Gmail Link / OTP Login Section -->
-<div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-<div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📧 Or Login with Gmail Link</div>
-<input type="email" id="authEmail" class="input-box" placeholder="Enter Gmail Address">
-<button class="pay-btn" style="background: linear-gradient(135deg, #0284c7, #6366f1); margin-top:0;" onclick="window.handleEmailLinkLogin()">Send Login Link to Gmail ✉️</button>
-</div>
-</div>
+    <!-- Firebase Gmail Link / OTP Login Section -->
+    <div style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+      <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📧 Or Login with Gmail Link</div>
+      <input type="email" id="authEmail" class="input-box" placeholder="Enter Gmail Address">
+      <button class="pay-btn" style="background: linear-gradient(135deg, #0284c7, #6366f1); margin-top:0;" onclick="window.handleEmailLinkLogin()">Send Login Link to Gmail ✉️</button>
+    </div>
+  </div>
 </div>
 
 <!-- Customer Profile Modal -->
 <div class="modal" id="profileModal">
-<div class="modal-content">
-<button class="close-btn" onclick="window.toggleProfileModal()">&times;</button>
-<h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">My Profile</h2>
+  <div class="modal-content">
+    <button class="close-btn" onclick="window.toggleProfileModal()">&times;</button>
+    <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">My Profile</h2>
+    <div style="text-align: center; margin-bottom: 15px;">
+      <div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
+      <h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
+      <p id="profileEmailDisplay" style="color: #94a3b8; font-size: 13px; margin-top: 2px;">-</p>
+      <p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px; margin-top: 4px; font-weight: bold;">-</p>
+    </div>
 
-<div style="text-align: center; margin-bottom: 15px;">
-<div id="profileAvatarDisplay" class="user-avatar-small" style="width: 70px; height: 70px; font-size: 30px; margin: 0 auto 10px auto;">A</div>
-<h3 id="profileNameDisplay" style="color: white; font-size: 18px;">User</h3>
-<p id="profileEmailDisplay" style="color: #94a3b8; font-size: 13px; margin-top: 2px;">-</p>
-<p id="profilePhoneDisplay" style="color: #38bdf8; font-size: 14px; margin-top: 4px; font-weight: bold;">-</p>
-</div>
+    <!-- Mobile Number update box -->
+    <div style="background: rgba(15, 23, 42, 0.6); padding: 14px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.2); margin-bottom: 15px;">
+      <h4 style="color: #38bdf8; margin-bottom: 8px; font-size: 14px;">Add / Update Mobile Number</h4>
+      <input type="tel" id="profilePhoneInput" class="input-box" placeholder="Enter 10-digit mobile number" maxlength="10" style="margin-bottom: 8px;">
+      <button class="add-btn" onclick="window.updateProfilePhone()" style="background: #38bdf8; color: #0f172a; font-weight: bold;">Save Mobile Number 📱</button>
+    </div>
 
-<!-- Mobile Number update box -->
-<div style="background: rgba(15, 23, 42, 0.6); padding: 14px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.2); margin-bottom: 15px;">
-<h4 style="color: #38bdf8; margin-bottom: 8px; font-size: 14px;">Add / Update Mobile Number</h4>
-<input type="tel" id="profilePhoneInput" class="input-box" placeholder="Enter 10-digit mobile number" maxlength="10" style="margin-bottom: 8px;">
-<button class="add-btn" onclick="window.updateProfilePhone()" style="background: #38bdf8; color: #0f172a; font-weight: bold;">Save Mobile Number 📱</button>
-</div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+      <h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses (Kota & Bundi Only):</h4>
+      <div id="savedAddressesList"></div>
+      
+      <div style="margin-top: 15px; background: rgba(15,23,42,0.5); padding: 12px; border-radius: 10px;">
+        <h5 style="color: #38bdf8; margin-bottom: 8px;">Add New Address</h5>
+        <textarea id="newAddressInput" class="input-box" placeholder="Click map button below to pick address…" rows="2" style="margin-bottom: 8px; background: rgba(15,23,42,0.9); color: #38bdf8; font-weight: bold;"></textarea>
+        <button type="button" onclick="window.openMapPicker('profile')" style="background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          📍 Pick Address on Map (Kota / Bundi)
+        </button>
+        <button class="add-btn" onclick="window.saveNewAddress()">Save Address</button>
+      </div>
+    </div>
 
-<div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-<h4 style="color: white; margin-bottom: 10px; font-size: 15px;">Saved Delivery Addresses (Kota & Bundi Only):</h4>
-<div id="savedAddressesList"></div>
-
-<div style="margin-top: 15px; background: rgba(15,23,42,0.5); padding: 12px; border-radius: 10px;">
-<h5 style="color: #38bdf8; margin-bottom: 8px;">Add New Address</h5>
-<textarea id="newAddressInput" class="input-box" placeholder="Click map button below to pick address…" rows="2" style="margin-bottom: 8px; background: rgba(15,23,42,0.9); color: #38bdf8; font-weight: bold;"></textarea>
-<button type="button" onclick="window.openMapPicker('profile')" style="background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-📍 Pick Address on Map (Kota / Bundi)
-</button>
-<button class="add-btn" onclick="window.saveNewAddress()">Save Address</button>
-</div>
-</div>
-
-<button onclick="window.logoutUser()" class="remove-btn" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 14px;">Logout 🚪</button>
-</div>
+    <button onclick="window.logoutUser()" class="remove-btn" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 14px;">Logout 🚪</button>
+  </div>
 </div>
 
 <!-- Top Announcement Bar -->
 <div class="announcement-bar">
-📍 OFFICIAL DELIVERY SERVICE AREA: KOTA & BUNDI (RAJASTHAN) ONLY • FAST SHIPPING • 100% SECURE
+  📍 OFFICIAL DELIVERY SERVICE AREA: KOTA & BUNDI (RAJASTHAN) ONLY • FAST SHIPPING • 100% SECURE
 </div>
 
 <!-- Drawer Menu Overlay -->
@@ -337,252 +357,254 @@ Continue with Google
 
 <!-- Side Drawer Menu -->
 <div class="drawer" id="drawer">
-<div class="drawer-header">
-<span>Menu</span>
-<button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
-</div>
-<div id="drawerUserSection"></div>
-<div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
-<div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
-<div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤ My Watchlist</div>
-<div class="drawer-item" onclick="window.filterCategory('Saree')">👗 Sarees</div>
-<div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
+  <div class="drawer-header">
+    <span>Menu</span>
+    <button class="close-drawer" onclick="window.toggleDrawer()">&times;</button>
+  </div>
+  <div id="drawerUserSection"></div>
+  <div class="drawer-item" onclick="window.filterCategory('All')">🏠 Home</div>
+  <div class="drawer-item" onclick="window.showMyOrders()">📦 My Orders</div>
+  <div class="drawer-item" onclick="window.showWatchlist()" style="color: #fb7185;">❤ My Watchlist</div>
+  <div class="drawer-item" onclick="window.filterCategory('Saree')">👗 Sarees</div>
+  <div class="drawer-item" onclick="window.filterCategory('Beauty')">💄 Beauty Products</div>
 
-<div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-<div style="font-size: 12px; color: #38bdf8; font-weight: 700; margin-bottom: 10px; text-transform: uppercase;">Content Overview</div>
-<div class="drawer-item" onclick="window.openPolicyModal('About Us')" style="font-size: 13px; padding: 10px;">ℹ️ About Us</div>
-<div class="drawer-item" onclick="window.openPolicyModal('Customer Support')" style="font-size: 13px; padding: 10px;">📞 Customer Support</div>
-<div class="drawer-item" onclick="window.openPolicyModal('Privacy Policy')" style="font-size: 13px; padding: 10px;">🔒 Privacy Policy</div>
-<div class="drawer-item" onclick="window.openPolicyModal('Terms & Conditions')" style="font-size: 13px; padding: 10px;">📄 Terms & Conditions</div>
-<div class="drawer-item" onclick="window.openPolicyModal('Return & Refund Policy')" style="font-size: 13px; padding: 10px;">↩️ Return & Refund Policy</div>
-</div>
+  <div style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+    <div style="font-size: 12px; color: #38bdf8; font-weight: 700; margin-bottom: 10px; text-transform: uppercase;">Content Overview</div>
+    <div class="drawer-item" onclick="window.openPolicyModal('About Us')" style="font-size: 13px; padding: 10px;">ℹ️ About Us</div>
+    <div class="drawer-item" onclick="window.openPolicyModal('Customer Support')" style="font-size: 13px; padding: 10px;">📞 Customer Support</div>
+    <div class="drawer-item" onclick="window.openPolicyModal('Privacy Policy')" style="font-size: 13px; padding: 10px;">🔒 Privacy Policy</div>
+    <div class="drawer-item" onclick="window.openPolicyModal('Terms & Conditions')" style="font-size: 13px; padding: 10px;">📄 Terms & Conditions</div>
+    <div class="drawer-item" onclick="window.openPolicyModal('Return & Refund Policy')" style="font-size: 13px; padding: 10px;">↩️ Return & Refund Policy</div>
+  </div>
 </div>
 
 <!-- Header -->
 <header>
-<div class="header-left">
-<button class="menu-icon" onclick="window.toggleDrawer()" aria-label="Open Menu">☰</button>
-<div class="logo" onclick="window.goHome()">Arpit Store</div>
-</div>
-<div class="header-right">
-<div id="headerAuthArea"></div>
-<button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
-</div>
+  <div class="header-left">
+    <button class="menu-icon" onclick="window.toggleDrawer()" aria-label="Open Menu">☰</button>
+    <div class="logo" onclick="window.goHome()">Arpit Store</div>
+  </div>
+  <div class="header-right">
+    <div id="headerAuthArea"></div>
+    <button class="cart-btn" onclick="window.toggleCart()">🛒 Cart (<span id="cartCount">0</span>)</button>
+  </div>
 </header>
 
 <div class="container">
-<!-- Home / Main View -->
-<div id="homeView">
-<div class="search-container">
-<span class="search-icon">🔍</span>
-<input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords…" oninput="window.handleSearch(this.value)">
-<button id="clearSearchBtn" class="clear-search" onclick="window.clearSearchBox()">✕</button>
-</div>
+  <!-- Home / Main View -->
+  <div id="homeView">
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search products, categories, or keywords…" oninput="window.handleSearch(this.value)">
+      <button id="clearSearchBtn" class="clear-search" onclick="window.clearSearchBox()">✕</button>
+    </div>
 
-<div id="activeFilters" class="active-filters"></div>
+    <div id="activeFilters" class="active-filters"></div>
 
-<!-- Filter & Category Bar -->
-<div class="filter-sort-bar">
-<div class="category-tabs">
-<button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">🏠 All</button>
-<button class="tab-btn" id="tab-Orders" onclick="window.showMyOrders()">📦 My Orders</button>
-<button class="tab-btn" id="tab-Watchlist" onclick="window.showWatchlist()">❤️️ Watchlist</button>
-<button class="tab-btn" id="tab-Saree" onclick="window.filterCategory('Saree')">👗 Sarees</button>
-<button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">💄 Beauty</button>
-<button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">🎛️ Filter</button>
-</div>
-<div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
-<select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
-<option value="featured">✨ Featured</option>
-<option value="low">💰 Price: Low to High</option>
-<option value="high">💎 Price: High to Low</option>
-<option value="name">🔤 Name: A to Z</option>
-</select>
-</div>
-</div>
+    <!-- Filter & Category Bar -->
+    <div class="filter-sort-bar">
+      <div class="category-tabs">
+        <button class="tab-btn active" id="tab-All" onclick="window.filterCategory('All')">🏠 All</button>
+        <button class="tab-btn" id="tab-Orders" onclick="window.showMyOrders()">📦 My Orders</button>
+        <button class="tab-btn" id="tab-Watchlist" onclick="window.showWatchlist()">❤️ Watchlist</button>
+        <button class="tab-btn" id="tab-Saree" onclick="window.filterCategory('Saree')">👗 Sarees</button>
+        <button class="tab-btn" id="tab-Beauty" onclick="window.filterCategory('Beauty')">💄 Beauty</button>
+        <button class="tab-btn" id="filterToggleBtn" onclick="window.toggleFilterSortMenu()">🎛️ Filter</button>
+      </div>
 
-<div id="sareeOfferBanner" class="saree-offer-banner">
-<span class="offer-badge">🔥 Mega Saree Special Offer</span>
-<div class="offer-title">👗 5 Saree Combo Trial Offer (COD Available)</div>
-<div class="offer-desc">
-Cart mein 5 Sarees add karke <b>Cash on Delivery (COD)</b> order karein! Pasand aane par sirf <b>1 Saree rakhein</b> (Delivery Charge Bilkul Free), aur baaki <b>4 Sarees bilkul free return</b> kardein bina kisi extra charge ke!<br><br>
-<span style="color: #38bdf8; font-weight: 600;">✨ Order 5 Sarees via COD, keep your favorite 1 & return the remaining 4 absolutely FREE with zero charges!</span>
-</div>
-<div class="offer-footer">
-<span>⚡ 100% Risk-Free Shopping</span>
-<span>✨ No Question Asked Return</span>
-</div>
-</div>
+      <div id="filterSortDropdown" style="display: none; width: 100%; margin-top: 5px;">
+        <select id="sortSelect" class="sort-select" style="width: 100%;" onchange="window.applyFiltersAndRender()">
+          <option value="featured">✨ Featured</option>
+          <option value="low">💰 Price: Low to High</option>
+          <option value="high">💎 Price: High to Low</option>
+          <option value="name">🔤 Name: A to Z</option>
+        </select>
+      </div>
+    </div>
 
-<div class="section-title">
-<span id="pageTitle">All Products</span>
-</div>
+    <div id="sareeOfferBanner" class="saree-offer-banner">
+      <span class="offer-badge">🔥 Mega Saree Special Offer</span>
+      <div class="offer-title">👗 5 Saree Combo Trial Offer (COD Available)</div>
+      <div class="offer-desc">
+        Cart mein 5 Sarees add karke <b>Cash on Delivery (COD)</b> order karein! Pasand aane par sirf <b>1 Saree rakhein</b> (Delivery Charge Bilkul Free), aur baaki <b>4 Sarees bilkul free return</b> kardein bina kisi extra charge ke!<br><br>
+        <span style="color: #38bdf8; font-weight: 600;">✨ Order 5 Sarees via COD, keep your favorite 1 & return the remaining 4 absolutely FREE with zero charges!</span>
+      </div>
+      <div class="offer-footer">
+        <span>⚡ 100% Risk-Free Shopping</span>
+        <span>✨ No Question Asked Return</span>
+      </div>
+    </div>
 
-<!-- Loading Spinner -->
-<div id="loader" class="loader-container">
-<div class="spinner"></div>
-<p style="color: #38bdf8; font-weight: 600;">Products load ho rahe hain…</p>
-</div>
+    <div class="section-title">
+      <span id="pageTitle">All Products</span>
+    </div>
 
-<div class="product-grid" id="productGrid"></div>
+    <!-- Loading Spinner -->
+    <div id="loader" class="loader-container">
+      <div class="spinner"></div>
+      <p style="color: #38bdf8; font-weight: 600;">Products load ho rahe hain…</p>
+    </div>
 
-<!-- Store Policies Section -->
-<div class="store-policies-section">
-<h3>Store Policies & Information</h3>
-<div class="policy-accordion" id="accordionAbout">
-<div class="policy-header" onclick="window.togglePolicyAccordion('accordionAbout')">
-<span>ℹ️ About Us & Delivery Coverage</span>
-<span>▼</span>
-</div>
-<div class="policy-body">
-Welcome to Arpit Store Online Shopping App! We are dedicated to providing you the best quality products at affordable prices. <b>Our delivery services are strictly active exclusively in Kota and Bundi (Rajasthan)</b>. We aim for a seamless shopping experience with working payment gateways and real-time GPS location validation.
-</div>
-</div>
+    <div class="product-grid" id="productGrid"></div>
 
-<div class="policy-accordion" id="accordionSupport">
-<div class="policy-header" onclick="window.togglePolicyAccordion('accordionSupport')">
-<span>📞 Customer Support / Contact Us</span>
-<span>▼</span>
-</div>
-<div class="policy-body">
-Need Help? Our customer support team is here to assist you.<br><br>
-<b>Phone Support:</b> 7665913393<br>
-<b>Email Support:</b> support@arpitstore.com<br>
-<b>Service Delivery Cities:</b> Kota & Bundi, Rajasthan, India
-</div>
-</div>
+    <!-- Store Policies Section -->
+    <div class="store-policies-section">
+      <h3>Store Policies & Information</h3>
+      <div class="policy-accordion" id="accordionAbout">
+        <div class="policy-header" onclick="window.togglePolicyAccordion('accordionAbout')">
+          <span>ℹ️ About Us & Delivery Coverage</span>
+          <span>▼</span>
+        </div>
+        <div class="policy-body">
+          Welcome to Arpit Store Online Shopping App! We are dedicated to providing you the best quality products at affordable prices. <b>Our delivery services are strictly active exclusively in Kota and Bundi (Rajasthan)</b>. We aim for a seamless shopping experience with working payment gateways and real-time GPS location validation.
+        </div>
+      </div>
 
-<div class="policy-accordion" id="accordionPrivacy">
-<div class="policy-header" onclick="window.togglePolicyAccordion('accordionPrivacy')">
-<span>🔒 Privacy Policy</span>
-<span>▼</span>
-</div>
-<div class="policy-body">
-At Arpit Store, your privacy is our top priority. We securely manage your personal information (such as name, email, phone number, and validated GPS delivery location). This data is strictly used for order processing and delivery in Kota and Bundi, and is never shared with unauthorized third parties.
-</div>
-</div>
+      <div class="policy-accordion" id="accordionSupport">
+        <div class="policy-header" onclick="window.togglePolicyAccordion('accordionSupport')">
+          <span>📞 Customer Support / Contact Us</span>
+          <span>▼</span>
+        </div>
+        <div class="policy-body">
+          Need Help? Our customer support team is here to assist you.<br><br>
+          <b>Phone Support:</b> 7665913393<br>
+          <b>Email Support:</b> support@arpitstore.com<br>
+          <b>Service Delivery Cities:</b> Kota & Bundi, Rajasthan, India
+        </div>
+      </div>
 
-<div class="policy-accordion" id="accordionTerms">
-<div class="policy-header" onclick="window.togglePolicyAccordion('accordionTerms')">
-<span>📄 Terms & Conditions</span>
-<span>▼</span>
-</div>
-<div class="policy-body">
-Welcome to Arpit Store. By using our app, you agree to comply with our terms and conditions. <b>Orders are exclusively fulfilled for Kota and Bundi addresses only</b>. Payment options include Cash on Delivery, Razorpay Gateway, and Direct UPI options.
-</div>
-</div>
+      <div class="policy-accordion" id="accordionPrivacy">
+        <div class="policy-header" onclick="window.togglePolicyAccordion('accordionPrivacy')">
+          <span>🔒 Privacy Policy</span>
+          <span>▼</span>
+        </div>
+        <div class="policy-body">
+          At Arpit Store, your privacy is our top priority. We securely manage your personal information (such as name, email, phone number, and validated GPS delivery location). This data is strictly used for order processing and delivery in Kota and Bundi, and is never shared with unauthorized third parties.
+        </div>
+      </div>
 
-<div class="policy-accordion" id="accordionReturn">
-<div class="policy-header" onclick="window.togglePolicyAccordion('accordionReturn')">
-<span>↩ Return & Refund Policy</span>
-<span>▼</span>
-</div>
-<div class="policy-body">
-We want you to be completely satisfied with your purchase. If you receive a damaged or incorrect product, you can request a return or exchange within 7 days of delivery in Kota and Bundi. Approved refunds will be processed back to your original payment method within 5-7 working days.
-</div>
-</div>
-</div>
-</div>
+      <div class="policy-accordion" id="accordionTerms">
+        <div class="policy-header" onclick="window.togglePolicyAccordion('accordionTerms')">
+          <span>📄 Terms & Conditions</span>
+          <span>▼</span>
+        </div>
+        <div class="policy-body">
+          Welcome to Arpit Store. By using our app, you agree to comply with our terms and conditions. <b>Orders are exclusively fulfilled for Kota and Bundi addresses only</b>. Payment options include Cash on Delivery, Razorpay Gateway, and Direct UPI options.
+        </div>
+      </div>
 
-<!-- Product Detail View -->
-<div id="detailView">
-<div class="back-link" onclick="window.goHome()">← Back to Store</div>
-<div class="detail-container" id="detailContent"></div>
-</div>
+      <div class="policy-accordion" id="accordionReturn">
+        <div class="policy-header" onclick="window.togglePolicyAccordion('accordionReturn')">
+          <span>↩ Return & Refund Policy</span>
+          <span>▼</span>
+        </div>
+        <div class="policy-body">
+          We want you to be completely satisfied with your purchase. If you receive a damaged or incorrect product, you can request a return or exchange within 7 days of delivery in Kota and Bundi. Approved refunds will be processed back to your original payment method within 5-7 working days.
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Product Detail View -->
+  <div id="detailView">
+    <div class="back-link" onclick="window.goHome()">← Back to Store</div>
+    <div class="detail-container" id="detailContent"></div>
+  </div>
 </div>
 
 <!-- Policy Modal for Drawer clicks -->
 <div class="modal" id="policyModal">
-<div class="modal-content">
-<button class="close-btn" onclick="window.closePolicyModal()">&times;</button>
-<h2 id="policyModalTitle" style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"></h2>
-<div id="policyModalContent" style="color: #cbd5e1; font-size: 14px; line-height: 1.6;"></div>
-</div>
+  <div class="modal-content">
+    <button class="close-btn" onclick="window.closePolicyModal()">&times;</button>
+    <h2 id="policyModalTitle" style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"></h2>
+    <div id="policyModalContent" style="color: #cbd5e1; font-size: 14px; line-height: 1.6;"></div>
+  </div>
 </div>
 
 <!-- Cart Modal -->
 <div class="modal" id="cartModal">
-<div class="modal-content">
-<button class="close-btn" onclick="window.toggleCart()">&times;</button>
-<h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Your Cart & Checkout</h2>
-<div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; color: #38bdf8; line-height: 1.4;">
-📍 <b>Delivery Area Notice:</b> We deliver orders exclusively within <b>Kota & Bundi, Rajasthan</b>. Please fetch GPS location or pick location on map below to validate your address.
-</div>
-<div id="cartList" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
+  <div class="modal-content">
+    <button class="close-btn" onclick="window.toggleCart()">&times;</button>
+    <h2 style="color: #38bdf8; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Your Cart & Checkout</h2>
 
-<div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-<label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
-<input type="text" id="custName" class="input-box" placeholder="Full Name *">
-<input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number *">
+    <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; color: #38bdf8; line-height: 1.4;">
+      📍 <b>Delivery Area Notice:</b> We deliver orders exclusively within <b>Kota & Bundi, Rajasthan</b>. Please fetch GPS location or pick location on map below to validate your address.
+    </div>
 
-<label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Street / House Number / Full Address *:</label>
-<input type="text" id="custStreetHouse" class="input-box" placeholder="Enter Street / House No. or Click GPS / Map..." style="margin-bottom: 10px; color: white;">
+    <div id="cartList" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
 
-<div id="checkoutAddressSection">
-<label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
-<select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
-</div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+      <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Delivery Details:</label>
+      <input type="text" id="custName" class="input-box" placeholder="Full Name *">
+      <input type="tel" id="custPhone" class="input-box" placeholder="Mobile Number *">
 
-<button type="button" onclick="window.fetchAndValidateGPS()" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-📍 Fetch Live GPS & Auto-Detect City (Kota / Bundi)
-</button>
+      <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Street / House Number / Full Address *:</label>
+      <input type="text" id="custStreetHouse" class="input-box" placeholder="Enter Street / House No. or Click GPS / Map…" style="margin-bottom: 10px; color: white;">
 
-<button type="button" onclick="window.openMapPicker('checkout')" style="background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-🗺️ Pick Exact Location on OpenStreetMap
-</button>
+      <div id="checkoutAddressSection">
+        <label style="font-size: 13px; color: #94a3b8;">Select Saved Address:</label>
+        <select id="checkoutAddressSelect" class="input-box" onchange="window.handleCheckoutAddressSelect()"></select>
+      </div>
 
-<div id="locationStatus" style="font-size: 12px; color: #38bdf8; margin-bottom: 10px; display: none; background: rgba(56, 189, 248, 0.1); padding: 8px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);"></div>
+      <button type="button" onclick="window.fetchAndValidateGPS()" style="background: linear-gradient(135deg, #0284c7, #38bdf8); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        📍 Fetch Live GPS & Auto-Detect City (Kota / Bundi)
+      </button>
 
-<label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Delivery City (Auto-detected / Select City) *:</label>
-<select id="custCity" class="input-box" style="background: rgba(15,23,42,0.9); color: #38bdf8; font-weight: bold;" onchange="window.handleManualCityChange()">
-<option value="">-- Select Delivery City --</option>
-<option value="Kota">Kota</option>
-<option value="Bundi">Bundi</option>
-</select>
+      <button type="button" onclick="window.openMapPicker('checkout')" style="background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; padding: 12px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        🗺️ Pick Exact Location on OpenStreetMap
+      </button>
 
-<input type="text" id="custArea" class="input-box" placeholder="Area / Colony / Sector" style="margin-bottom: 8px;">
-<input type="text" id="custLandmark" class="input-box" placeholder="Landmark (Optional)" style="margin-bottom: 8px;">
+      <div id="locationStatus" style="font-size: 12px; color: #38bdf8; margin-bottom: 10px; display: none; background: rgba(56, 189, 248, 0.1); padding: 8px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);"></div>
 
-<label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Pincode *:</label>
-<input type="text" id="custPincode" class="input-box" placeholder="Enter Pincode (e.g. 323001)" style="color: white;">
+      <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Delivery City (Auto-detected / Select City) *:</label>
+      <select id="custCity" class="input-box" style="background: rgba(15,23,42,0.9); color: #38bdf8; font-weight: bold;" onchange="window.handleManualCityChange()">
+        <option value="">-- Select Delivery City --</option>
+        <option value="Kota">Kota</option>
+        <option value="Bundi">Bundi</option>
+      </select>
 
-<label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
-<select id="paymentMode" class="input-box" onchange="window.handlePaymentMode()">
-<option value="COD">Cash on Delivery (COD)</option>
-<option value="Razorpay">Online Payment Gateway (Razorpay / Cards / UPI)</option>
-<option value="Online">Direct UPI / QR Code Payment</option>
-</select>
+      <input type="text" id="custArea" class="input-box" placeholder="Area / Colony / Sector" style="margin-bottom: 8px;">
+      <input type="text" id="custLandmark" class="input-box" placeholder="Landmark (Optional)" style="margin-bottom: 8px;">
 
-<div id="razorpayPaymentSection" style="display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-<h4 style="color: white; margin-bottom: 10px;">Pay via Razorpay Secure Gateway</h4>
-<p style="color: #cbd5e1; font-size: 13px; margin-bottom: 12px;">Total: ₹<span id="rzpTotal">0</span></p>
-<button type="button" onclick="window.payWithRazorpay()" style="background: linear-gradient(135deg, #6366f1, #38bdf8); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px;">💳 Pay Online Securely</button>
-</div>
+      <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Pincode *:</label>
+      <input type="text" id="custPincode" class="input-box" placeholder="Enter Pincode (e.g. 323001)" style="color: white;">
 
-<div id="onlinePaymentSection" style="display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
-<h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
-<a id="directPayLink" href="#" style="display: block; width: 100%; background: #22c55e; color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 14px; border-radius: 8px; margin-bottom: 15px; text-decoration: none;">
-📱 Pay via PhonePe / GPay / Paytm
-</a>
-<p style="color: #cbd5e1; font-size: 13px; margin-bottom: 10px;">Ya fir niche diya QR Code scan karein:</p>
-<img id="qrCodeImg" src="" alt="UPI QR Code" width="180" height="180" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
-<p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment hone ke baad apna UTR / Transaction Number niche zaroor daalein 👇</p>
-<input type="text" id="utrNumber" class="input-box" placeholder="Daalein 12-Digit UTR Number *" style="border-color: #ef4444;">
-</div>
+      <label style="font-size: 14px; color: #cbd5e1; font-weight: bold;">Payment Method:</label>
+      <select id="paymentMode" class="input-box" onchange="window.handlePaymentMode()">
+        <option value="COD">Cash on Delivery (COD)</option>
+        <option value="Razorpay">Online Payment Gateway (Razorpay / Cards / UPI)</option>
+        <option value="Online">Direct UPI / QR Code Payment</option>
+      </select>
 
-<button class="pay-btn" id="submitBtn" onclick="window.submitOrder()">Confirm & Place Order</button>
-</div>
-</div>
+      <div id="razorpayPaymentSection" style="display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
+        <h4 style="color: white; margin-bottom: 10px;">Pay via Razorpay Secure Gateway</h4>
+        <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 12px;">Total: ₹<span id="rzpTotal">0</span></p>
+        <button type="button" onclick="window.payWithRazorpay()" style="background: linear-gradient(135deg, #6366f1, #38bdf8); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px;">💳 Pay Online Securely</button>
+      </div>
+
+      <div id="onlinePaymentSection" style="display: none; background: rgba(56, 189, 248, 0.05); border: 1px solid rgba(56, 189, 248, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
+        <h4 style="color: white; margin-bottom: 15px;">Total Amount: ₹<span id="qrTotal">0</span></h4>
+        <a id="directPayLink" href="#" style="display: block; width: 100%; background: #22c55e; color: white; text-align: center; font-size: 16px; font-weight: bold; padding: 14px; border-radius: 8px; margin-bottom: 15px; text-decoration: none;">
+          📱 Pay via PhonePe / GPay / Paytm
+        </a>
+        <p style="color: #cbd5e1; font-size: 13px; margin-bottom: 10px;">Ya fir niche diya QR Code scan karein:</p>
+        <img id="qrCodeImg" src="" alt="UPI QR Code" width="180" height="180" style="background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px;">
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Payment hone ke baad apna UTR / Transaction Number niche zaroor daalein 👇</p>
+        <input type="text" id="utrNumber" class="input-box" placeholder="Daalein 12-Digit UTR Number *" style="border-color: #ef4444;">
+      </div>
+
+      <button class="pay-btn" id="submitBtn" onclick="window.submitOrder()">Confirm & Place Order</button>
+    </div>
+  </div>
 </div>
 
 <!-- Success Modal -->
 <div class="modal" id="successModal">
-<div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
-<div style="font-size: 60px; color: #22c55e; margin-bottom: 10px;">✔️</div>
-<h2 style="color: white; font-size: 24px; margin-bottom: 5px;">Order Done!</h2>
-<p style="color: #94a3b8; font-size: 15px;">Aapka order successfully place ho gaya hai!</p>
-</div>
+  <div class="modal-content" style="text-align: center; border: 2px solid #22c55e;">
+    <div style="font-size: 60px; color: #22c55e; margin-bottom: 10px;">✔️</div>
+    <h2 style="color: white; font-size: 24px; margin-bottom: 5px;">Order Done!</h2>
+    <p style="color: #94a3b8; font-size: 15px;">Aapka order successfully place ho gaya hai!</p>
+  </div>
 </div>
 
 <!-- Firebase & Core Engine Module -->
@@ -625,6 +647,7 @@ window.initGoogleMapPicker = () => {
 function reverseGeocodeOSM(pos) {
   const infoDiv = document.getElementById('mapLocationInfo');
   if (infoDiv) infoDiv.innerText = "Resolving address…";
+  
   fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`)
     .then(res => res.json())
     .then(data => {
@@ -634,10 +657,12 @@ function reverseGeocodeOSM(pos) {
         let pincode = addr.postcode || "";
         let street = addr.road || addr.suburb || addr.neighbourhood || "";
         let full = data.display_name || "";
+        
         resolvedAddressObj = { street, area: addr.suburb || addr.neighbourhood || "", landmark: "", city, state: addr.state || "Rajasthan", pincode, fullAddress: full, lat: pos.lat, lng: pos.lng };
         
         let lowerCity = city.toLowerCase();
         let isPermitted = PERMITTED_CITIES.some(pc => lowerCity.includes(pc));
+        
         if (infoDiv) {
           if (!isPermitted) {
             infoDiv.innerHTML = `<span style="color:#ef4444; font-weight:bold;">⚠️ Delivery Unavailable:</span> Detected city <b>${city}</b>. We deliver exclusively in Kota & Bundi, Rajasthan.`;
@@ -774,6 +799,7 @@ function getUserWatchlistKey() {
 
 let cart = JSON.parse(localStorage.getItem(getUserCartKey())) || [];
 let watchlist = JSON.parse(localStorage.getItem(getUserWatchlistKey())) || [];
+
 let currentCategory = 'All';
 let searchQuery = '';
 let cartTotalAmount = 0;
@@ -801,6 +827,7 @@ window.openPolicyModal = (title) => {
   const titleEl = document.getElementById('policyModalTitle');
   const contentEl = document.getElementById('policyModalContent');
   titleEl.innerText = title;
+  
   if (title === 'About Us') {
     contentEl.innerText = "Welcome to Arpit Store Online Shopping App! We are dedicated to providing you the best quality products at affordable prices. Our delivery services are currently active exclusively in Kota and Bundi (Rajasthan). We aim for a seamless shopping experience with working payment gateways and real-time GPS location validation.";
   } else if (title === 'Customer Support') {
@@ -877,6 +904,7 @@ window.switchAuthTab = (mode) => {
   const signupBtn = document.getElementById('tabSignupBtn');
   const nameInput = document.getElementById('authName');
   const submitBtn = document.getElementById('authSubmitBtn');
+  
   if (mode === 'login') {
     loginBtn.classList.add('active');
     signupBtn.classList.remove('active');
@@ -906,6 +934,7 @@ function handleSuccessfulAuthUser(user) {
     password: 'google_auth_user',
     addresses: []
   };
+
   let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
   let existing = registeredUsers.find(u => (u.email && user.email && u.email === user.email));
   if (!existing) {
@@ -915,6 +944,7 @@ function handleSuccessfulAuthUser(user) {
     currentUser = existing;
     if (!currentUser.email && user.email) currentUser.email = user.email;
   }
+  
   localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
   syncUserToExcel({ action: 'google_login', name: currentUser.name, phone: currentUser.phone, password: 'google_auth_user', email: currentUser.email });
   
@@ -935,11 +965,14 @@ window.submitAuth = async () => {
   const phone = document.getElementById('authPhone').value.trim();
   const password = document.getElementById('authPassword').value.trim();
   const name = document.getElementById('authName').value.trim();
+
   if (!phone || phone.length !== 10 || !password) {
     window.showToast("Kripya sahi 10-digit mobile number aur password bharein!", "error");
     return;
   }
+
   let registeredUsers = JSON.parse(localStorage.getItem('arpit_registered_users')) || [];
+
   if (authMode === 'signup') {
     if (!name) {
       window.showToast("Sign up ke liye naam daalna zaroori hai!", "error");
@@ -955,6 +988,7 @@ window.submitAuth = async () => {
     registeredUsers.push(newUser);
     localStorage.setItem('arpit_registered_users', JSON.stringify(registeredUsers));
     syncUserToExcel({ action: 'signup', name, phone, password, email: '' });
+    
     currentUser = newUser;
     localStorage.setItem('arpit_current_user', JSON.stringify(currentUser));
     window.toggleAuthModal();
@@ -972,6 +1006,7 @@ window.submitAuth = async () => {
       window.showToast("Login successful!");
       return;
     }
+
     window.showToast("Verifying login details… ⏳");
     try {
       let response = await fetch(GOOGLE_SCRIPT_URL + "?action=login&phone=" + encodeURIComponent(phone) + "&password=" + encodeURIComponent(password));
@@ -1071,6 +1106,7 @@ function syncUserToExcel(payloadData) {
 function updateAuthUI() {
   const headerAuthArea = document.getElementById('headerAuthArea');
   const drawerUserSection = document.getElementById('drawerUserSection');
+
   if (currentUser) {
     headerAuthArea.innerHTML = `
       <button onclick="window.toggleProfileModal()" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;">
@@ -1309,6 +1345,7 @@ function listenToProducts() {
   window.checkNetworkStatus();
   fetchLiveStatusForAllOrders();
   if (productsUnsubscribe) productsUnsubscribe();
+  
   const productsRef = collection(db, "products");
   productsUnsubscribe = onSnapshot(productsRef, (snapshot) => {
     if(!snapshot.empty) {
@@ -1396,7 +1433,7 @@ window.toggleLike = (id, event) => {
   localStorage.setItem(key, JSON.stringify(watchlist));
   window.applyFiltersAndRender();
   const detailLikeBtn = document.getElementById('detailLikeBtn');
-  if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🤍';
+  if (detailLikeBtn) detailLikeBtn.innerHTML = watchlist.includes(id) ? '❤️' : '🖤';
   if(isAdding) window.showToast("Saved to Watchlist!");
 };
 
@@ -1475,6 +1512,7 @@ window.applyFiltersAndRender = () => {
       return productCat.includes(target) || target.includes(productCat);
     });
   }
+
   if (searchQuery !== '') {
     filtered = filtered.filter(p => {
       let name = (p.name || '').toLowerCase();
@@ -1483,10 +1521,12 @@ window.applyFiltersAndRender = () => {
       return name.includes(searchQuery) || desc.includes(searchQuery) || cat.includes(searchQuery);
     });
   }
+
   const sortVal = document.getElementById('sortSelect').value;
   if (sortVal === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
   else if (sortVal === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
   else if (sortVal === 'name') filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
   updateActiveFiltersUI();
   renderProductsUI(filtered);
 };
@@ -1513,13 +1553,15 @@ function renderProductsUI(items) {
     else grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 20px;">Is category me abhi koi product nahi hai!</p>';
     return;
   }
+
   items.forEach(p => {
     let isLiked = watchlist.includes(p.id);
-    let heartIcon = isLiked ? '❤️' : '🤍';
+    let heartIcon = isLiked ? '❤️' : '🖤';
     let categoryTag = p.category || p.type || p.cat || 'General';
     let sellingPrice = Number(p.price) || 0;
     let mrpPrice = Number(p.mrp) || 0;
     let priceHtml = `<p style="font-weight: 700; color: #38bdf8; font-size: 18px; margin-bottom: 10px;">₹${sellingPrice}</p>`;
+
     if (mrpPrice > sellingPrice) {
       let offAmount = mrpPrice - sellingPrice;
       let offPercent = Math.round((offAmount / mrpPrice) * 100);
@@ -1533,6 +1575,7 @@ function renderProductsUI(items) {
         </div>
       `;
     }
+
     let mediaHtml = '<div class="media-slider">';
     if (p.media && p.media.length > 0) {
       p.media.forEach(rawLink => {
@@ -1566,17 +1609,20 @@ function renderOrdersUI() {
     grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">🔒</div><p style="color: #94a3b8; font-size:16px;">Apne orders dekhne ke liye Login karein!</p><button onclick="window.toggleAuthModal()" style="margin-top:15px; padding:12px 24px; background:#38bdf8; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#0f172a;">Login / Sign Up 🚀</button></div>';
     return;
   }
+
   let savedOrders = JSON.parse(localStorage.getItem(getUserOrdersKey())) || [];
   if(savedOrders.length === 0) {
     grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 20px;"><div style="font-size:50px; margin-bottom:10px;">📦</div><p style="color: #94a3b8; font-size:16px;">Aapne abhi tak koi order nahi kiya hai!</p></div>';
     return;
   }
+
   savedOrders.forEach((ord, ordIndex) => {
     let itemsListHtml = '<ul style="margin: 10px 0; padding: 0; list-style: none;">';
     ord.items.forEach(it => {
       let imgUrl = 'https://via.placeholder.com/50?text=No+Img';
       if (it.selectedImage) imgUrl = it.selectedImage;
       else if (it.media && it.media.length > 0) imgUrl = formatMediaUrl(it.media[0]);
+
       let variantTxt = '';
       if (it.selectedColor || it.selectedSize) {
         variantTxt = `<div style="color:#cbd5e1; font-size:11px; display:flex; gap:6px; align-items:center; margin-top:2px;">`;
@@ -1584,6 +1630,7 @@ function renderOrdersUI() {
         if (it.selectedSize) variantTxt += `<span style="background:rgba(244,63,94,0.2); padding:1px 5px; border-radius:4px;">📏 ${it.selectedSize}</span>`;
         variantTxt += `</div>`;
       }
+
       itemsListHtml += `
         <li class="order-item-clickable" onclick="window.showProductDetail('${it.id}')" style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid rgba(255,255,255,0.05);">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -1637,8 +1684,10 @@ window.cancelCustomerOrder = (index) => {
   if (savedOrders[index]) {
     savedOrders[index].status = "Cancel your order";
     localStorage.setItem(key, JSON.stringify(savedOrders));
+    
     let ord = savedOrders[index];
     let cleanId = ord.orderId.toString().replace('#', '').trim();
+    
     fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -1662,8 +1711,8 @@ function fetchLiveStatusForAllOrders() {
   let key = getUserOrdersKey();
   let savedOrders = JSON.parse(localStorage.getItem(key)) || [];
   if (savedOrders.length === 0) return;
-  let statusChanged = false;
 
+  let statusChanged = false;
   let fetchPromises = savedOrders.map((ord, index) => {
     let cleanId = ord.orderId.toString().replace('#', '').trim();
     return fetch(`${GOOGLE_SCRIPT_URL}?orderId=${encodeURIComponent(cleanId)}`)
@@ -1773,6 +1822,7 @@ window.showProductDetail = (id) => {
   currentProduct = p;
 
   pushNavState('detail');
+
   document.getElementById('homeView').style.display = 'none';
   document.getElementById('detailView').style.display = 'block';
 
@@ -1781,7 +1831,7 @@ window.showProductDetail = (id) => {
   selectedColorImg = "";
 
   let isLiked = watchlist.includes(p.id);
-  let heartIcon = isLiked ? '❤️' : '🤍';
+  let heartIcon = isLiked ? '❤️' : '🖤';
   let categoryTag = p.category || p.type || p.cat || 'General';
   let detailSellingPrice = Number(p.price) || 0;
   let detailMrpPrice = Number(p.mrp) || 0;
@@ -1802,11 +1852,11 @@ window.showProductDetail = (id) => {
     let firstName = selectedColor.toString().toLowerCase();
     let pName = (p.name || '').toString().toLowerCase();
 
-    let isWeightOrQty = catLower.includes('beauty') ||
-                        catLower.includes('grocery') ||
-                        catLower.includes('food') ||
-                        catLower.includes('face wash') ||
-                        catLower.includes('facewash') ||
+    let isWeightOrQty = catLower.includes('beauty') || 
+                        catLower.includes('grocery') || 
+                        catLower.includes('food') || 
+                        catLower.includes('face wash') || 
+                        catLower.includes('facewash') || 
                         catLower.includes('care') ||
                         /\d+\s*(g|gm|gram|grams|ml|l|kg|pack|pc|pcs)\b/i.test(firstName) ||
                         /\d+\s*(g|gm|gram|grams|ml|l|kg|pack|pc|pcs)\b/i.test(pName) ||
@@ -1816,7 +1866,7 @@ window.showProductDetail = (id) => {
     let variantTitle = isWeightOrQty ? "Weight / Quantity" : "Color";
 
     variantHtml += `<div class="variant-section">
-      <div class="variant-title"> ${variantTitle}: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
+      <div class="variant-title">🎨 ${variantTitle}: <span id="colorLabel" style="color:#38bdf8">${selectedColor}</span></div>
       <div class="color-options">`;
 
     p.colors.forEach((c, idx) => {
@@ -1828,6 +1878,7 @@ window.showProductDetail = (id) => {
       } else if (p.media && p.media.length > 0) {
         cImg = formatMediaUrl(p.media[0]);
       }
+
       let activeClass = (idx === 0) ? 'active' : '';
 
       if (cImg && (catLower.includes('saree') || catLower.includes('cloth') || catLower.includes('apparel') || catLower.includes('wear'))) {
@@ -1840,6 +1891,7 @@ window.showProductDetail = (id) => {
   }
 
   let detailPriceHtml = `<h3 style="color: #38bdf8; font-size: 24px; margin-bottom: 15px;">₹${detailSellingPrice}</h3>`;
+
   if (detailMrpPrice > detailSellingPrice) {
     let offAmount = detailMrpPrice - detailSellingPrice;
     let offPercent = Math.round((offAmount / detailMrpPrice) * 100);
@@ -1874,17 +1926,21 @@ window.showProductDetail = (id) => {
       </div>
       <button class="detail-like-btn" id="detailLikeBtn" onclick="window.toggleLike('${p.id}', event)">${heartIcon}</button>
     </div>
+
     <div id="detailPriceContainer">${detailPriceHtml}</div>
+
     ${variantHtml}
+
     <div style="margin: 20px 0; background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
       <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 8px;">Product Description</h3>
       <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; white-space: pre-line;">${p.description || 'No description available.'}</p>
     </div>
+
     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
       <button class="pay-btn" style="flex: 1; background: linear-gradient(135deg, #38bdf8, #6366f1); margin-top:0;" onclick="window.addToCartDirect('${p.id}')">Add to Cart 🛒</button>
       <button class="pay-btn" style="flex: 1; margin-top:0;" onclick="window.buyNowDirect('${p.id}')">Buy Now ⚡</button>
     </div>
-    <button class="pay-btn" style="background: #22c55e; margin-top:0;" onclick="window.shareOnWhatsApp('${p.id}', '${p.name.replace(/[']/g, "")}', '${detailSellingPrice}')">Share on WhatsApp 📱</button>
+    <button class="pay-btn" style="background: #22c55e; margin-top:0;" onclick="window.shareOnWhatsApp('${p.id}', '${p.name.replace(/['"]/g, "")}', '${detailSellingPrice}')">Share on WhatsApp 📱</button>
   `;
 
   updateGalleryImages(selectedColor);
@@ -2012,7 +2068,7 @@ window.handlePaymentMode = () => {
 window.fetchAndValidateGPS = () => {
   const statusDiv = document.getElementById('locationStatus');
   statusDiv.style.display = 'block';
-  statusDiv.innerText = "Fetching current GPS location & validating delivery zone… 📶";
+  statusDiv.innerText = "Fetching current GPS location & validating delivery zone… 📡";
 
   if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
     window.flutter_inappwebview.callHandler('requestNativeLocation');
@@ -2037,6 +2093,7 @@ window.fetchAndValidateGPS = () => {
   );
 };
 
+// ✅ FIXED NATIVE GPS LOCATION RESPONSE HANDLER FOR APP & MAP VIEW
 window.onNativeLocationResult = function(lat, lng, errorMsg) {
   const statusDiv = document.getElementById('locationStatus');
   if (errorMsg) {
@@ -2047,7 +2104,23 @@ window.onNativeLocationResult = function(lat, lng, errorMsg) {
     window.showToast("Location Error: " + errorMsg, "error");
     return;
   }
-  window.processCoordinates(lat, lng);
+  
+  if (lat && lng) {
+    let numericLat = parseFloat(lat);
+    let numericLng = parseFloat(lng);
+    
+    // Update Global Coordinates
+    currentCenterPos = { lat: numericLat, lng: numericLng };
+    
+    // Update Map View if Map modal is open
+    if (leafletMap) {
+      leafletMap.setView([numericLat, numericLng], 16);
+      reverseGeocodeOSM(currentCenterPos);
+    }
+    
+    // Process for checkout
+    window.processCoordinates(numericLat, numericLng);
+  }
 };
 
 window.processCoordinates = function(lat, lng) {
@@ -2066,17 +2139,18 @@ window.processCoordinates = function(lat, lng) {
         let pincode = addr.postcode || "";
         let street = addr.road || addr.suburb || addr.neighbourhood || data.display_name || "";
         let area = addr.suburb || addr.neighbourhood || "";
-
+        
         let lowerCity = detectedCity.toLowerCase();
         let isPermitted = PERMITTED_CITIES.some(pc => lowerCity.includes(pc));
-
         let finalCity = lowerCity.includes("bundi") ? "Bundi" : "Kota";
+
         if (citySelect) citySelect.value = finalCity;
         if (pincodeInput) pincodeInput.value = pincode || (finalCity === "Bundi" ? "323001" : "324001");
         if (streetEl && (!streetEl.value || streetEl.value === "")) streetEl.value = street;
         if (areaEl && (!areaEl.value || areaEl.value === "")) areaEl.value = area;
 
         verifiedGPSData = { lat, lng, city: finalCity, pincode: pincodeInput.value, isVerified: true };
+
         if (statusDiv) {
           statusDiv.style.display = 'block';
           statusDiv.innerHTML = `✅ <b>Location Verified!</b> City: <b>${finalCity}</b>, Pincode: <b>${pincodeInput.value}</b><br><small>Lat: ${Number(lat).toFixed(4)}, Lng: ${Number(lng).toFixed(4)}</small>`;
@@ -2117,6 +2191,7 @@ window.closeMapPicker = () => {
   if (modal) modal.style.display = 'none';
 };
 
+// ✅ FIXED USE CURRENT LOCATION BUTTON HANDLER FOR MAP MODAL
 window.useCurrentLocationOnMap = () => {
   if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
     window.flutter_inappwebview.callHandler('requestNativeLocation');
@@ -2167,6 +2242,7 @@ window.confirmSelectedMapLocation = () => {
     if (citySelect) citySelect.value = finalCity;
 
     verifiedGPSData = { lat: resolvedAddressObj.lat, lng: resolvedAddressObj.lng, city: finalCity, pincode: pincodeEl.value, isVerified: true };
+
     window.closeMapPicker();
     window.showToast("Map Location Verified! 📍");
 
@@ -2184,7 +2260,6 @@ window.payWithRazorpay = () => {
     window.toggleAuthModal();
     return;
   }
-
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const city = document.getElementById('custCity').value.trim().toLowerCase();
@@ -2237,6 +2312,7 @@ function renderCartUI() {
   if (currentUser) {
     document.getElementById('custName').value = currentUser.name || '';
     document.getElementById('custPhone').value = currentUser.phone || '';
+
     const addrSelect = document.getElementById('checkoutAddressSelect');
     if (currentUser.addresses && currentUser.addresses.length > 0) {
       addrSelect.parentElement.style.display = 'block';
@@ -2265,6 +2341,7 @@ function renderCartUI() {
   cart.forEach((item, index) => {
     let itemTotal = item.price * (item.quantity || 1);
     cartTotalAmount += itemTotal;
+
     let variantText = '';
     if (item.selectedColor || item.selectedSize) {
       variantText = `<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">`;
@@ -2274,6 +2351,7 @@ function renderCartUI() {
     }
 
     let imgUrl = item.selectedImage || 'https://via.placeholder.com/55?text=No+Img';
+
     cartList.innerHTML += `
       <div class="cart-item">
         <img src="${imgUrl}" class="cart-item-img" alt="${item.name}">
@@ -2308,7 +2386,6 @@ window.submitOrder = (isRazorpaySuccess = false) => {
     window.toggleAuthModal();
     return;
   }
-
   const name = document.getElementById('custName').value.trim();
   const phone = document.getElementById('custPhone').value.trim();
   const city = document.getElementById('custCity').value.trim();
@@ -2322,22 +2399,18 @@ window.submitOrder = (isRazorpaySuccess = false) => {
     window.showToast("Kripya apna naam, 10-digit mobile aur street/house number bharein!", "error");
     return;
   }
-
   if (!city) {
     window.showToast("Kripya Delivery City select karein (Kota / Bundi)!", "error");
     return;
   }
-
   if (cart.length === 0) {
     window.showToast("Aapka cart khaali hai!", "error");
     return;
   }
-
   if (paymentMode === 'Razorpay' && !isRazorpaySuccess) {
     window.showToast("Kripya pehle Razorpay se payment karein!", "error");
     return;
   }
-
   if (paymentMode === 'Online' && !utr) {
     window.showToast("Online payment ke liye UTR / Transaction number daalna anivarya hai!", "error");
     return;
@@ -2393,8 +2466,8 @@ window.submitOrder = (isRazorpaySuccess = false) => {
   cart = [];
   localStorage.setItem(getUserCartKey(), JSON.stringify(cart));
   document.getElementById('cartCount').innerText = '0';
-  document.getElementById('successModal').style.display = 'flex';
 
+  document.getElementById('successModal').style.display = 'flex';
   setTimeout(() => {
     document.getElementById('successModal').style.display = 'none';
     const cartModal = document.getElementById('cartModal');
@@ -2403,9 +2476,7 @@ window.submitOrder = (isRazorpaySuccess = false) => {
   }, 2000);
 };
 
-window.addEventListener('DOMContentLoaded', () => {
-  listenToProducts();
-});
+listenToProducts();
 </script>
 </body>
 </html>
