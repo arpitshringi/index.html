@@ -137,7 +137,6 @@ header { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); paddin
 .color-options::-webkit-scrollbar { display: none; }
 .color-thumb { width: 60px; height: 75px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); object-fit: cover; cursor: pointer; transition: 0.2s; background: #0f172a; }
 .color-thumb.active { border-color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.6); transform: scale(1.05); }
-.size-options { display: flex; gap: 8px; flex-wrap: wrap; }
 .size-btn { padding: 8px 16px; border-radius: 8px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-align: center; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .size-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 700; }
 /* Order Re-buy Items */
@@ -2360,6 +2359,7 @@ const phone = document.getElementById('custPhone').value.trim();
 const city = document.getElementById('custCity').value.trim();
 const streetHouse = document.getElementById('custStreetHouse').value.trim();
 const area = document.getElementById('custArea').value.trim();
+const landmark = document.getElementById('custLandmark').value.trim();
 const pincode = document.getElementById('custPincode').value.trim();
 const paymentMode = document.getElementById('paymentMode').value;
 const utr = document.getElementById('utrNumber').value.trim();
@@ -2389,7 +2389,8 @@ window.showToast("Online payment ke liye UTR / Transaction number daalna anivary
 return;
 }
 
-const fullFormattedAddress = `${streetHouse}${area ? ', Area: ' + area : ''}, City: ${city}, Pincode: ${pincode || (city==='Bundi'?'323001':'324001')}, Rajasthan`;
+// Format Full Address including optional Landmark for Telegram Bot & Apps Script
+const fullFormattedAddress = `${streetHouse}${landmark ? ' (Landmark: ' + landmark + ')' : ''}${area ? ', Area: ' + area : ''}, City: ${city}, Pincode: ${pincode || (city==='Bundi'?'323001':'324001')}, Rajasthan`;
 const orderId = 'ARP-' + Math.floor(100000 + Math.random() * 900000);
 
 let txnDetail = 'COD';
